@@ -1,25 +1,13 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { MessageCircle, Twitter, Github } from "lucide-react"
-
-// Random image selection
-const desktopScenes = ['/scenes/1.png', '/scenes/2.png', '/scenes/3.png', '/scenes/4.png', '/scenes/5.png', '/scenes/6.png', '/scenes/7.png']
-const mobileScenes = ['/scenes/mobile/1.png', '/scenes/mobile/2.png', '/scenes/mobile/3.png', '/scenes/mobile/4.png', '/scenes/mobile/5.png', '/scenes/mobile/6.png', '/scenes/mobile/7.png']
-
-function getRandomImage(images: string[]): string {
-  const idx = Math.floor(Math.random() * images.length)
-  return images[idx]
-}
+import { MessageCircle, Twitter, Github, Send } from "lucide-react"
+import { ImageChanger } from "@/components/ui/ImageChanger"
 
 export default function LandingPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [inputValue, setInputValue] = useState("")
-  
-  // Random selection happens once on mount
-  const desktopImage = useMemo(() => getRandomImage(desktopScenes), [])
-  const mobileImage = useMemo(() => getRandomImage(mobileScenes), [])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,36 +23,27 @@ export default function LandingPage() {
       <div className="flex flex-col w-full h-full">
         {/* Mobile Image - Full Background */}
         <div className="flex items-center justify-center xl:hidden aspect-3/2 p-6">
-        <div className="w-full h-full rounded-lg overflow-hidden">
-          <img
-            src={desktopImage}
-            alt=""
-            className="w-full h-full object-cover"
-          />
-        </div>
+          <div className="w-full h-full rounded-lg overflow-hidden">
+            <ImageChanger />
+          </div>
         </div>
 
          
         {/* Right Column - Featured Image */}
         <div className="absolute inset-0 p-8 xl:p-16 hidden xl:block max-w-6xl ml-auto my-auto aspect-3/2">
-            <div className="w-full h-full rounded-2xl overflow-hidden relative">
-              {/* Desktop Image */}
-              <img
-                src={desktopImage}
-                alt="Featured scene"
-                className="w-full h-full object-cover"
-              />
-            </div>
+          <div className="w-full h-full rounded-2xl overflow-hidden relative">
+            {/* Desktop Image */}
+            <ImageChanger />
           </div>
+        </div>
 
         {/* Left Column - Content */}
-        <div className="flex-1 flex flex-col justify-end xl:justify-center p-6 z-10">
+        <div className="flex-1 flex flex-col justify-end xl:justify-center p-6 z-50">
           <div className="max-w-lg">
             {/* Logo/Brand Mark */}
             <div className="mb-8 md:mb-12">
               <p 
                 className="text-xs md:text-sm tracking-[0.4em] uppercase text-white/80 font-light"
-                style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
               >
                 Paras is evolving
               </p>
@@ -74,7 +53,6 @@ export default function LandingPage() {
             <h1 
               className="text-3xl md:text-5xl font-extralight tracking-tight text-white leading-tight mb-6 md:mb-8"
               style={{ 
-                fontFamily: 'system-ui, -apple-system, sans-serif',
                 textShadow: '0 0 80px rgba(255,255,255,0.15), 0 4px 20px rgba(0,0,0,0.8)'
               }}
             >
@@ -96,14 +74,14 @@ export default function LandingPage() {
             {/* Description Block - Poetic */}
             <div className="space-y-1 md:space-y-2 max-w-xl mb-6 md:mb-8">
               <p 
-                className="text-sm md:text-base lg:text-lg text-white/60 font-light tracking-wide"
-                style={{ fontFamily: 'Georgia, serif' }}
+                className="text-sm md:text-base text-white/60 font-light tracking-wide"
+                
               >
                 Where history shapes possibility,
               </p>
               <p 
-                className="text-sm md:text-base lg:text-lg text-white/60 font-light tracking-wide"
-                style={{ fontFamily: 'Georgia, serif' }}
+                className="text-sm md:text-base text-white/60 font-light tracking-wide"
+                
               >
                 and AI determines the next turn.
               </p>
@@ -113,15 +91,15 @@ export default function LandingPage() {
             <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-8 mb-6 md:mb-8">
               <div className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-emerald-400/80 rounded-full shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-                <span className="text-xs md:text-sm text-white/70 tracking-wider uppercase">Context-aware</span>
+                <span className="text-xs text-white/70 tracking-wider uppercase font-semibold">Context-aware</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-emerald-400/80 rounded-full shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-                <span className="text-xs md:text-sm text-white/70 tracking-wider uppercase">Events emerge</span>
+                <span className="text-xs text-white/70 tracking-wider uppercase font-semibold">Events emerge</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-emerald-400/80 rounded-full shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-                <span className="text-xs md:text-sm text-white/70 tracking-wider uppercase">Outcomes verifiable</span>
+                <span className="text-xs text-white/70 tracking-wider uppercase font-semibold">Outcomes verifiable</span>
               </div>
             </div>
             
@@ -133,17 +111,13 @@ export default function LandingPage() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="What kind of world will you begin?"
-                  className="flex-1 px-4 md:px-6 py-3 md:py-4 border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-500 text-sm md:text-base text-white/90 placeholder:text-white/50 tracking-widest font-light focus:outline-none focus:border-white/60"
+                  className="flex-1 px-4 md:px-6 py-3 md:py-4 border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-500 text-sm md:text-base text-white/90 placeholder:text-white/50 tracking-widest font-light focus:outline-none focus:border-white/60  rounded-lg"
                 />
                 <button 
                   type="submit"
-                  className="group relative px-6 md:px-8 py-3 md:py-4 border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-500 cursor-pointer"
+                  className="group relative px-6 border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-500 cursor-pointer flex items-center justify-center rounded-lg"
                 >
-                  <span 
-                    className="text-sm md:text-base text-white/90 tracking-widest uppercase font-light group-hover:tracking-[0.2em] transition-all duration-500"
-                  >
-                    Submit
-                  </span>
+                  <Send className="h-5 w-5 md:h-6 md:w-6 text-white/90 group-hover:text-white transition-all duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </button>
               </form>
@@ -156,7 +130,7 @@ export default function LandingPage() {
               </p>
               <p 
                 className="text-xs md:text-sm text-white/30 font-light italic"
-                style={{ fontFamily: 'Georgia, serif' }}
+                
               >
                 Let the world decide.
               </p>
@@ -167,7 +141,7 @@ export default function LandingPage() {
       
       {/* Social Media Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-black/95 border-white/20 text-white">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle className="text-2xl font-light tracking-widest uppercase text-white">
               Join Our Community
@@ -181,7 +155,7 @@ export default function LandingPage() {
               href="https://discord.gg/paras"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-4 px-6 py-4 border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-500 group"
+              className="flex items-center gap-4 px-6 py-4 border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-500 group rounded-lg"
             >
               <MessageCircle className="h-6 w-6 text-white/80 group-hover:text-white transition-colors" />
               <div className="flex-1">
@@ -193,7 +167,7 @@ export default function LandingPage() {
               href="https://twitter.com/paras"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-4 px-6 py-4 border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-500 group"
+              className="flex items-center gap-4 px-6 py-4 border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-500 group rounded-lg"
             >
               <Twitter className="h-6 w-6 text-white/80 group-hover:text-white transition-colors" />
               <div className="flex-1">
@@ -205,7 +179,7 @@ export default function LandingPage() {
               href="https://github.com/paras"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-4 px-6 py-4 border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-500 group"
+              className="flex items-center gap-4 px-6 py-4 border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-500 group rounded-lg"
             >
               <Github className="h-6 w-6 text-white/80 group-hover:text-white transition-colors" />
               <div className="flex-1">

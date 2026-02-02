@@ -121,5 +121,9 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  }
+  code, pre, kbd, samp {
+    font-family: var(--font-geist-mono), 'Courier New', monospace;
   }
 }

@@ -30,12 +30,35 @@ export default function LandingPage() {
   }
 
   return (
-    <main className="h-screen w-full relative overflow-hidden flex bg-black">
+    <main className="min-h-screen xl:h-screen xl:p-12 w-full relative overflow-hidden flex bg-neutral-950">
       {/* Two Column Layout */}
-      <div className="flex flex-col md:flex-row w-full h-full">
-        
+      <div className="flex flex-col w-full h-full">
+        {/* Mobile Image - Full Background */}
+        <div className="flex items-center justify-center xl:hidden aspect-3/2 p-6">
+        <div className="w-full h-full rounded-lg overflow-hidden">
+          <img
+            src={desktopImage}
+            alt=""
+            className="w-full h-full object-cover"
+          />
+        </div>
+        </div>
+
+         
+        {/* Right Column - Featured Image */}
+        <div className="absolute inset-0 p-8 xl:p-16 hidden xl:block max-w-6xl ml-auto my-auto aspect-3/2">
+            <div className="w-full h-full rounded-2xl overflow-hidden relative">
+              {/* Desktop Image */}
+              <img
+                src={desktopImage}
+                alt="Featured scene"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
         {/* Left Column - Content */}
-        <div className="flex-1 flex flex-col justify-center px-6 md:px-12 lg:px-16 xl:px-20 py-12 z-10">
+        <div className="flex-1 flex flex-col justify-end xl:justify-center p-6 z-10">
           <div className="max-w-lg">
             {/* Logo/Brand Mark */}
             <div className="mb-8 md:mb-12">
@@ -139,28 +162,6 @@ export default function LandingPage() {
               </p>
             </div>
           </div>
-        </div>
-        
-        {/* Right Column - Featured Image */}
-        <div className="absolute inset-0 p-8 lg:p-12 xl:p-16 hidden md:block max-w-6xl ml-auto my-auto aspect-3/2">
-            <div className="w-full h-full rounded-2xl overflow-hidden relative">
-              {/* Desktop Image */}
-              <img
-                src={desktopImage}
-                alt="Featured scene"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        
-        {/* Mobile Image - Full Background */}
-        <div className="absolute inset-0 md:hidden">
-          <img
-            src={mobileImage}
-            alt=""
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/40" />
         </div>
       </div>
       

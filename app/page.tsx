@@ -152,8 +152,8 @@ export default function Home() {
                 <div className="w-16 md:w-24 h-px bg-border my-4" />
                 
                 {/* Description */}
-                <p className="text-base md:text-lg text-secondary-foreground font-normal mb-8 max-w-2xl text-shadow-lg/30">
-                  Engine for generating world states and events using AI — where outcomes are produced within explicit constraints and recorded as persistent world states.
+                <p className="text-base md:text-lg text-secondary-foreground font-normal mb-8 max-w-md text-shadow-lg/30">
+                  AI-native protocol engine for generating world states and events — where outcomes are produced within explicit constraints and recorded as persistent world states.
                 </p>
 
                 {/* CTA Buttons */}

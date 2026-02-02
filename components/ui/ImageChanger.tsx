@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 
 const IMAGES = [
-  '/scenes/sm/1.png', '/scenes/sm/2.png', '/scenes/sm/3.png', '/scenes/sm/4.png', '/scenes/sm/5.png', '/scenes/sm/6.png', '/scenes/sm/7.png'
+  '/scenes/sm/1.png', '/scenes/sm/2.png', '/scenes/sm/3.png', '/scenes/sm/4.png', '/scenes/sm/5.png', '/scenes/sm/6.png', '/scenes/sm/7.png', '/scenes/sm/8.png', '/scenes/sm/9.png'
 ]
 
 export function ImageChanger() {
@@ -44,7 +44,7 @@ export function ImageChanger() {
   return (
     <div className="relative w-full h-full aspect-3/2 rounded-lg overflow-hidden shadow-2xl">
       {/* TV Frame */}
-      <div className="absolute inset-0 rounded-lg shadow-[inset_0_0_60px_rgba(0,0,0,0.8)] pointer-events-none z-30" />
+      <div className="absolute inset-0 rounded-lg shadow-[inset_0_0_60px_rgba(0,0,0,0.8)] pointer-events-none z-10" />
       
       {/* Main Image */}
       <img
@@ -86,14 +86,14 @@ export function ImageChanger() {
 
       {/* Black flash */}
       <div
-        className={`absolute inset-0 z-25 bg-black transition-opacity ${
+        className={`absolute inset-0 z-5 bg-black transition-opacity ${
           isTransitioning ? "animate-tv-flash" : "opacity-0"
         }`}
       />
 
       {/* Screen curvature effect */}
       <div
-        className="absolute inset-0 z-30 pointer-events-none rounded-lg"
+        className="absolute inset-0 z-10 pointer-events-none rounded-lg"
         style={{
           background:
             "radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%)",

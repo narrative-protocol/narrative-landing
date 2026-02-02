@@ -111,7 +111,7 @@ export default function LandingPage() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="What kind of world will you begin?"
-                  className="flex-1 px-4 md:px-6 py-3 md:py-4 border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-500 text-sm md:text-base text-white/90 placeholder:text-white/50 tracking-widest font-light focus:outline-none focus:border-white/60  rounded-lg"
+                  className="flex-1 px-4 md:px-6 py-3 md:py-4 border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-500 text-sm md:text-base text-white/90 placeholder:text-white/50 tracking-widest font-light focus:outline-none focus:border-white/60 rounded-lg"
                 />
                 <button 
                   type="submit"

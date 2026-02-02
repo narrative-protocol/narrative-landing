@@ -153,7 +153,7 @@ export default function Home() {
                 
                 {/* Description */}
                 <p className="text-base md:text-lg text-secondary-foreground font-normal mb-8 max-w-2xl text-shadow-lg/30">
-                  Engine for generating living worlds and unfolding events using AI — where outcomes are produced within explicit constraints and recorded as persistent world states.
+                  Engine for generating world states and events using AI — where outcomes are produced within explicit constraints and recorded as persistent world states.
                 </p>
 
                 {/* CTA Buttons */}

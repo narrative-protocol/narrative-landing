@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { MessageCircle, Twitter, Github, Send } from "lucide-react"
+import { MessageCircle, Send, X } from "lucide-react"
 import { ImageChanger } from "@/components/ui/ImageChanger"
 
 export default function LandingPage() {
@@ -150,43 +150,28 @@ export default function LandingPage() {
               Follow us on social media and join our Discord to stay updated
             </DialogDescription>
           </DialogHeader>
+          
           <div className="flex flex-col gap-4 py-4">
             <a
-              href="https://discord.gg/paras"
+              href="https://x.com/ParasHQ"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-4 px-6 py-4 border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-500 group rounded-lg"
             >
-              <MessageCircle className="h-6 w-6 text-white/80 group-hover:text-white transition-colors" />
+              <X className="h-6 w-6 text-white/80 group-hover:text-white transition-colors" />
               <div className="flex-1">
-                <p className="text-white/90 font-medium tracking-wide">Join Discord</p>
-                <p className="text-white/60 text-sm font-light">Connect with our community</p>
-              </div>
-            </a>
-            <a
-              href="https://twitter.com/paras"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-4 px-6 py-4 border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-500 group rounded-lg"
-            >
-              <Twitter className="h-6 w-6 text-white/80 group-hover:text-white transition-colors" />
-              <div className="flex-1">
-                <p className="text-white/90 font-medium tracking-wide">Follow on Twitter</p>
+                <p className="text-white/90 font-medium tracking-wide">Follow on X</p>
                 <p className="text-white/60 text-sm font-light">Get the latest updates</p>
               </div>
             </a>
-            <a
-              href="https://github.com/paras"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-4 px-6 py-4 border border-white/20 hover:border-white/40 bg-white/5 hover:bg-white/10 backdrop-blur-sm transition-all duration-500 group rounded-lg"
-            >
-              <Github className="h-6 w-6 text-white/80 group-hover:text-white transition-colors" />
+            <div className="flex items-center gap-4 px-6 py-4 border border-white/10 bg-white/2 backdrop-blur-sm rounded-lg text-left w-full opacity-50 cursor-not-allowed">
+              <MessageCircle className="h-6 w-6 text-white/40" />
               <div className="flex-1">
-                <p className="text-white/90 font-medium tracking-wide">Check out GitHub</p>
-                <p className="text-white/60 text-sm font-light">Explore our codebase</p>
+                <p className="text-white/50 font-medium tracking-wide">Join Discord <span className="text-white/40 text-xs">soon</span></p>
+                <p className="text-white/30 text-sm font-light">Connect with our community</p>
               </div>
-            </a>
+            </div>
+            
           </div>
         </DialogContent>
       </Dialog>

@@ -153,7 +153,7 @@ export default function Home() {
                 
                 {/* Description */}
                 <p className="text-base md:text-lg text-secondary-foreground font-normal mb-8 max-w-md text-shadow-lg/30">
-                  AI-native protocol engine for generating world states and events — where outcomes are produced within explicit constraints and recorded as persistent world states.
+                  AI-native engine for generating world states and events — where outcomes are produced within explicit constraints and recorded as persistent world states.
                 </p>
 
                 {/* CTA Buttons */}

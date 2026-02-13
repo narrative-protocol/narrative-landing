@@ -1,24 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Menu, X, ChevronRight } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Menu, X, ChevronRight } from "lucide-react";
 
 const navigation = [
   {
     title: "Getting Started",
     items: [
       { title: "Introduction", href: "/docs" },
-      { title: "Quick Start", href: "/docs/getting-started" },
+      { title: "Quick Start", href: "/docs/quickstart" },
     ],
   },
   {
     title: "Core Concepts",
     items: [
-      { title: "Overview", href: "/docs/core-concepts" },
+      { title: "Overview", href: "/docs/concepts" },
       { title: "World Charter", href: "/docs/world-charter" },
       { title: "Narrative Frames", href: "/docs/narrative-frames" },
       { title: "Entities & Context", href: "/docs/entities" },
@@ -32,11 +32,11 @@ const navigation = [
       { title: "Rules & Guardrails", href: "/docs/guardrails" },
     ],
   },
-]
+];
 
 export function DocsMobileNav() {
-  const [isOpen, setIsOpen] = useState(false)
-  const pathname = usePathname()
+  const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <div className="lg:hidden">
@@ -68,7 +68,7 @@ export function DocsMobileNav() {
                           "flex items-center gap-2 rounded-md px-4 py-2 text-sm transition-colors",
                           pathname === item.href
                             ? "bg-primary/10 text-primary font-medium"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground",
                         )}
                       >
                         {pathname === item.href && (
@@ -85,5 +85,5 @@ export function DocsMobileNav() {
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -1,121 +1,184 @@
-import Link from "next/link"
-import { Callout } from "@/components/callout"
-import { ArrowRight } from "lucide-react"
+import { Callout } from "@/components/callout";
+import Link from "next/link";
 
 export default function DocsPage() {
   return (
     <article className="prose prose-invert max-w-none">
-      <h1 className="text-4xl font-bold text-foreground">Introduction</h1>
+      <h1 className="text-4xl font-bold text-foreground">Narrative Studio</h1>
       <p className="text-lg text-muted-foreground mt-4">
-        Welcome to the NPC (Narrative Play Coordinator) documentation. NPC is a
-        comprehensive specification for AI-driven narrative in games.
+        Narrative Studio is a <strong>World State &amp; Event Engine</strong>{" "}
+        that enables you to define, manage, and execute complex world
+        simulations with versioned events, AI-driven execution, and on-chain
+        verification.
       </p>
-
-      <Callout type="info" title="What is NPC?">
-        <p>
-          NPC defines the architecture for creating dynamic, AI-powered narrative
-          experiences. It provides a structured approach to world-building, story
-          management, and NPC behavior that enables coherent, engaging storytelling.
-        </p>
-      </Callout>
-
-      <h2 className="text-2xl font-semibold text-foreground mt-8">Overview</h2>
-      <p className="text-muted-foreground">
-        The NPC system consists of several interconnected components that work
-        together to create immersive narrative experiences:
-      </p>
-
-      <div className="grid gap-4 mt-6 not-prose">
-        <Link
-          href="/docs/world-charter"
-          className="flex items-center justify-between rounded-lg border border-border p-4 hover:border-primary/50 transition-colors group"
-        >
-          <div>
-            <h3 className="font-semibold text-foreground">World Charter</h3>
-            <p className="text-sm text-muted-foreground">
-              Foundation of your narrative universe
-            </p>
-          </div>
-          <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-        </Link>
-
-        <Link
-          href="/docs/narrative-frames"
-          className="flex items-center justify-between rounded-lg border border-border p-4 hover:border-primary/50 transition-colors group"
-        >
-          <div>
-            <h3 className="font-semibold text-foreground">Narrative Frames</h3>
-            <p className="text-sm text-muted-foreground">
-              Guide story trajectories with flexible arcs
-            </p>
-          </div>
-          <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-        </Link>
-
-        <Link
-          href="/docs/entities"
-          className="flex items-center justify-between rounded-lg border border-border p-4 hover:border-primary/50 transition-colors group"
-        >
-          <div>
-            <h3 className="font-semibold text-foreground">Entities & Context</h3>
-            <p className="text-sm text-muted-foreground">
-              Characters, locations, and objects
-            </p>
-          </div>
-          <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-        </Link>
-
-        <Link
-          href="/docs/actions"
-          className="flex items-center justify-between rounded-lg border border-border p-4 hover:border-primary/50 transition-colors group"
-        >
-          <div>
-            <h3 className="font-semibold text-foreground">Actions</h3>
-            <p className="text-sm text-muted-foreground">
-              Dynamic NPC behaviors and world interactions
-            </p>
-          </div>
-          <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-        </Link>
-      </div>
 
       <h2 className="text-2xl font-semibold text-foreground mt-8">
-        Key Principles
+        Key Concepts
       </h2>
-      <ul className="text-muted-foreground space-y-2 mt-4">
+
+      <h3 className="text-xl font-semibold text-foreground mt-6">
+        Blueprint vs Live
+      </h3>
+      <p className="text-muted-foreground">
+        The system separates <strong>design-time</strong> (World/Blueprint) from{" "}
+        <strong>runtime</strong> (Deployment/Live):
+      </p>
+      <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
         <li>
-          <strong className="text-foreground">Consistency</strong> - The World
-          Charter ensures all narrative elements remain coherent
+          <strong>World (Blueprint)</strong>: Define your entity schemas and
+          events with versioned behavior
         </li>
         <li>
-          <strong className="text-foreground">Flexibility</strong> - Narrative
-          Frames allow stories to adapt while maintaining direction
-        </li>
-        <li>
-          <strong className="text-foreground">Safety</strong> - Guardrails
-          enforce rules and prevent inappropriate content
-        </li>
-        <li>
-          <strong className="text-foreground">Richness</strong> - Entity context
-          maintains deep state for meaningful interactions
+          <strong>Deployment (Live)</strong>: Create instances, execute events
+          via AI, and track history
         </li>
       </ul>
 
-      <div className="mt-8 flex gap-4 not-prose">
-        <Link
-          href="/docs/getting-started"
-          className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-        >
-          Get Started
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-        <Link
-          href="/docs/core-concepts"
-          className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
-        >
-          Core Concepts
-        </Link>
-      </div>
+      <h3 className="text-xl font-semibold text-foreground mt-6">
+        Core Components
+      </h3>
+      <table className="w-full border-collapse border border-border my-4">
+        <thead>
+          <tr className="border-b border-border bg-muted">
+            <th className="px-4 py-2 text-left text-foreground font-semibold">
+              Component
+            </th>
+            <th className="px-4 py-2 text-left text-foreground font-semibold">
+              Layer
+            </th>
+            <th className="px-4 py-2 text-left text-foreground font-semibold">
+              Description
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr className="border-b border-border">
+            <td className="px-4 py-2 text-muted-foreground">Worlds</td>
+            <td className="px-4 py-2 text-muted-foreground">Blueprint</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              Container for all definitions (title, tags, prompt seed)
+            </td>
+          </tr>
+          <tr className="border-b border-border">
+            <td className="px-4 py-2 text-muted-foreground">Entity Schemas</td>
+            <td className="px-4 py-2 text-muted-foreground">Blueprint</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              Define the shape of entities (e.g., Horse, Track, Jockey)
+            </td>
+          </tr>
+          <tr className="border-b border-border">
+            <td className="px-4 py-2 text-muted-foreground">Events</td>
+            <td className="px-4 py-2 text-muted-foreground">Blueprint</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              Define what can happen (with versioned behavior)
+            </td>
+          </tr>
+          <tr className="border-b border-border">
+            <td className="px-4 py-2 text-muted-foreground">Deployments</td>
+            <td className="px-4 py-2 text-muted-foreground">Live</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              Running instance of a world with its own state
+            </td>
+          </tr>
+          <tr>
+            <td className="px-4 py-2 text-muted-foreground">
+              Entity Instances
+            </td>
+            <td className="px-4 py-2 text-muted-foreground">Live</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              Actual entities (e.g., HORSE_1, HORSE_2)
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 className="text-2xl font-semibold text-foreground mt-8">Features</h2>
+
+      <h3 className="text-xl font-semibold text-foreground mt-6">
+        Event Versioning
+      </h3>
+      <p className="text-muted-foreground">
+        Events have versions that become immutable once published, ensuring
+        reproducibility and auditability.
+      </p>
+
+      <h3 className="text-xl font-semibold text-foreground mt-6">
+        AI Event Execution
+      </h3>
+      <p className="text-muted-foreground">
+        Events are executed by an AI engine (NEAR AI / DeepSeek-V3.1) that
+        computes state changes based on world context, current state, and
+        behavior prompts.
+      </p>
+
+      <h3 className="text-xl font-semibold text-foreground mt-6">
+        Deployment Modes
+      </h3>
+      <p className="text-muted-foreground">
+        Deployments can be{" "}
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+          upgradable
+        </code>{" "}
+        (default) or{" "}
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">locked</code>{" "}
+        (irreversible freeze for archival).
+      </p>
+
+      <h3 className="text-xl font-semibold text-foreground mt-6">
+        Snapshotting
+      </h3>
+      <p className="text-muted-foreground">
+        Create new deployments by copying state from existing ones - useful for
+        forking simulations or creating test environments.
+      </p>
+
+      <h3 className="text-xl font-semibold text-foreground mt-6">
+        Cryptographic Attestation
+      </h3>
+      <p className="text-muted-foreground">
+        Every AI response includes a cryptographic attestation for independent
+        verification.
+      </p>
+
+      <h3 className="text-xl font-semibold text-foreground mt-6">
+        Solana On-chain Oracle
+      </h3>
+      <p className="text-muted-foreground">
+        Event execution records are pushed to Solana for immutable on-chain
+        storage and verification.
+      </p>
+
+      <Callout type="tip" title="Quick Links">
+        <ul className="list-disc pl-6 space-y-1 text-muted-foreground">
+          <li>
+            <Link
+              href="/docs/quickstart"
+              className="text-primary hover:underline"
+            >
+              Quickstart Guide
+            </Link>{" "}
+            - Get running in 5 minutes
+          </li>
+          <li>
+            <Link
+              href="/docs/concepts"
+              className="text-primary hover:underline"
+            >
+              Core Concepts
+            </Link>{" "}
+            - Understand the architecture
+          </li>
+          <li>
+            <Link
+              href="/docs/api-reference/authentication"
+              className="text-primary hover:underline"
+            >
+              API Reference
+            </Link>{" "}
+            - Complete API documentation
+          </li>
+        </ul>
+      </Callout>
     </article>
-  )
+  );
 }

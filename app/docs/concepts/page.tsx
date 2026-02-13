@@ -6,7 +6,7 @@ export default function ConceptsPage() {
     <article className="prose prose-invert max-w-none">
       <h1 className="text-4xl font-bold text-foreground">Core Concepts</h1>
       <p className="text-lg text-muted-foreground mt-4">
-        Narrative Studio is a <strong>World State &amp; Event Engine</strong>{" "}
+        Narrative Protocol is a <strong>World State &amp; Event Engine</strong>{" "}
         that manages complex simulations with versioned events, immutable state
         transitions, and AI-driven event execution.
       </p>
@@ -167,7 +167,7 @@ Deployment (Live, targetChain: solana|near|both|none)
 
       <Callout type="info" title="Getting Started">
         <p className="text-muted-foreground">
-          New to Narrative Studio? Start with the{" "}
+          New to Narrative Protocol? Start with the{" "}
           <Link
             href="/docs/quickstart"
             className="text-primary hover:underline"

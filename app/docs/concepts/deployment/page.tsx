@@ -1,3 +1,4 @@
+import { Callout } from "@/components/callout"
 import { CodeBlock } from "@/components/code-block"
 import Link from "next/link"
 
@@ -149,6 +150,13 @@ export default function DeploymentPage() {
       </ul>
 
       <h3 className="text-xl font-semibold text-foreground mt-6">Locked Mode</h3>
+      
+      <Callout type="warning" title="Irreversible Action">
+        <p className="text-muted-foreground">
+          Locking a deployment is <strong>permanent and cannot be undone</strong>. Once locked, the deployment becomes read-only forever. Make sure to create a snapshot before locking if you need to continue the simulation.
+        </p>
+      </Callout>
+
       <p className="text-muted-foreground">
         A frozen state where no modifications are allowed. <strong>This transition is irreversible.</strong>
       </p>
@@ -256,13 +264,16 @@ export default function DeploymentPage() {
       </ul>
 
       <h2 className="text-2xl font-semibold text-foreground mt-8">Best Practices</h2>
-      <ol className="list-decimal pl-6 space-y-2 text-muted-foreground">
-        <li><strong>Use descriptive names</strong>: Name deployments clearly (e.g., &quot;Season 1&quot;, &quot;Test Environment&quot;)</li>
-        <li><strong>Choose targetChain early</strong>: The target chain affects data size limits</li>
-        <li><strong>Lock when complete</strong>: Lock simulations when they reach a final state</li>
-        <li><strong>Snapshot before lock</strong>: Create a snapshot if you need to continue from the same state</li>
-        <li><strong>Verify before locking</strong>: Once locked, the state is permanent</li>
-      </ol>
+      
+      <Callout type="tip" title="Deployment Management">
+        <ol className="list-decimal pl-6 space-y-2 text-muted-foreground">
+          <li><strong>Use descriptive names</strong>: Name deployments clearly (e.g., &quot;Season 1&quot;, &quot;Test Environment&quot;)</li>
+          <li><strong>Choose targetChain early</strong>: The target chain affects data size limits</li>
+          <li><strong>Lock when complete</strong>: Lock simulations when they reach a final state</li>
+          <li><strong>Snapshot before lock</strong>: Create a snapshot if you need to continue from the same state</li>
+          <li><strong>Verify before locking</strong>: Once locked, the state is permanent</li>
+        </ol>
+      </Callout>
 
       <h2 className="text-2xl font-semibold text-foreground mt-8">Related Concepts</h2>
       <ul className="list-disc pl-6 space-y-2 text-muted-foreground">

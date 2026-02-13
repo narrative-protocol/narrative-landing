@@ -1,3 +1,4 @@
+import { Callout } from "@/components/callout";
 import { CodeBlock } from "@/components/code-block";
 import Link from "next/link";
 
@@ -6,7 +7,7 @@ export default function AIExecutionPage() {
     <article className="prose prose-invert max-w-none">
       <h1 className="text-4xl font-bold text-foreground">AI Event Execution</h1>
       <p className="text-lg text-muted-foreground mt-4">
-        Events in Narrative Studio are executed by an AI engine that computes
+        Events in Narrative Protocol are executed by an AI engine that computes
         state changes based on world context, current state, event
         configuration, and user input.
       </p>
@@ -213,6 +214,14 @@ export default function AIExecutionPage() {
           </tr>
         </tbody>
       </table>
+
+      <Callout type="info" title="Verifiable Execution">
+        <p className="text-muted-foreground">
+          The attestation allows independent verification that the response came
+          from NEAR AI and the content hasn&apos;t been modified. This is
+          crucial for auditability and trust in AI-driven state changes.
+        </p>
+      </Callout>
 
       <p className="text-muted-foreground">
         This allows independent verification that:

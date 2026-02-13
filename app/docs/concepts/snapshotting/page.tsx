@@ -1,3 +1,4 @@
+import { Callout } from "@/components/callout"
 import { CodeBlock } from "@/components/code-block"
 import Link from "next/link"
 
@@ -126,11 +127,14 @@ export default function SnapshottingPage() {
       </pre>
 
       <h2 className="text-2xl font-semibold text-foreground mt-8">Constraints</h2>
-      <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-        <li>Source deployment must be from the <strong>same world</strong></li>
-        <li>You must own the source deployment</li>
-        <li>Source deployment can be in any mode (upgradable or locked)</li>
-      </ul>
+
+      <Callout type="info" title="Snapshot Requirements">
+        <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+          <li>Source deployment must be from the <strong>same world</strong></li>
+          <li>You must own the source deployment</li>
+          <li>Source deployment can be in any mode (upgradable or locked)</li>
+        </ul>
+      </Callout>
 
       <h2 className="text-2xl font-semibold text-foreground mt-8">Example Workflow</h2>
       

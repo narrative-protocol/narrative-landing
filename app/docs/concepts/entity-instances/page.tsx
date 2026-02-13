@@ -1,3 +1,4 @@
+import { Callout } from "@/components/callout"
 import { CodeBlock } from "@/components/code-block"
 import Link from "next/link"
 
@@ -201,11 +202,14 @@ export default function EntityInstancesPage() {
       />
 
       <h2 className="text-2xl font-semibold text-foreground mt-8">Constraints</h2>
-      <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-        <li>Cannot modify instances in locked deployments</li>
-        <li>Cannot delete instances if deployment has event history</li>
-        <li>Instance IDs must be unique within deployment + schema</li>
-      </ul>
+
+      <Callout type="info" title="Important Limitations">
+        <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+          <li>Cannot modify instances in locked deployments</li>
+          <li>Cannot delete instances if deployment has event history</li>
+          <li>Instance IDs must be unique within deployment + schema</li>
+        </ul>
+      </Callout>
 
       <h2 className="text-2xl font-semibold text-foreground mt-8">Related Concepts</h2>
       <ul className="list-disc pl-6 space-y-2 text-muted-foreground">

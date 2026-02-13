@@ -10,6 +10,12 @@ export default function QuickstartPage() {
         This guide will walk you through creating your first world, defining entities, executing events, and seeing AI-driven state changes.
       </p>
 
+      <Callout type="info" title="Prerequisites">
+        <p className="text-muted-foreground">
+          Set the <code className="bg-muted px-1.5 py-0.5 rounded text-sm">URL</code> environment variable to your API endpoint (e.g., <code className="bg-muted px-1.5 py-0.5 rounded text-sm">export URL=http://localhost:3000</code>)
+        </p>
+      </Callout>
+
       <h2 className="text-2xl font-semibold text-foreground mt-8">Get an Auth Token</h2>
       <p className="text-muted-foreground">
         First, register to get a debug token:
@@ -257,6 +263,13 @@ curl -s -X POST $URL/api/entity-instances \\
       />
 
       <h2 className="text-2xl font-semibold text-foreground mt-8">Full Script</h2>
+
+      <Callout type="tip" title="Quick Start">
+        <p className="text-muted-foreground">
+          Save this script as <code className="bg-muted px-1.5 py-0.5 rounded text-sm">setup.sh</code>, make it executable with <code className="bg-muted px-1.5 py-0.5 rounded text-sm">chmod +x setup.sh</code>, and run it to get started in seconds.
+        </p>
+      </Callout>
+
       <p className="text-muted-foreground">
         Here&apos;s a complete script to run all steps:
       </p>

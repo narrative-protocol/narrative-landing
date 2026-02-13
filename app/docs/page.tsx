@@ -4,9 +4,9 @@ import Link from "next/link";
 export default function DocsPage() {
   return (
     <article className="prose prose-invert max-w-none">
-      <h1 className="text-4xl font-bold text-foreground">Narrative Studio</h1>
+      <h1 className="text-4xl font-bold text-foreground">Narrative Protocol</h1>
       <p className="text-lg text-muted-foreground mt-4">
-        Narrative Studio is a <strong>World State &amp; Event Engine</strong>{" "}
+        Narrative Protocol is a <strong>World State &amp; Event Engine</strong>{" "}
         that enables you to define, manage, and execute complex world
         simulations with versioned events, AI-driven execution, and on-chain
         verification.

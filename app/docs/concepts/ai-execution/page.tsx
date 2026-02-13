@@ -1,17 +1,21 @@
-import { CodeBlock } from "@/components/code-block"
-import Link from "next/link"
+import { CodeBlock } from "@/components/code-block";
+import Link from "next/link";
 
 export default function AIExecutionPage() {
   return (
     <article className="prose prose-invert max-w-none">
       <h1 className="text-4xl font-bold text-foreground">AI Event Execution</h1>
       <p className="text-lg text-muted-foreground mt-4">
-        Events in Narrative Studio are executed by an AI engine that computes state changes based on world context, current state, event configuration, and user input.
+        Events in Narrative Studio are executed by an AI engine that computes
+        state changes based on world context, current state, event
+        configuration, and user input.
       </p>
 
-      <h2 className="text-2xl font-semibold text-foreground mt-8">Execution Flow</h2>
-      <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm text-muted-foreground">
-{`1. User calls POST /api/deployments/:id/execute
+      <h2 className="text-2xl font-semibold text-foreground mt-8">
+        Execution Flow
+      </h2>
+      <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">
+        {`1. User calls POST /api/deployments/:id/execute
            │
            ▼
 2. System gathers context
@@ -36,12 +40,11 @@ export default function AIExecutionPage() {
 5. Returns response with stateChanges, result, attestation`}
       </pre>
 
-      <h2 className="text-2xl font-semibold text-foreground mt-8">Request Format</h2>
-      
-      <CodeBlock
-        code={`POST /api/deployments/:id/execute`}
-        language="http"
-      />
+      <h2 className="text-2xl font-semibold text-foreground mt-8">
+        Request Format
+      </h2>
+
+      <CodeBlock code={`POST /api/deployments/:id/execute`} language="http" />
 
       <CodeBlock
         code={`{
@@ -55,8 +58,10 @@ export default function AIExecutionPage() {
         title="Request Body"
       />
 
-      <h2 className="text-2xl font-semibold text-foreground mt-8">Response Format</h2>
-      
+      <h2 className="text-2xl font-semibold text-foreground mt-8">
+        Response Format
+      </h2>
+
       <CodeBlock
         code={`{
   "success": true,
@@ -88,13 +93,17 @@ export default function AIExecutionPage() {
         title="Response"
       />
 
-      <h2 className="text-2xl font-semibold text-foreground mt-8">AI Context</h2>
+      <h2 className="text-2xl font-semibold text-foreground mt-8">
+        AI Context
+      </h2>
       <p className="text-muted-foreground">
         The AI engine receives structured context:
       </p>
 
-      <h3 className="text-xl font-semibold text-foreground mt-6">World Context</h3>
-      
+      <h3 className="text-xl font-semibold text-foreground mt-6">
+        World Context
+      </h3>
+
       <CodeBlock
         code={`{
   "name": "Horse Racing",
@@ -105,8 +114,10 @@ export default function AIExecutionPage() {
         language="json"
       />
 
-      <h3 className="text-xl font-semibold text-foreground mt-6">Current State</h3>
-      
+      <h3 className="text-xl font-semibold text-foreground mt-6">
+        Current State
+      </h3>
+
       <CodeBlock
         code={`[
   {
@@ -123,8 +134,10 @@ export default function AIExecutionPage() {
         language="json"
       />
 
-      <h3 className="text-xl font-semibold text-foreground mt-6">Event Configuration</h3>
-      
+      <h3 className="text-xl font-semibold text-foreground mt-6">
+        Event Configuration
+      </h3>
+
       <CodeBlock
         code={`{
   "name": "race_result",
@@ -136,33 +149,67 @@ export default function AIExecutionPage() {
         language="json"
       />
 
-      <h2 className="text-2xl font-semibold text-foreground mt-8">Attestation</h2>
+      <h2 className="text-2xl font-semibold text-foreground mt-8">
+        Attestation
+      </h2>
       <p className="text-muted-foreground">
         Every AI response includes a cryptographic attestation from NEAR AI:
       </p>
       <table className="w-full border-collapse border border-border my-4">
         <thead>
           <tr className="border-b border-border bg-muted">
-            <th className="px-4 py-2 text-left text-foreground font-semibold">Field</th>
-            <th className="px-4 py-2 text-left text-foreground font-semibold">Description</th>
+            <th className="px-4 py-2 text-left text-foreground font-semibold">
+              Field
+            </th>
+            <th className="px-4 py-2 text-left text-foreground font-semibold">
+              Description
+            </th>
           </tr>
         </thead>
         <tbody>
           <tr className="border-b border-border">
-            <td className="px-4 py-2 text-muted-foreground"><code className="bg-muted px-1.5 py-0.5 rounded text-sm">signature</code></td>
-            <td className="px-4 py-2 text-muted-foreground">ECDSA signature (65 bytes hex)</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+                signature
+              </code>
+            </td>
+            <td className="px-4 py-2 text-muted-foreground">
+              ECDSA signature (65 bytes hex)
+            </td>
           </tr>
           <tr className="border-b border-border">
-            <td className="px-4 py-2 text-muted-foreground"><code className="bg-muted px-1.5 py-0.5 rounded text-sm">signing_address</code></td>
-            <td className="px-4 py-2 text-muted-foreground">Ethereum-style address (20 bytes hex)</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+                signing_address
+              </code>
+            </td>
+            <td className="px-4 py-2 text-muted-foreground">
+              Ethereum-style address (20 bytes hex)
+            </td>
           </tr>
           <tr className="border-b border-border">
-            <td className="px-4 py-2 text-muted-foreground"><code className="bg-muted px-1.5 py-0.5 rounded text-sm">signing_algo</code></td>
-            <td className="px-4 py-2 text-muted-foreground">Algorithm used (<code className="bg-muted px-1.5 py-0.5 rounded text-sm">&quot;ecdsa&quot;</code>)</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+                signing_algo
+              </code>
+            </td>
+            <td className="px-4 py-2 text-muted-foreground">
+              Algorithm used (
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+                &quot;ecdsa&quot;
+              </code>
+              )
+            </td>
           </tr>
           <tr>
-            <td className="px-4 py-2 text-muted-foreground"><code className="bg-muted px-1.5 py-0.5 rounded text-sm">text</code></td>
-            <td className="px-4 py-2 text-muted-foreground">Hash of signed content</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+                text
+              </code>
+            </td>
+            <td className="px-4 py-2 text-muted-foreground">
+              Hash of signed content
+            </td>
           </tr>
         </tbody>
       </table>
@@ -175,11 +222,17 @@ export default function AIExecutionPage() {
         <li>The content hasn&apos;t been modified</li>
       </ol>
 
-      <h2 className="text-2xl font-semibold text-foreground mt-8">State Change Application</h2>
+      <h2 className="text-2xl font-semibold text-foreground mt-8">
+        State Change Application
+      </h2>
       <p className="text-muted-foreground">
-        After AI returns, the system applies changes based on <code className="bg-muted px-1.5 py-0.5 rounded text-sm">stateChangeSchema</code>:
+        After AI returns, the system applies changes based on{" "}
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+          stateChangeSchema
+        </code>
+        :
       </p>
-      
+
       <CodeBlock
         code={`// stateChangeSchema
 { "horse": "partial", "race_log": "append" }
@@ -196,12 +249,18 @@ export default function AIExecutionPage() {
         language="json"
       />
 
-      <h2 className="text-2xl font-semibold text-foreground mt-8">Error Handling</h2>
+      <h2 className="text-2xl font-semibold text-foreground mt-8">
+        Error Handling
+      </h2>
       <table className="w-full border-collapse border border-border my-4">
         <thead>
           <tr className="border-b border-border bg-muted">
-            <th className="px-4 py-2 text-left text-foreground font-semibold">Scenario</th>
-            <th className="px-4 py-2 text-left text-foreground font-semibold">Response</th>
+            <th className="px-4 py-2 text-left text-foreground font-semibold">
+              Scenario
+            </th>
+            <th className="px-4 py-2 text-left text-foreground font-semibold">
+              Response
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -210,12 +269,16 @@ export default function AIExecutionPage() {
             <td className="px-4 py-2 text-muted-foreground">400 Bad Request</td>
           </tr>
           <tr className="border-b border-border">
-            <td className="px-4 py-2 text-muted-foreground">Deployment locked</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              Deployment locked
+            </td>
             <td className="px-4 py-2 text-muted-foreground">400 Bad Request</td>
           </tr>
           <tr className="border-b border-border">
             <td className="px-4 py-2 text-muted-foreground">AI unavailable</td>
-            <td className="px-4 py-2 text-muted-foreground">500 Internal Server Error</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              500 Internal Server Error
+            </td>
           </tr>
           <tr>
             <td className="px-4 py-2 text-muted-foreground">Invalid input</td>
@@ -224,12 +287,38 @@ export default function AIExecutionPage() {
         </tbody>
       </table>
 
-      <h2 className="text-2xl font-semibold text-foreground mt-8">Related Concepts</h2>
+      <h2 className="text-2xl font-semibold text-foreground mt-8">
+        Related Concepts
+      </h2>
       <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-        <li><Link href="/docs/concepts/event" className="text-primary hover:underline">Event Versioning</Link> - Behavior prompts and schemas</li>
-        <li><Link href="/docs/concepts/entity-instances" className="text-primary hover:underline">Entity Instances</Link> - State change application</li>
-        <li><Link href="/docs/concepts/on-chain-oracle" className="text-primary hover:underline">On-chain Oracle</Link> - On-chain recording</li>
+        <li>
+          <Link
+            href="/docs/concepts/event"
+            className="text-primary hover:underline"
+          >
+            Event Versioning
+          </Link>{" "}
+          - Behavior prompts and schemas
+        </li>
+        <li>
+          <Link
+            href="/docs/concepts/entity-instances"
+            className="text-primary hover:underline"
+          >
+            Entity Instances
+          </Link>{" "}
+          - State change application
+        </li>
+        <li>
+          <Link
+            href="/docs/concepts/on-chain-oracle"
+            className="text-primary hover:underline"
+          >
+            On-chain Oracle
+          </Link>{" "}
+          - On-chain recording
+        </li>
       </ul>
     </article>
-  )
+  );
 }

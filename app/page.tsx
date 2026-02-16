@@ -424,85 +424,89 @@ export default function Home() {
                     <div className="relative">
                       <SyntaxHighlightedCode
                         language="json"
-                        code={`{
-  "worldId": "world.emerald_racing_league",
-  "frameId": "race.22.emerald_derby",
-  "globalNarration": "Against expectations, Sunfire surges through the final stretch as rain-soaked ground slows the favorites. Iron Crown fights to recover but cannot close the gap, while Night Comet fades after a strong early pace. The crowd erupts as the underdog claims a dramatic victory in the Emerald Derby.",
-  "signals": [
-    {
-      "entityId": "horse.sunfire",
-      "component": "reputation",
-      "op": "set",
-      "value": "giant_killer",
-      "confidence": 0.91,
-      "reason": "Defeated a heavy favorite under difficult conditions."
+                        code={`{        
+    "execution": {
+      "input": {
+        "date": "2026-02-16T13:16:42.495Z"
+      },
+      "stateChanges": {
+        "atmosphere:main": {
+          "solar_flux": 0.25,
+          "debris_index": 0.47,
+          "atmospheric_density": 0.74,
+          "ionization_potential": 0.5,
+          "magnetic_instability": 0.73,
+          "fog_persistence_probability": 0.68
+        },
+        "latest_weather:main": {
+          "date": "2026-02-16T13:16:42.495Z",
+          "weather": "magnetic_surge"        
+        }
+      },
+      "result": {
+        "date": "2026-02-16T13:16:42.495Z",
+        "weather": "magnetic_surge",
+        "atm_analysis": "[\"Magnetic undulations intensify, rippling through the ionized veil and tugging at stray particles.\",\"The waning solar influx casts cooler shadows, while lingering debris settles into a thin, shimmering haze.\",\"A subtle electric tension builds, hinting at a forthcoming surge as the planet's field realigns.\"]",
+        "cur_analysis": "[\"The sky flickers with erratic arcs of light, a silent storm of magnetic energy.\",\"Atmospheric currents quiver as charged particles cascade, distorting the horizon.\",\"Sounds crackle faintly, and instruments register spikes in field strength, marking a brief but potent magnetic surge.\"]"
+      },
+      "executedAt": "2026-02-16T13:17:01.312Z",
+      "executedBy": 746628
     },
-    {
-      "entityId": "horse.sunfire",
-      "component": "morale",
-      "op": "set",
-      "value": "high",
-      "confidence": 0.88,
-      "reason": "First major win boosts confidence going into future races."
+    "event": {
+      "id": 18,
+      "name": "resolve_weather",
+      "description": "Resolve the official weather for the given date. Use only the provided world state."
     },
-    {
-      "entityId": "horse.iron_crown",
-      "component": "morale",
-      "op": "set",
-      "value": "shaken",
-      "confidence": 0.64,
-      "reason": "Unexpected loss as the favorite raises questions about adaptability."
+    "deployment": {
+      "id": 17,
+      "address": "0x451d8dc0c5a15745e1d3ed38aafeb38b9fe9c602",
+      "name": "Season 1",
+      "targetChain": "near",
+      "world": {
+        "id": 28,
+        "address": "0x1f5476299243720e897348fbed84c50fcdebc403",
+        "name": "Planet X"
+      }
     },
-    {
-      "entityId": "jockey.mira",
-      "component": "reputation",
-      "op": "set",
-      "value": "tactician",
-      "confidence": 0.79,
-      "reason": "Well-timed strategy in adverse conditions."
+    "id": 7749,
+    "eventVersion": {
+      "id": 42,
+      "version": 17,
+      "inputSchema": {
+        "date": "string"
+      },
+      "resultSchema": {
+        "date": "string",
+        "weather": "string",
+        "atm_analysis": "string",
+        "cur_analysis": "string"
+      },
+      "stateChangeSchema": {
+        "atmosphere": "partial",
+        "latest_weather": "full"
+      },
+      "publishedAt": "2026-02-12T14:24:39.339Z"
     },
-    {
-      "entityId": "context",
-      "component": "crowd_hype",
-      "op": "set",
-      "value": "high",
-      "confidence": 0.93,
-      "reason": "Underdog victory excites spectators and media."
+    "llm": {
+      "model": "openai/gpt-oss-120b",
+      "request": "You are a world-state simulation engine.\n\nYour task is to compute the next world state update caused by an event.\n\n# World definition\nTitle: Planet X\nDescription: A newly discovered planet with unstable atmospheric systems.\nTags: sci-fi, simulation, weather\nSeed prompt: This world obeys internal physical logic. Outcomes must be explainable using existing world state.\n\n# Entity schemas\natmosphere:\n  - magnetic_instability: float (min: 0, max: 1)\n  - solar_flux: float (min: 0, max: 1)\n  - atmospheric_density: float (min: 0, max: 1)\n  - debris_index: float (min: 0, max: 1)\n  - ionization_potential: float (min: 0, max: 1)\n  - fog_persistence_probability: float (min: 0, max: 1)\n\nlatest_weather:\n  - date: string\n  - weather: string (enum: [storm, clear, fog, ash_rain, aurora, dust_veil, ice_crystal, magnetic_surge])\n\n# Current state\n[\n  {\n    \"schema\": \"atmosphere\",\n    \"id\": \"main\",\n    \"solar_flux\": 0.32,\n    \"atm_analysis\": \"[\\\"The mist thickens as magnetic ripples stir the dense fog, coaxing it into a velvety shroud that cloaks the horizon.\\\",\\\"Ionized particles wane under reduced solar flux, while lingering debris settles, adding a gritty texture to the lingering cloud.\\\",\\\"A subtle cooling settles, allowing the fog's persistence to dominate, muting colors and muffling distant sounds.\\\"]\",\n    \"debris_index\": 0.53,\n    \"atmospheric_density\": 0.62,\n    \"ionization_potential\": 0.65,\n    \"magnetic_instability\": 0.63,\n    \"fog_persistence_probability\": 0.76\n  },\n  {\n    \"schema\": \"latest_weather\",\n    \"id\": \"main\",\n    \"date\": \"2026-02-16T13:15:18.310Z\",\n    \"weather\": \"fog\",\n    \"cur_analysis\": \"[\\\"A blanket of fog rolls across the plains, reducing visibility and swallowing the landscape in muted gray.\\\",\\\"Gentle breezes carry the damp air, whispering through the haze and dampening any residual auroral glow.\\\",\\\"Ambient temperature slips lower, and sounds become muffled as the dense fog holds the planet in a quiet, opaque veil.\\\"]\"\n  }\n]\n\n# Event\nname: resolve_weather\ndescription: Resolve the official weather for the given date. Use only the provided world state.\nbehavior: Resolve the official weather for the given date. Use only the provided world state.\nbehavior: 50/50 coin toss: DETERMINISTIC (resolve from current values) or DISRUPTION (apply 1-3 sudden anomalies shifting values ±0.2-0.4 first). Drift all fields ±0.05-0.25 randomly. Decay to lower values if value is too high. Determine weather from the dominant atmospheric combination—no single attribute should always win. Avoid repeating previous weather unless atmosphere strongly demands it.atm_analysis is a stringified array with 3 strings, each ana\nlyzes the atmosphere after state change in a non-detailed scifi way. cur_analysis is a stringified array with 3 strings, each analyzes the weather result.\n\n# Input\n{\n  \"date\": \"2026-02-16T13:16:42.495Z\"\n}\n\n# Expected output format\nState change include:\n- atmosphere\n- latest_weather\n\nResult schema: {\"date\":\"string\",\"weather\":\"string\",\"atm_analysis\":\"string\",\"cur_analysis\":\"string\"}\n\nRespond with a JSON object containing:\n1. \"stateChanges\": an object where keys are \"<schemaName>:<instanceId>\" and values are the state updates. Values MUST conform to the entity schema attribute definitions and constraints.\n2. \"result\": the result of this event. If values defined in entity schema attribute, it MUST conform to the constraints.\n\nOutput ONLY valid JSON, nothing else.",
+      "response": "{\n  \"stateChanges\": {\n    \"atmosphere:main\": {\n      \"solar_flux\": 0.25,\n      \"debris_index\": 0.47,\n      \"atmospheric_density\": 0.74,\n      \"ionization_potential\": 0.5,\n      \"magnetic_instability\": 0.73,\n      \"fog_persistence_probability\": 0.68,\n      \"atm_analysis\": \"[\\\"Magnetic undulations intensify, rippling through the ionized veil and tugging at stray particles.\\\",\\\"The waning solar influx casts cooler shadows, while lingering debris settles into a thin, shimmering haze.\\\",\\\"A subtle electric tension builds, hinting at a forthcoming surge as the planet's field realigns.\\\"]\"\n    },\n    \"latest_weather:main\": {\n      \"date\": \"2026-02-16T13:16:42.495Z\",\n      \"weather\": \"magnetic_surge\",\n      \"cur_analysis\": \"[\\\"The sky flickers with erratic arcs of light, a silent storm of magnetic energy.\\\",\\\"Atmospheric currents quiver as charged particles cascade, distorting the horizon.\\\",\\\"Sounds crackle faintly, and instruments register spikes in field strength, marking a brief but potent magnetic surge.\\\"]\"\n    }\n  },\n  \"result\": {\n    \"date\": \"2026-02-16T13:16:42.495Z\",\n    \"weather\": \"magnetic_surge\",\n    \"atm_analysis\": \"[\\\"Magnetic undulations intensify, rippling through the ionized veil and tugging at stray particles.\\\",\\\"The waning solar influx casts cooler shadows, while lingering debris settles into a thin, shimmering haze.\\\",\\\"A subtle electric tension builds, hinting at a forthcoming surge as the planet's field realigns.\\\"]\",\n    \"cur_analysis\": \"[\\\"The sky flickers with erratic arcs of light, a silent storm of magnetic energy.\\\",\\\"Atmospheric currents quiver as charged particles cascade, distorting the horizon.\\\",\\\"Sounds crackle faintly, and instruments register spikes in field strength, marking a brief but potent magnetic surge.\\\"]\"\n  }\n}"
     },
-    {
-      "entityId": "context",
-      "component": "track_story",
-      "op": "add",
-      "value": "mud_specialist_advantage",
-      "confidence": 0.7,
-      "reason": "Repeated evidence that wet conditions favor adaptable horses."
+    "attestation": {
+      "signature": "0x0e5428e4193b80e825aaf1b06fe8779a8998527c44a461c4652f560bb3de56aa5c703e66d105bf346769759d0d21250122d7982dd0b2b8958babccff0ff92f371c",
+      "signingAddress": "0xbBC409e6b529817D257aD61D5738D8e3a39b5791",
+      "signingAlgo": "ecdsa",
+      "text": "4467e31242895b65a5988f45111d155a4bf06ff35e69184b545d33e3e22fa871:7a57ab24e5df72bd0fe2b736faacd8d54e78e31b3639f330746827dd44f5f143"
+    },
+    "onChain": {
+      "solana": null,
+      "near": {
+        "txHash": "Hi6RX6HYighawmo3fD4q6bnTpQ51yDtigDaJDGaUfFAy",
+        "receiptId": "7xESJX8VrVR1YGE4PUGKzhPsNjoVLVtkRdjG2dNoLWea",
+        "explorerUrl": "https://explorer.near.org/transactions/Hi6RX6HYighawmo3fD4q6bnTpQ51yDtigDaJDGaUfFAy"
+      }
     }
-  ],
-  "perspectives": [
-    {
-      "scope": "entity",
-      "targetId": "horse.sunfire",
-      "audience": "all",
-      "text": "Sunfire thrives in the mud, turning nervous energy into a perfectly timed late charge."
-    },
-    {
-      "scope": "entity",
-      "targetId": "horse.iron_crown",
-      "audience": "all",
-      "text": "Iron Crown's powerful stride struggles to find purchase on the wet track, forcing a costly adjustment mid-race."
-    },
-    {
-      "scope": "entity",
-      "targetId": "jockey.mira",
-      "audience": "jockey.mira",
-      "text": "Mira's decision to hold back early pays off, drawing praise from commentators for tactical patience."
-    }
-  ],
-  "meta": {
-    "model": "gpt-5.1-thinking",
-    "generationTime": "2026-01-26T11:05:00Z"
-  }
-}`}
+  }`}
                       />
                       <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-card to-transparent pointer-events-none" />
                     </div>

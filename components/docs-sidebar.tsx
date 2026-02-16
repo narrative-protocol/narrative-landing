@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { ChevronRight } from "lucide-react"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { ChevronRight } from "lucide-react";
 
 const navigation = [
   {
@@ -11,6 +11,7 @@ const navigation = [
     items: [
       { title: "Introduction", href: "/docs" },
       { title: "Quickstart", href: "/docs/quickstart" },
+      { title: "Endpoint & Environments", href: "/docs/environment" },
     ],
   },
   {
@@ -34,13 +35,16 @@ const navigation = [
       { title: "Entity Schemas", href: "/docs/api-reference/entity-schemas" },
       { title: "Events", href: "/docs/api-reference/events" },
       { title: "Deployments", href: "/docs/api-reference/deployments" },
-      { title: "Entity Instances", href: "/docs/api-reference/entity-instances" },
+      {
+        title: "Entity Instances",
+        href: "/docs/api-reference/entity-instances",
+      },
     ],
   },
-]
+];
 
 export function DocsSidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <aside className="hidden w-64 shrink-0 border-r border-border lg:block">
@@ -60,7 +64,7 @@ export function DocsSidebar() {
                         "flex items-center gap-2 rounded-md px-4 py-2 text-sm transition-colors",
                         pathname === item.href
                           ? "bg-primary/10 text-primary font-medium"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground",
                       )}
                     >
                       {pathname === item.href && (
@@ -76,5 +80,5 @@ export function DocsSidebar() {
         </nav>
       </div>
     </aside>
-  )
+  );
 }

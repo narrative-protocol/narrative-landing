@@ -70,7 +70,12 @@ export default function DeploymentsAPIPage() {
       <CodeBlock
         code={`{
   "name": "Season 1",
-  "targetChain": "solana",
+  "targetChains": ["solana-devnet"],
+  "aiModelId": "openai/gpt-oss-120b",
+  "onchain": {
+    "stateChanges": ["wins"],
+    "result": ["winner"]
+  },
   "firstBinding": {
     "eventId": 1,
     "eventVersionId": 1
@@ -91,7 +96,12 @@ export default function DeploymentsAPIPage() {
         code={`{
   "worldId": 1,
   "name": "Season 1",
-  "targetChain": "solana",
+  "targetChains": ["solana-devnet"],
+  "aiModelId": "openai/gpt-oss-120b",
+  "onchain": {
+    "stateChanges": ["wins"],
+    "result": ["winner"]
+  },
   "firstBinding": {...},
   ...
 }`}
@@ -142,33 +152,87 @@ export default function DeploymentsAPIPage() {
           <tr className="border-b border-border">
             <td className="px-4 py-2 text-muted-foreground">
               <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                targetChain
+                targetChains
+              </code>
+            </td>
+            <td className="px-4 py-2 text-muted-foreground">string[]</td>
+            <td className="px-4 py-2 text-muted-foreground">No</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              On-chain targets:{" "}
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+                solana-devnet
+              </code>
+              ,{" "}
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+                solana-mainnet
+              </code>
+              ,{" "}
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+                near-testnet
+              </code>
+              ,{" "}
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+                near-mainnet
+              </code>{" "}
+              (default:{" "}
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">[]</code>
+              )
+            </td>
+          </tr>
+          <tr className="border-b border-border">
+            <td className="px-4 py-2 text-muted-foreground">
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+                aiModelId
               </code>
             </td>
             <td className="px-4 py-2 text-muted-foreground">string</td>
             <td className="px-4 py-2 text-muted-foreground">No</td>
             <td className="px-4 py-2 text-muted-foreground">
-              On-chain oracle:{" "}
+              AI model ID (default:{" "}
               <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                none
+                openai/gpt-oss-120b
               </code>
-              ,{" "}
+              ). See{" "}
               <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                solana
-              </code>
-              ,{" "}
-              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                near
-              </code>
-              ,{" "}
-              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                both
+                GET /api/ai-models
               </code>{" "}
-              (default:{" "}
+              for available models
+            </td>
+          </tr>
+          <tr className="border-b border-border">
+            <td className="px-4 py-2 text-muted-foreground">
               <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                none
+                onchain
               </code>
-              )
+            </td>
+            <td className="px-4 py-2 text-muted-foreground">object</td>
+            <td className="px-4 py-2 text-muted-foreground">No</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              Selective on-chain push config
+            </td>
+          </tr>
+          <tr className="border-b border-border">
+            <td className="px-4 py-2 text-muted-foreground">
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+                onchain.stateChanges
+              </code>
+            </td>
+            <td className="px-4 py-2 text-muted-foreground">string[]</td>
+            <td className="px-4 py-2 text-muted-foreground">No</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              Keys from stateChanges to push on-chain
+            </td>
+          </tr>
+          <tr className="border-b border-border">
+            <td className="px-4 py-2 text-muted-foreground">
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+                onchain.result
+              </code>
+            </td>
+            <td className="px-4 py-2 text-muted-foreground">string[]</td>
+            <td className="px-4 py-2 text-muted-foreground">No</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              Keys from result to push on-chain
             </td>
           </tr>
           <tr className="border-b border-border">
@@ -237,7 +301,12 @@ export default function DeploymentsAPIPage() {
     "worldId": 1,
     "name": "Season 1",
     "mode": "upgradable",
-    "targetChain": "solana",
+    "targetChains": ["solana-devnet"],
+    "aiModelId": "openai/gpt-oss-120b",
+    "onchain": {
+      "stateChanges": ["wins"],
+      "result": ["winner"]
+    },
     "lockedAt": null,
     "eventBindings": [
       {
@@ -478,7 +547,7 @@ export default function DeploymentsAPIPage() {
             <td className="px-4 py-2 text-muted-foreground">
               On-chain records (based on deployment&apos;s{" "}
               <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                targetChain
+                targetChains
               </code>
               )
             </td>
@@ -494,7 +563,7 @@ export default function DeploymentsAPIPage() {
               <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
                 null
               </code>{" "}
-              if not configured or not selected)
+              if no Solana chain configured)
             </td>
           </tr>
           <tr className="border-b border-border">
@@ -544,10 +613,16 @@ export default function DeploymentsAPIPage() {
           <tr>
             <td className="px-4 py-2 text-muted-foreground">
               <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                oracle.near.receiptId
+                oracle.near
               </code>
             </td>
-            <td className="px-4 py-2 text-muted-foreground">NEAR receipt ID</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              NEAR record (
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+                null
+              </code>{" "}
+              if no NEAR chain configured)
+            </td>
           </tr>
         </tbody>
       </table>
@@ -563,13 +638,16 @@ export default function DeploymentsAPIPage() {
         <li>Receives current entity states from the deployment</li>
         <li>Receives event version config (behavior prompt, schemas)</li>
         <li>Receives user-provided input</li>
-        <li>Generates state changes and public result</li>
+        <li>
+          Generates state changes and public result using the deployment&apos;s
+          configured AI model
+        </li>
         <li>Applies state changes to entity instances</li>
         <li>Records everything in event history with attestation</li>
         <li>
           Pushes to on-chain oracle(s) based on deployment&apos;s{" "}
           <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-            targetChain
+            targetChains
           </code>
         </li>
       </ol>
@@ -731,10 +809,23 @@ export default function DeploymentsAPIPage() {
       />
 
       <h3 className="text-xl font-semibold text-foreground mt-6">
-        Create Event Binding
+        Execute Event
       </h3>
       <p className="text-muted-foreground">
-        Bind a specific event version to a deployment.
+        Execute a bound event on the deployment. This invokes the AI engine to
+        compute state changes based on the world definition, current state,
+        event behavior, and input.
+      </p>
+      <p className="text-muted-foreground mt-2">
+        The AI model used is determined by the deployment&apos;s{" "}
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+          aiModelId
+        </code>{" "}
+        field (defaults to{" "}
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+          openai/gpt-oss-120b
+        </code>
+        ).
       </p>
       <p className="text-muted-foreground">
         <strong>Nested route (recommended)</strong>
@@ -787,23 +878,14 @@ export default function DeploymentsAPIPage() {
           >
             Deployments
           </Link>{" "}
-          - Modes, target chains, and more
+          - Modes, target chains, AI models, and more
         </li>
         <li>
           <Link
-            href="/docs/concepts/snapshotting"
+            href="/docs/concepts/ai-engine"
             className="text-primary hover:underline"
           >
-            Snapshotting
-          </Link>{" "}
-          - Copy state between deployments
-        </li>
-        <li>
-          <Link
-            href="/docs/concepts/ai-execution"
-            className="text-primary hover:underline"
-          >
-            AI Execution
+            AI Engine
           </Link>{" "}
           - How events are processed
         </li>
@@ -815,6 +897,15 @@ export default function DeploymentsAPIPage() {
             On-chain Oracle
           </Link>{" "}
           - Multi-chain verification
+        </li>
+        <li>
+          <Link
+            href="/docs/api-reference/ai-models"
+            className="text-primary hover:underline"
+          >
+            AI Models
+          </Link>{" "}
+          - Available AI models
         </li>
       </ul>
     </article>

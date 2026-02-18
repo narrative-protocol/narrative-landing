@@ -169,7 +169,7 @@ echo "Event ID: $EVENT_ID, Version ID: $EVENT_VERSION_ID"`}
   -d '{
     "worldId": '$WORLD_ID',
     "name": "Season 1",
-    "targetChain": "solana",
+    "targetChains": ["solana-devnet"],
     "firstBinding": {
       "eventId": '$EVENT_ID',
       "eventVersionId": '$EVENT_VERSION_ID'
@@ -184,26 +184,32 @@ echo "Deployment ID: $DEPLOYMENT_ID"`}
       <p className="text-muted-foreground">
         The{" "}
         <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-          targetChain
+          targetChains
         </code>{" "}
         option determines where event data is stored on-chain:
       </p>
       <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
         <li>
-          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">none</code> -
+          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">[]</code> -
           No on-chain storage (default)
         </li>
         <li>
-          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">solana</code>{" "}
-          - Push to Solana
+          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+            ["solana-devnet"]
+          </code>{" "}
+          - Push to Solana devnet
         </li>
         <li>
-          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">near</code> -
-          Push to NEAR
+          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+            ["near-testnet"]
+          </code>{" "}
+          - Push to NEAR testnet
         </li>
         <li>
-          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">both</code> -
-          Push to both chains
+          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+            ["solana-devnet", "near-testnet"]
+          </code>{" "}
+          - Push to both chains
         </li>
       </ul>
 
@@ -336,7 +342,7 @@ curl -s -X POST $URL/api/entity-instances \\
         code={`#!/bin/bash
 set -e
 
-URL="http://localhost:3000"
+URL="https://api.narrativeprotocol.com"
 
 # Get token
 TOKEN=$(curl -s -X POST $URL/DEBUG_register \\
@@ -373,14 +379,14 @@ EVENT_RESPONSE=$(curl -s -X POST $URL/api/events \\
 EVENT_ID=$(echo $EVENT_RESPONSE | jq -r '.data.id')
 EVENT_VERSION_ID=$(echo $EVENT_RESPONSE | jq -r '.data.versions[0].id')
 
-# Create deployment with first binding (targetChain: none|solana|near|both)
+# Create deployment with first binding
 DEPLOYMENT_ID=$(curl -s -X POST $URL/api/deployments \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer $TOKEN" \\
   -d '{
     "worldId": '$WORLD_ID',
     "name": "Season 1",
-    "targetChain": "solana",
+    "targetChains": ["solana-devnet"],
     "firstBinding": {
       "eventId": '$EVENT_ID',
       "eventVersionId": '$EVENT_VERSION_ID'
@@ -434,12 +440,12 @@ echo "Done! World: $WORLD_ID, Deployment: $DEPLOYMENT_ID"`}
         <li>
           Explore{" "}
           <Link
-            href="/docs/concepts/ai-execution"
+            href="/docs/concepts/ai-engine"
             className="text-primary hover:underline"
           >
-            AI Execution
+            AI Engine
           </Link>{" "}
-          - How events are processed
+          - How events are processed and model selection
         </li>
         <li>
           See{" "}

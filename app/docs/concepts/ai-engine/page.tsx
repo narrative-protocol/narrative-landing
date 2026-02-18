@@ -2,10 +2,10 @@ import { Callout } from "@/components/callout";
 import { CodeBlock } from "@/components/code-block";
 import Link from "next/link";
 
-export default function AIExecutionPage() {
+export default function AIEnginePage() {
   return (
     <article className="prose prose-invert max-w-none">
-      <h1 className="text-4xl font-bold text-foreground">AI Event Execution</h1>
+      <h1 className="text-4xl font-bold text-foreground">AI Engine</h1>
       <p className="text-lg text-muted-foreground mt-4">
         Events in Narrative Protocol are executed by an AI engine that computes
         state changes based on world context, current state, event
@@ -25,7 +25,7 @@ export default function AIExecutionPage() {
    └── Event version config (behaviorPrompt, schemas)
            │
            ▼
-3. AI Engine processes (NEAR AI / DeepSeek-V3.1)
+3. AI Engine processes (AI / configurable model)
    ├── Understands world context
    ├── Reads current state
    ├── Applies behavior prompt
@@ -35,11 +35,66 @@ export default function AIExecutionPage() {
 4. System applies changes
    ├── Updates entity instances
    ├── Records in event history
-   └── Pushes to Solana (if configured)
+   └── Pushes to chain(s) (if configured)
            │
            ▼
-5. Returns response with stateChanges, result, attestation`}
+5. Returns response with stateChanges, result, attestation, oracle`}
       </pre>
+
+      <h2 className="text-2xl font-semibold text-foreground mt-8">
+        AI Model Selection
+      </h2>
+      <p className="text-muted-foreground">
+        Each deployment can specify which AI model to use via the{" "}
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+          aiModelId
+        </code>{" "}
+        field. If not set, the default model{" "}
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+          openai/gpt-oss-120b
+        </code>{" "}
+        is used.
+      </p>
+
+      <h3 className="text-xl font-semibold text-foreground mt-6">
+        Available Models
+      </h3>
+      <p className="text-muted-foreground">List them via:</p>
+
+      <CodeBlock code={`GET /api/ai-models`} language="http" />
+
+      <CodeBlock
+        code={`{
+  "success": true,
+  "data": [
+    {
+      "modelId": "openai/gpt-oss-120b",
+      "modelDisplayName": "GPT OSS 120B",
+      "modelDescription": "...",
+      "contextLength": 131000,
+      "attestationSupported": true,
+      "verifiable": true,
+      "isDefault": true
+    }
+  ]
+}`}
+        language="json"
+      />
+
+      <h3 className="text-xl font-semibold text-foreground mt-6">
+        Setting a Model on Deployment
+      </h3>
+
+      <CodeBlock
+        code={`POST /api/deployments
+{
+  "worldId": 1,
+  "name": "Season 1",
+  "aiModelId": "openai/gpt-oss-120b",
+  "firstBinding": { "eventId": 1, "eventVersionId": 1 }
+}`}
+        language="json"
+      />
 
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         Request Format
@@ -84,9 +139,12 @@ export default function AIExecutionPage() {
       "signing_algo": "ecdsa",
       "text": "eda20c62..."
     },
-    "solana": {
-      "signature": "5xYz...",
-      "eventRecordPda": "7abc..."
+    "oracle": {
+      "solana": {
+        "signature": "5xYz...",
+        "eventRecordPda": "7abc..."
+      },
+      "near": null
     }
   }
 }`}
@@ -154,7 +212,7 @@ export default function AIExecutionPage() {
         Attestation
       </h2>
       <p className="text-muted-foreground">
-        Every AI response includes a cryptographic attestation from NEAR AI:
+        Every AI response includes a cryptographic attestation:
       </p>
       <table className="w-full border-collapse border border-border my-4">
         <thead>
@@ -227,9 +285,65 @@ export default function AIExecutionPage() {
         This allows independent verification that:
       </p>
       <ol className="list-decimal pl-6 space-y-2 text-muted-foreground">
-        <li>The response came from NEAR AI</li>
+        <li>The response came from AI</li>
         <li>The content hasn&apos;t been modified</li>
       </ol>
+
+      <h2 className="text-2xl font-semibold text-foreground mt-8">
+        LLM Metadata
+      </h2>
+      <p className="text-muted-foreground">
+        Event history records include LLM metadata for debugging and
+        transparency:
+      </p>
+      <table className="w-full border-collapse border border-border my-4">
+        <thead>
+          <tr className="border-b border-border bg-muted">
+            <th className="px-4 py-2 text-left text-foreground font-semibold">
+              Field
+            </th>
+            <th className="px-4 py-2 text-left text-foreground font-semibold">
+              Description
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr className="border-b border-border">
+            <td className="px-4 py-2 text-muted-foreground">
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+                llmModel
+              </code>
+            </td>
+            <td className="px-4 py-2 text-muted-foreground">
+              The model used (e.g.,{" "}
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+                openai/gpt-oss-120b
+              </code>
+              )
+            </td>
+          </tr>
+          <tr className="border-b border-border">
+            <td className="px-4 py-2 text-muted-foreground">
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+                plainTextRequest
+              </code>
+            </td>
+            <td className="px-4 py-2 text-muted-foreground">
+              The full prompt sent to the LLM
+            </td>
+          </tr>
+          <tr>
+            <td className="px-4 py-2 text-muted-foreground">
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+                plainTextResponse
+              </code>
+            </td>
+            <td className="px-4 py-2 text-muted-foreground">
+              The raw response from the LLM
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         State Change Application
@@ -302,7 +416,7 @@ export default function AIExecutionPage() {
       <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
         <li>
           <Link
-            href="/docs/concepts/event"
+            href="/docs/concepts/events"
             className="text-primary hover:underline"
           >
             Event Versioning
@@ -311,7 +425,7 @@ export default function AIExecutionPage() {
         </li>
         <li>
           <Link
-            href="/docs/concepts/entity-instances"
+            href="/docs/concepts/entities"
             className="text-primary hover:underline"
           >
             Entity Instances
@@ -326,6 +440,15 @@ export default function AIExecutionPage() {
             On-chain Oracle
           </Link>{" "}
           - On-chain recording
+        </li>
+        <li>
+          <Link
+            href="/docs/concepts/deployment"
+            className="text-primary hover:underline"
+          >
+            Deployments
+          </Link>{" "}
+          - AI model selection per deployment
         </li>
       </ul>
     </article>

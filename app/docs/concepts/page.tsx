@@ -76,10 +76,22 @@ export default function ConceptsPage() {
 
       <h3 className="text-xl font-semibold text-foreground mt-6">
         <Link
-          href="/docs/concepts/event"
+          href="/docs/concepts/entities"
           className="text-primary hover:underline"
         >
-          Event
+          Entities
+        </Link>
+      </h3>
+      <p className="text-muted-foreground">
+        Multiple instances per schema, each with their own state.
+      </p>
+
+      <h3 className="text-xl font-semibold text-foreground mt-6">
+        <Link
+          href="/docs/concepts/events"
+          className="text-primary hover:underline"
+        >
+          Events
         </Link>
       </h3>
       <p className="text-muted-foreground">
@@ -102,34 +114,10 @@ export default function ConceptsPage() {
 
       <h3 className="text-xl font-semibold text-foreground mt-6">
         <Link
-          href="/docs/concepts/snapshotting"
+          href="/docs/concepts/ai-engine"
           className="text-primary hover:underline"
         >
-          Snapshotting
-        </Link>
-      </h3>
-      <p className="text-muted-foreground">
-        Create new deployments by copying state from existing ones.
-      </p>
-
-      <h3 className="text-xl font-semibold text-foreground mt-6">
-        <Link
-          href="/docs/concepts/entity-instances"
-          className="text-primary hover:underline"
-        >
-          Entity Instances
-        </Link>
-      </h3>
-      <p className="text-muted-foreground">
-        Multiple instances per schema, each with their own state.
-      </p>
-
-      <h3 className="text-xl font-semibold text-foreground mt-6">
-        <Link
-          href="/docs/concepts/ai-execution"
-          className="text-primary hover:underline"
-        >
-          AI Event Execution
+          AI Engine
         </Link>
       </h3>
       <p className="text-muted-foreground">
@@ -157,8 +145,8 @@ export default function ConceptsPage() {
 └── Events (define behavior)
     └── Event Versions (immutable after publish)
 
-Deployment (Live, targetChain: solana|near|both|none)
-├── Entity Instances (actual data)
+Deployment (Live, targetChains: ["solana-devnet"], etc.)
+├── Entities (actual data)
 ├── Event Bindings (which versions to use)
 └── Event History (execution records)
     ├── Solana Records (on-chain verification)

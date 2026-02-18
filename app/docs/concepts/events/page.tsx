@@ -5,9 +5,7 @@ import Link from "next/link";
 export default function EventPage() {
   return (
     <article className="prose prose-invert max-w-none">
-      <h1 className="text-4xl font-bold text-foreground">
-        Events &amp; Versioning
-      </h1>
+      <h1 className="text-4xl font-bold text-foreground">Events</h1>
 
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         What is an Event?
@@ -474,10 +472,10 @@ Version 2 (published) ─── immutable, can be bound`}
       <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
         <li>
           <Link
-            href="/docs/concepts/ai-execution"
+            href="/docs/concepts/ai-engine"
             className="text-primary hover:underline"
           >
-            AI Execution
+            AI Engine
           </Link>{" "}
           - How events are processed
         </li>

@@ -2,10 +2,10 @@ import { Callout } from "@/components/callout"
 import { CodeBlock } from "@/components/code-block"
 import Link from "next/link"
 
-export default function EntityInstancesPage() {
+export default function EntitiesPage() {
   return (
     <article className="prose prose-invert max-w-none">
-      <h1 className="text-4xl font-bold text-foreground">Entity Instances</h1>
+      <h1 className="text-4xl font-bold text-foreground">Entities</h1>
       <p className="text-lg text-muted-foreground mt-4">
         Entity Instances are the actual data in a deployment. They follow a schema but each instance has its own state.
       </p>
@@ -214,7 +214,7 @@ export default function EntityInstancesPage() {
       <h2 className="text-2xl font-semibold text-foreground mt-8">Related Concepts</h2>
       <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
         <li><Link href="/docs/concepts/architecture" className="text-primary hover:underline">Architecture</Link> - Schema vs Instance relationship</li>
-        <li><Link href="/docs/concepts/ai-execution" className="text-primary hover:underline">AI Execution</Link> - How events modify state</li>
+        <li><Link href="/docs/concepts/ai-engine" className="text-primary hover:underline">AI Engine</Link> - How events modify state</li>
       </ul>
     </article>
   )

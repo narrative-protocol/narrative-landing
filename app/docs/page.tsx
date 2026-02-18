@@ -106,9 +106,12 @@ export default function DocsPage() {
         AI Event Execution
       </h3>
       <p className="text-muted-foreground">
-        Events are executed by an AI engine (NEAR AI / DeepSeek-V3.1) that
-        computes state changes based on world context, current state, and
-        behavior prompts.
+        Events are executed by an AI engine with configurable model selection
+        (default:{" "}
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+          openai/gpt-oss-120b
+        </code>
+        ). Each deployment can use a different AI model.
       </p>
 
       <h3 className="text-xl font-semibold text-foreground mt-6">
@@ -141,11 +144,24 @@ export default function DocsPage() {
       </p>
 
       <h3 className="text-xl font-semibold text-foreground mt-6">
-        Solana On-chain Oracle
+        Multi-Chain On-chain Oracle
       </h3>
       <p className="text-muted-foreground">
-        Event execution records are pushed to Solana for immutable on-chain
-        storage and verification.
+        Event execution records can be pushed to Solana and/or NEAR networks for
+        immutable on-chain storage. Deployments specify target chains as an
+        array (e.g.,{" "}
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+          ["solana-devnet", "near-testnet"]
+        </code>
+        ).
+      </p>
+
+      <h3 className="text-xl font-semibold text-foreground mt-6">
+        Selective On-Chain Push
+      </h3>
+      <p className="text-muted-foreground">
+        Configure which state change and result fields get pushed to the
+        blockchain.
       </p>
 
       <Callout type="tip" title="Quick Links">

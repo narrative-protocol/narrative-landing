@@ -19,7 +19,7 @@ export default function OnChainOraclePage() {
         Narrative Protocol pushes event execution records to blockchain
         networks, providing immutable on-chain records for verification and
         auditability. The system supports multiple chains:{" "}
-        <strong>Solana</strong> and <strong>NEAR</strong>.
+        <strong>Solana</strong> (devnet/mainnet) and <strong>NEAR</strong> (testnet/mainnet).
       </p>
 
       <h2 className="text-2xl font-semibold text-foreground mt-8">Overview</h2>
@@ -30,8 +30,7 @@ export default function OnChainOraclePage() {
           PostgreSQL
         </li>
         <li>
-          <strong>On-chain Record</strong>: Event data pushed to selected
-          blockchain(s)
+          <strong>On-chain Record</strong>: Event data pushed to selected blockchain(s)
         </li>
         <li>
           <strong>Attestation</strong>: AI attestation stored on-chain
@@ -45,7 +44,7 @@ export default function OnChainOraclePage() {
         Target Chain Selection
       </h2>
       <p className="text-muted-foreground">
-        When creating a deployment, specify which chain(s) to use:
+        When creating a deployment, specify which chain network(s) to use via the <code className="bg-muted px-1.5 py-0.5 rounded text-sm">targetChains</code> array:
       </p>
       <table className="w-full border-collapse border border-border my-4">
         <thead>
@@ -65,60 +64,94 @@ export default function OnChainOraclePage() {
           <tr className="border-b border-border">
             <td className="px-4 py-2 text-muted-foreground">
               <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                none
+                solana-devnet
               </code>
             </td>
             <td className="px-4 py-2 text-muted-foreground">
-              No on-chain storage (default)
+              Push to Solana devnet
             </td>
-            <td className="px-4 py-2 text-muted-foreground">N/A</td>
+            <td className="px-4 py-2 text-muted-foreground">1232 bytes per field</td>
           </tr>
           <tr className="border-b border-border">
             <td className="px-4 py-2 text-muted-foreground">
               <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                solana
+                solana-mainnet
               </code>
             </td>
             <td className="px-4 py-2 text-muted-foreground">
-              Push to Solana only
+              Push to Solana mainnet
             </td>
-            <td className="px-4 py-2 text-muted-foreground">2048 bytes</td>
+            <td className="px-4 py-2 text-muted-foreground">1232 bytes per field</td>
           </tr>
           <tr className="border-b border-border">
             <td className="px-4 py-2 text-muted-foreground">
               <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                near
+                near-testnet
               </code>
             </td>
             <td className="px-4 py-2 text-muted-foreground">
-              Push to NEAR only
+              Push to NEAR testnet
             </td>
             <td className="px-4 py-2 text-muted-foreground">Unlimited</td>
           </tr>
           <tr>
             <td className="px-4 py-2 text-muted-foreground">
               <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                both
+                near-mainnet
               </code>
             </td>
             <td className="px-4 py-2 text-muted-foreground">
-              Push to both Solana and NEAR
+              Push to NEAR mainnet
             </td>
-            <td className="px-4 py-2 text-muted-foreground">2048 bytes</td>
+            <td className="px-4 py-2 text-muted-foreground">Unlimited</td>
           </tr>
         </tbody>
       </table>
+
+      <p className="text-muted-foreground mt-4">
+        An empty array <code className="bg-muted px-1.5 py-0.5 rounded text-sm">[]</code> (default) means no on-chain storage.
+      </p>
 
       <CodeBlock
         code={`{
   "worldId": 1,
   "name": "Season 1",
-  "targetChain": "solana",
+  "targetChains": ["solana-devnet", "near-testnet"],
   "firstBinding": { "eventId": 1, "eventVersionId": 1 }
 }`}
         language="json"
         title="Deployment Configuration"
       />
+
+      <p className="text-muted-foreground mt-4">
+        When both Solana and NEAR chains are included, the stricter Solana 1232-byte limit applies to size validation.
+      </p>
+
+      <h2 className="text-2xl font-semibold text-foreground mt-8">
+        Selective On-Chain Push
+      </h2>
+      <p className="text-muted-foreground">
+        Deployments can configure which fields get pushed on-chain via the <code className="bg-muted px-1.5 py-0.5 rounded text-sm">onchain</code> config:
+      </p>
+
+      <CodeBlock
+        code={`{
+  "targetChains": ["solana-devnet"],
+  "onchain": {
+    "stateChanges": ["wins", "speed_rating"],
+    "result": ["winner"]
+  }
+}`}
+        language="json"
+      />
+
+      <p className="text-muted-foreground mt-4">
+        When <code className="bg-muted px-1.5 py-0.5 rounded text-sm">onchain</code> is set, only the specified keys from <code className="bg-muted px-1.5 py-0.5 rounded text-sm">stateChanges</code> and <code className="bg-muted px-1.5 py-0.5 rounded text-sm">result</code> are included in the on-chain push. When omitted or null, all data is pushed.
+      </p>
+
+      <p className="text-muted-foreground mt-4">
+        This is particularly useful for Solana deployments where the 1232-byte per-field limit requires careful data selection.
+      </p>
 
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         What Gets Stored On-chain
@@ -309,9 +342,9 @@ export default function OnChainOraclePage() {
     pub event_history_id: u64,
     pub event_count: u64,
     pub input_hash: [u8; 32],
-    #[max_len(2048)]
+    #[max_len(1232)]
     pub state_changes: String,
-    #[max_len(2048)]
+    #[max_len(1232)]
     pub result: String,
     pub attestation: Attestation,
     pub executed_at: i64,
@@ -320,6 +353,23 @@ export default function OnChainOraclePage() {
 }`}
         language="rust"
       />
+
+      <h3 className="text-xl font-semibold text-foreground mt-6">Network Support</h3>
+      <p className="text-muted-foreground">
+        The Solana client supports both <code className="bg-muted px-1.5 py-0.5 rounded text-sm">devnet</code> and <code className="bg-muted px-1.5 py-0.5 rounded text-sm">mainnet</code> via network-specific environment variables:
+      </p>
+
+      <CodeBlock
+        code={`SOLANA_DEVNET_RPC_URL=...
+SOLANA_DEVNET_PRIVATE_KEY=...
+SOLANA_MAINNET_RPC_URL=...
+SOLANA_MAINNET_PRIVATE_KEY=...`}
+        language="bash"
+      />
+
+      <p className="text-muted-foreground mt-4">
+        Legacy variables (<code className="bg-muted px-1.5 py-0.5 rounded text-sm">SOLANA_RPC_URL</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-sm">SOLANA_PRIVATE_KEY</code>) are used as fallback for devnet.
+      </p>
 
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         NEAR Integration
@@ -354,6 +404,27 @@ pub struct EventRecord {
 }`}
         language="rust"
       />
+
+      <h3 className="text-xl font-semibold text-foreground mt-6">Network Support</h3>
+      <p className="text-muted-foreground">
+        The NEAR client supports both <code className="bg-muted px-1.5 py-0.5 rounded text-sm">testnet</code> and <code className="bg-muted px-1.5 py-0.5 rounded text-sm">mainnet</code> via network-specific environment variables:
+      </p>
+
+      <CodeBlock
+        code={`NEAR_TESTNET_RPC_URL=...
+NEAR_TESTNET_ACCOUNT_ID=...
+NEAR_TESTNET_PRIVATE_KEY=...
+NEAR_TESTNET_CONTRACT_ID=...
+NEAR_MAINNET_RPC_URL=...
+NEAR_MAINNET_ACCOUNT_ID=...
+NEAR_MAINNET_PRIVATE_KEY=...
+NEAR_MAINNET_CONTRACT_ID=...`}
+        language="bash"
+      />
+
+      <p className="text-muted-foreground mt-4">
+        Legacy variables (<code className="bg-muted px-1.5 py-0.5 rounded text-sm">NEAR_RPC_URL</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-sm">NEAR_ACCOUNT_ID</code>, etc.) are used as fallback for testnet.
+      </p>
 
       <h3 className="text-xl font-semibold text-foreground mt-6">
         Contract Methods
@@ -490,31 +561,25 @@ pub struct EventRecord {
       <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
         <li>
           <code className="bg-muted px-1.5 py-0.5 rounded text-sm">solana</code>{" "}
-          - Solana transaction details (if{" "}
+          - Solana transaction details (if any Solana network is in{" "}
           <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-            targetChain
-          </code>{" "}
-          is{" "}
-          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">solana</code>{" "}
-          or{" "}
-          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">both</code>)
+            targetChains
+          </code>
+          )
         </li>
         <li>
           <code className="bg-muted px-1.5 py-0.5 rounded text-sm">near</code> -
-          NEAR transaction details (if{" "}
+          NEAR transaction details (if any NEAR network is in{" "}
           <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-            targetChain
-          </code>{" "}
-          is{" "}
-          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">near</code>{" "}
-          or{" "}
-          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">both</code>)
+            targetChains
+          </code>
+          )
         </li>
       </ul>
       <p className="text-muted-foreground">
         Either field will be{" "}
         <code className="bg-muted px-1.5 py-0.5 rounded text-sm">null</code> if
-        that chain is not configured or not selected.
+        that chain family is not configured or not selected.
       </p>
 
       <h2 className="text-2xl font-semibold text-foreground mt-8">
@@ -532,8 +597,7 @@ pub struct EventRecord {
           </code>
         </li>
         <li>
-          <strong>Compare state_changes and result</strong> - on-chain contains
-          full JSON
+          <strong>Compare state_changes and result</strong> - on-chain contains full JSON (or filtered JSON if <code className="bg-muted px-1.5 py-0.5 rounded text-sm">onchain</code> config is set)
         </li>
         <li>
           <strong>Compute hash</strong> of input
@@ -586,23 +650,19 @@ assert(arrayEquals(inputHash, onChainRecord.input_hash));`}
 
       <Callout type="warning" title="Size Constraints">
         <p className="text-muted-foreground">
-          When using{" "}
-          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">solana</code>{" "}
-          or{" "}
-          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">both</code>{" "}
-          as your target chain, be mindful of Solana&apos;s size limits.
-          Exceeding these limits will cause event execution to fail.
+          When using Solana chains, be mindful of the 1232-byte per-field limit.
+          Use the <code className="bg-muted px-1.5 py-0.5 rounded text-sm">onchain</code> config on the deployment to select only the fields you need on-chain.
         </p>
       </Callout>
 
       <p className="text-muted-foreground">
-        When using on-chain storage, be mindful of Solana&apos;s size limits:
+        When using on-chain storage, be mindful of data sizes:
       </p>
       <table className="w-full border-collapse border border-border my-4">
         <thead>
           <tr className="border-b border-border bg-muted">
             <th className="px-4 py-2 text-left text-foreground font-semibold">
-              Chain
+              Chain Family
             </th>
             <th className="px-4 py-2 text-left text-foreground font-semibold">
               Max per field
@@ -615,10 +675,8 @@ assert(arrayEquals(inputHash, onChainRecord.input_hash));`}
         <tbody>
           <tr className="border-b border-border">
             <td className="px-4 py-2 text-muted-foreground">Solana</td>
-            <td className="px-4 py-2 text-muted-foreground">2048 bytes</td>
-            <td className="px-4 py-2 text-muted-foreground">
-              Compact state, simple results
-            </td>
+            <td className="px-4 py-2 text-muted-foreground">1232 bytes</td>
+            <td className="px-4 py-2 text-muted-foreground">Use <code className="bg-muted px-1.5 py-0.5 rounded text-sm">onchain</code> config to filter fields</td>
           </tr>
           <tr className="border-b border-border">
             <td className="px-4 py-2 text-muted-foreground">NEAR</td>
@@ -629,7 +687,7 @@ assert(arrayEquals(inputHash, onChainRecord.input_hash));`}
           </tr>
           <tr>
             <td className="px-4 py-2 text-muted-foreground">Both</td>
-            <td className="px-4 py-2 text-muted-foreground">2048 bytes</td>
+            <td className="px-4 py-2 text-muted-foreground">1232 bytes</td>
             <td className="px-4 py-2 text-muted-foreground">
               Uses stricter Solana limit
             </td>
@@ -643,10 +701,8 @@ assert(arrayEquals(inputHash, onChainRecord.input_hash));`}
         </code>{" "}
         or{" "}
         <code className="bg-muted px-1.5 py-0.5 rounded text-sm">result</code>{" "}
-        exceeds Solana&apos;s limit when using{" "}
-        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">solana</code>{" "}
-        or <code className="bg-muted px-1.5 py-0.5 rounded text-sm">both</code>,
-        the event execution will fail with a validation error.
+        exceeds 1232 bytes when using a Solana chain, the event execution will fail with a validation error. Use the{" "}
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">onchain</code> config on the deployment to select only the fields you need on-chain.
       </p>
 
       <h2 className="text-2xl font-semibold text-foreground mt-8">
@@ -655,10 +711,10 @@ assert(arrayEquals(inputHash, onChainRecord.input_hash));`}
       <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
         <li>
           <Link
-            href="/docs/concepts/ai-execution"
+            href="/docs/concepts/ai-engine"
             className="text-primary hover:underline"
           >
-            AI Execution
+            AI Engine
           </Link>{" "}
           - Generates attestations
         </li>
@@ -669,7 +725,7 @@ assert(arrayEquals(inputHash, onChainRecord.input_hash));`}
           >
             Deployments
           </Link>{" "}
-          - Locked deployments can be verified
+          - Target chains and onchain config
         </li>
       </ul>
     </article>

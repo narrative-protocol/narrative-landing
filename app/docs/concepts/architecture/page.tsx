@@ -269,10 +269,10 @@ World ──────────────────────── D
       <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
         <li>
           <Link
-            href="/docs/concepts/event"
+            href="/docs/concepts/events"
             className="text-primary hover:underline"
           >
-            Events &amp; Versioning
+            Events
           </Link>
         </li>
         <li>
@@ -285,10 +285,10 @@ World ──────────────────────── D
         </li>
         <li>
           <Link
-            href="/docs/concepts/entity-instances"
+            href="/docs/concepts/entities"
             className="text-primary hover:underline"
           >
-            Entity Instances
+            Entities
           </Link>
         </li>
         <li>

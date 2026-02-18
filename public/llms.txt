@@ -1,0 +1,97 @@
+# Narrative Protocol - LLMs.txt
+
+## Overview
+Narrative Protocol is a World State & Event Engine that enables you to define, manage, and execute complex world simulations with versioned events, AI-driven execution, and on-chain verification.
+
+## Base URL
+```
+https://api.narrativeprotocol.com
+```
+
+## Authentication
+All `/api/*` endpoints require a Bearer token in the Authorization header:
+```
+Authorization: Bearer <token>
+```
+
+### Get Token (Debug)
+```
+POST /DEBUG_register
+Body: { "email": "dev@example.com" }
+Response: { "success": true, "data": { "token": "eyJhbGci..." } }
+```
+
+## Core Concepts
+
+### Worlds
+Top-level container for simulations. Contains entity schemas and events.
+- `POST /api/worlds` - Create a world
+- `GET /api/worlds` - List worlds
+- `GET /api/worlds/:id` - Get world details
+
+### Entity Schemas
+Defines structure for entities (e.g., horse, player, item).
+- `POST /api/entity-schemas` - Create schema
+- `GET /api/entity-schemas` - List schemas
+- `GET /api/entity-schemas/:id` - Get schema details
+- `POST /api/attribute-definitions` - Add attributes to schema
+
+### Events
+Actions that drive state changes. Have versioned behavior.
+- `POST /api/events` - Create event with first version
+- `GET /api/events` - List events
+- `GET /api/events/:id` - Get event with versions
+- `POST /api/events/:id/versions` - Create new version
+
+### Deployments
+Running instances of a world with isolated state.
+- `POST /api/deployments` - Create deployment
+- `GET /api/deployments` - List deployments
+- `GET /api/deployments/:id` - Get deployment details
+- `POST /api/deployments/:id/lock` - Lock deployment
+- `POST /api/deployments/:id/execute` - Execute event
+
+### Entity Instances
+Actual data in a deployment following a schema.
+- `POST /api/entity-instances` - Create instance
+- `GET /api/entity-instances` - List instances
+- `GET /api/entity-instances/:id` - Get instance
+- `PATCH /api/entity-instances/:id` - Update instance
+- `DELETE /api/entity-instances/:id` - Delete instance
+
+### AI Models
+- `GET /api/ai-models` - List available AI models
+
+## Key Features
+
+### Deployment targetChains
+```json
+{ "targetChains": ["solana-devnet"] }
+```
+Options: `[]` (default), `["solana-devnet"]`, `["near-testnet"]`, `["solana-devnet", "near-testnet"]`
+
+### On-chain Config
+```json
+{
+  "targetChains": ["solana-devnet"],
+  "onchain": {
+    "stateChanges": ["wins"],
+    "result": ["winner"]
+  }
+}
+```
+
+### AI Model Selection
+```json
+{ "aiModelId": "openai/gpt-oss-120b" }
+```
+
+## Quick Start Flow
+1. Register: `POST /DEBUG_register`
+2. Create World: `POST /api/worlds`
+3. Create Entity Schema: `POST /api/entity-schemas`
+4. Add Attributes: `POST /api/attribute-definitions`
+5. Create Event: `POST /api/events`
+6. Create Deployment: `POST /api/deployments`
+7. Create Instances: `POST /api/entity-instances`
+8. Execute: `POST /api/deployments/:id/execute`

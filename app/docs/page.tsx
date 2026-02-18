@@ -12,6 +12,20 @@ export default function DocsPage() {
         verification.
       </p>
 
+      <Callout type="info" title="Machine-Readable Documentation">
+        <p className="text-muted-foreground">
+          The documentation is also available for machine readers at{" "}
+          <Link href="/llms.txt" className="text-primary hover:underline">
+            /llms.txt
+          </Link>{" "}
+          (concise) and{" "}
+          <Link href="/llms-full.txt" className="text-primary hover:underline">
+            /llms-full.txt
+          </Link>{" "}
+          (complete).
+        </p>
+      </Callout>
+
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         Key Concepts
       </h2>

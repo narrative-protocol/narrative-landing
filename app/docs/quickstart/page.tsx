@@ -24,53 +24,17 @@ export default function QuickstartPage() {
       </Callout>
 
       {/* SECTION 1: SETUP */}
-      <h2 className="text-3xl font-bold text-foreground mt-12 mb-4">Setup</h2>
+      <h2 className="text-3xl font-bold text-foreground mt-12 mb-4">
+        Getting an API key
+      </h2>
       <p className="text-muted-foreground mb-6">
         Before making any API calls, you need to authenticate with the system.
-        Register your email to get a debug token that will be used for all
-        subsequent requests.
+        Register at{" "}
+        <a href="https://dashboard.narrativeprotocol.com">
+          https://dashboard.narrativeprotocol.com
+        </a>{" "}
+        to get API key that will be used for all subsequent requests.
       </p>
-
-      <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">
-        Get an Auth Token
-      </h3>
-      <p className="text-muted-foreground mb-4">
-        This endpoint registers a new user and returns an authentication token.
-        The token must be included in the Authorization header for all protected
-        requests.
-      </p>
-
-      <CodeTabs
-        title="Register"
-        examples={{
-          curl: `curl -X POST https://api.narrativeprotocol.com/DEBUG_register \\
-  -H "Content-Type: application/json" \\
-  -d '{"email": "dev@example.com"}'`,
-          javascript: `const response = await fetch(\`https://api.narrativeprotocol.com/DEBUG_register\`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ email: "dev@example.com" })
-});
-console.log(await response.json());`,
-          python: `import requests
-
-response = requests.post(
-    "https://api.narrativeprotocol.com/DEBUG_register",
-    json={"email": "dev@example.com"}
-)
-print(response.json())`,
-        }}
-        response={`{
-  "success": true,
-  "data": {
-    "user": {
-      "id": 746629,
-      "email": "dev@example.com"
-    },
-    "token": "eyJhbGciOiJIUzI1NiJ9..."
-  }
-}`}
-      />
 
       {/* DIVIDER */}
       <hr className="my-12 border-border" />

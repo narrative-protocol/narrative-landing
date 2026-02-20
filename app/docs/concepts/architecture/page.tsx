@@ -185,7 +185,7 @@ export default function ArchitecturePage() {
   "worldId": 1,
   "name": "Season 1",
   "mode": "upgradable",
-  "firstBinding": { "eventId": 1, "eventVersionId": 1 }
+  "firstBinding": { "eventId": 1, "eventVersion": 1 }
 }`}
         language="json"
         title="Deployment"

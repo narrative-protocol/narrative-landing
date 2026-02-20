@@ -183,7 +183,7 @@ export default function AIModelsPage() {
   "aiModelId": "openai/gpt-oss-120b",
   "firstBinding": {
     "eventId": 1,
-    "eventVersionId": 1
+    "eventVersion": 1
   }
 }`}
         language="json"

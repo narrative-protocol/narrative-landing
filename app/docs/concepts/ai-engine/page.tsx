@@ -91,7 +91,7 @@ export default function AIEnginePage() {
   "worldId": 1,
   "name": "Season 1",
   "aiModelId": "openai/gpt-oss-120b",
-  "firstBinding": { "eventId": 1, "eventVersionId": 1 }
+  "firstBinding": { "eventId": 1, "eventVersion": 1 }
 }`}
         language="json"
       />
@@ -123,7 +123,7 @@ export default function AIEnginePage() {
   "success": true,
   "data": {
     "historyId": 42,
-    "eventVersionId": 1,
+    "eventVersion": 1,
     "stateChanges": {
       "horse:HORSE_1": { "wins": 6, "lastRace": "2024-06-15" },
       "horse:HORSE_2": { "stamina": 0.72 }

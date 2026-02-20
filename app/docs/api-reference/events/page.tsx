@@ -310,7 +310,7 @@ export default function EventsAPIPage() {
       </p>
 
       <CodeBlock
-        code={`GET /api/event-versions?eventId=<event-id>`}
+        code={`GET /api/events/:eventId/versions`}
         language="http"
       />
 
@@ -325,7 +325,7 @@ export default function EventsAPIPage() {
       </p>
 
       <CodeBlock
-        code={`POST /api/worlds/:worldId/events/:eventId/event-versions`}
+        code={`POST /api/events/:eventId/versions`}
         language="http"
       />
 
@@ -355,16 +355,6 @@ export default function EventsAPIPage() {
 
       <CodeBlock code={`POST /api/event-versions`} language="http" />
 
-      <CodeBlock
-        code={`{
-  "eventId": 1,
-  "inputSchema": {...},
-  ...
-}`}
-        language="json"
-        title="Request Body"
-      />
-
       <table className="w-full border-collapse border border-border my-4">
         <thead>
           <tr className="border-b border-border bg-muted">
@@ -383,18 +373,6 @@ export default function EventsAPIPage() {
           </tr>
         </thead>
         <tbody>
-          <tr className="border-b border-border">
-            <td className="px-4 py-2 text-muted-foreground">
-              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                eventId
-              </code>
-            </td>
-            <td className="px-4 py-2 text-muted-foreground">integer</td>
-            <td className="px-4 py-2 text-muted-foreground">Yes*</td>
-            <td className="px-4 py-2 text-muted-foreground">
-              Parent event ID (*not needed for nested route)
-            </td>
-          </tr>
           <tr className="border-b border-border">
             <td className="px-4 py-2 text-muted-foreground">
               <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
@@ -483,7 +461,7 @@ export default function EventsAPIPage() {
         Update Event Version
       </h3>
 
-      <CodeBlock code={`PUT /api/event-versions/:id`} language="http" />
+      <CodeBlock code={`PUT /api/events/:eventId/versions/:version`} language="http" />
 
       <h4 className="text-lg font-semibold text-foreground mt-4">
         Constraints
@@ -503,7 +481,7 @@ export default function EventsAPIPage() {
       </p>
 
       <CodeBlock
-        code={`POST /api/worlds/:worldId/events/:eventId/event-versions/:versionId/publish`}
+        code={`POST /api/worlds/:worldId/events/:eventId/event-versions/:version/publish`}
         language="http"
       />
 
@@ -512,7 +490,7 @@ export default function EventsAPIPage() {
       </p>
 
       <CodeBlock
-        code={`POST /api/event-versions/:id/publish`}
+        code={`POST /api/events/:eventId/versions/:version/publish`}
         language="http"
       />
 
@@ -535,7 +513,7 @@ export default function EventsAPIPage() {
         Delete Event Version
       </h3>
 
-      <CodeBlock code={`DELETE /api/event-versions/:id`} language="http" />
+      <CodeBlock code={`DELETE /api/events/:eventId/versions/:version`} language="http" />
 
       <h4 className="text-lg font-semibold text-foreground mt-4">
         Constraints

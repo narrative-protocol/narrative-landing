@@ -486,7 +486,7 @@ print(response.json())`,
     "targetChains": ["near-testnet"],
     "firstBinding": {
       "eventId": <event-id>,
-      "eventVersionId": <event-version-id>
+      "eventVersion": <event-version>
     }
   }'`,
           javascript: `const response = await fetch(\`https://api.narrativeprotocol.com/api/deployments\`, {
@@ -501,7 +501,7 @@ print(response.json())`,
     targetChains: ["near-testnet"],
     firstBinding: {
       eventId: <event-id>,
-      eventVersionId: <event-version-id>
+      eventVersion: <event-version>
     }
   })
 });
@@ -520,7 +520,7 @@ response = requests.post(
         "targetChains": ["near-testnet"],
         "firstBinding": {
             "eventId": <event-id>,
-            "eventVersionId": <event-version-id>
+            "eventVersion": <event-version>
         }
     }
 )
@@ -551,7 +551,7 @@ print(response.json())`,
         "id": 28,
         "deploymentId": 28,
         "eventId": 29,
-        "eventVersionId": 48,
+        "eventVersion": 1,
         "createdAt": "2026-02-18T04:19:04.997Z",
         "updatedAt": "2026-02-18T04:19:04.997Z"
       }
@@ -778,7 +778,7 @@ print(response.json())`,
   "success": true,
   "data": {
     "historyId": 11133,
-    "eventVersionId": 48,
+    "eventVersion": 1,
     "stateChanges": {
       "horse:HORSE_1": {
         "wins": 1

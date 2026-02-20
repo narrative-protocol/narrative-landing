@@ -29,7 +29,7 @@ export default function DeploymentPage() {
   },
   "firstBinding": {
     "eventId": 1,
-    "eventVersionId": 1
+    "eventVersion": 1
   }
 }`}
         language="json"
@@ -353,7 +353,7 @@ export default function DeploymentPage() {
         code={`{
   "worldId": 1,
   "name": "Season 2",
-  "firstBinding": { "eventId": 1, "eventVersionId": 2 },
+  "firstBinding": { "eventId": 1, "eventVersion": 2 },
   "sourceDeploymentId": 123
 }`}
         language="json"

@@ -78,7 +78,7 @@ export default function DeploymentsAPIPage() {
   },
   "firstBinding": {
     "eventId": 1,
-    "eventVersionId": 1
+    "eventVersion": 1
   },
   "sourceDeploymentId": 2
 }`}
@@ -262,13 +262,13 @@ export default function DeploymentsAPIPage() {
           <tr className="border-b border-border">
             <td className="px-4 py-2 text-muted-foreground">
               <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                firstBinding.eventVersionId
+                firstBinding.eventVersion
               </code>
             </td>
             <td className="px-4 py-2 text-muted-foreground">integer</td>
             <td className="px-4 py-2 text-muted-foreground">Yes</td>
             <td className="px-4 py-2 text-muted-foreground">
-              Event version ID to bind
+              Relative event version number to bind
             </td>
           </tr>
           <tr>
@@ -313,7 +313,7 @@ export default function DeploymentsAPIPage() {
         "id": 123457,
         "deploymentId": 123456,
         "eventId": 1,
-        "eventVersionId": 1
+        "eventVersion": 1
       }
     ]
   }
@@ -436,7 +436,7 @@ export default function DeploymentsAPIPage() {
   "success": true,
   "data": {
     "historyId": 123458,
-    "eventVersionId": 1,
+    "eventVersion": 1,
     "stateChanges": {
       "horse:HORSE_1": {
         "wins": 5,
@@ -493,11 +493,11 @@ export default function DeploymentsAPIPage() {
           <tr className="border-b border-border">
             <td className="px-4 py-2 text-muted-foreground">
               <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                eventVersionId
+                eventVersion
               </code>
             </td>
             <td className="px-4 py-2 text-muted-foreground">
-              Event version that was executed
+              Relative version number of the event version that was executed
             </td>
           </tr>
           <tr className="border-b border-border">
@@ -760,14 +760,12 @@ export default function DeploymentsAPIPage() {
     {
       "id": 123459,
       "deploymentId": 123456,
-      "eventVersionId": 1,
       "input": { "raceId": "RACE_001" },
       "stateChanges": { ... },
       "result": { ... },
       "attestation": { ... },
       "executedAt": "2024-06-15T10:30:00Z",
       "eventVersion": {
-        "id": 1,
         "version": 1,
         "event": { "id": 123456, "name": "race_result" }
       }
@@ -839,7 +837,7 @@ export default function DeploymentsAPIPage() {
       <CodeBlock
         code={`{
   "eventId": 1,
-  "eventVersionId": 2
+  "eventVersion": 2
 }`}
         language="json"
         title="Request Body"
@@ -855,7 +853,7 @@ export default function DeploymentsAPIPage() {
         code={`{
   "deploymentId": 1,
   "eventId": 1,
-  "eventVersionId": 2
+  "eventVersion": 2
 }`}
         language="json"
         title="Request Body"

@@ -3,6 +3,12 @@
 ## Overview
 Narrative Protocol is a World State & Event Engine that enables you to define, manage, and execute complex world simulations with versioned events, AI-driven execution, and on-chain verification.
 
+## Studio
+```
+https://studio.narrativeprotocol.com
+```
+Use the studio to register, add credits, and create API keys.
+
 ## Base URL
 ```
 https://api.narrativeprotocol.com
@@ -45,11 +51,16 @@ Actions that drive state changes. Have versioned behavior.
 
 ### Deployments
 Running instances of a world with isolated state.
-- `POST /api/deployments` - Create deployment
-- `GET /api/deployments` - List deployments
+- `POST /api/worlds/:worldId/deployments` - Create deployment (nested, recommended)
+- `POST /api/deployments` - Create deployment (direct)
+- `GET /api/worlds/:worldId/deployments` - List deployments (nested, recommended)
+- `GET /api/deployments` - List deployments (direct)
 - `GET /api/deployments/:id` - Get deployment details
-- `POST /api/deployments/:id/lock` - Lock deployment
-- `POST /api/deployments/:id/execute` - Execute event
+- `POST /api/worlds/:worldId/deployments/:deploymentId/lock` - Lock deployment (nested)
+- `POST /api/deployments/:id/lock` - Lock deployment (direct)
+- `POST /api/worlds/:worldId/deployments/:deploymentId/execute` - Execute event (nested)
+- `POST /api/deployments/:id/execute` - Execute event (direct)
+- `DELETE /api/deployments/:id` - Delete deployment
 
 ### Entity Instances
 Actual data in a deployment following a schema.
@@ -58,6 +69,18 @@ Actual data in a deployment following a schema.
 - `GET /api/entity-instances/:id` - Get instance
 - `PATCH /api/entity-instances/:id` - Update instance
 - `DELETE /api/entity-instances/:id` - Delete instance
+
+### Event Bindings
+Links between deployments and event versions.
+- `GET /api/worlds/:worldId/deployments/:deploymentId/event-bindings` - List bindings (nested)
+- `GET /api/event-bindings?deploymentId=<id>` - List bindings (direct)
+- `POST /api/worlds/:worldId/deployments/:deploymentId/event-bindings` - Create binding (nested)
+- `POST /api/event-bindings` - Create binding (direct)
+- `DELETE /api/event-bindings/:id` - Delete binding
+
+### Event History
+- `GET /api/worlds/:worldId/deployments/:deploymentId/history?page=1&limit=10` - List history (nested)
+- `GET /api/deployments/:id/history?page=1&limit=10` - List history (direct)
 
 ### AI Models
 - `GET /api/ai-models` - List available AI models
@@ -68,7 +91,7 @@ Actual data in a deployment following a schema.
 ```json
 { "targetChains": ["solana-devnet"] }
 ```
-Options: `[]` (default), `["solana-devnet"]`, `["near-testnet"]`, `["solana-devnet", "near-testnet"]`
+Options: `[]` (default), `["solana-devnet"]`, `["solana-mainnet"]`, `["near-testnet"]`, `["near-mainnet"]`, or multiple
 
 ### On-chain Config
 ```json
@@ -86,12 +109,26 @@ Options: `[]` (default), `["solana-devnet"]`, `["near-testnet"]`, `["solana-devn
 { "aiModelId": "openai/gpt-oss-120b" }
 ```
 
+### State Change Modes
+- `partial`: Merge changes into existing state (default)
+- `full`: Replace entire state
+- `append`: Append to arrays, merge objects
+
+## Environment
+
+### Mainnet
+- NEAR Smart Contract: `oracle-1.narrativeprotocol.near`
+
+### Testnet / Devnet
+- NEAR Smart Contract: `narrative-p.testnet`
+- Solana Program ID: `3L4tQCyJQDJTxGb2FHKkp2mSpnQPzUKguX5stbktxAaFWutu2cZS8Nnpk17eQ3bThgkNkErXceJ7wE7wTR8jpewz`
+
 ## Quick Start Flow
 1. Register: `POST /DEBUG_register`
 2. Create World: `POST /api/worlds`
 3. Create Entity Schema: `POST /api/entity-schemas`
 4. Add Attributes: `POST /api/attribute-definitions`
 5. Create Event: `POST /api/events`
-6. Create Deployment: `POST /api/deployments`
+6. Create Deployment: `POST /api/worlds/:worldId/deployments`
 7. Create Instances: `POST /api/entity-instances`
-8. Execute: `POST /api/deployments/:id/execute`
+8. Execute: `POST /api/worlds/:worldId/deployments/:deploymentId/execute`

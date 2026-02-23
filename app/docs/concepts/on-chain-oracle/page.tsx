@@ -8,10 +8,9 @@ export default function OnChainOraclePage() {
       <Callout type="warning" title="Deployment Status">
         <p>
           Solana program is currently only deployed on devnet, NEAR smart
-          contract is currently only deployed on testnet.
+          contract is currently only deployed on mainnet and testnet.
         </p>
       </Callout>
-
       <h1 className="text-4xl font-bold text-foreground mt-6">
         On-chain Oracle
       </h1>
@@ -19,9 +18,9 @@ export default function OnChainOraclePage() {
         Narrative Protocol pushes event execution records to blockchain
         networks, providing immutable on-chain records for verification and
         auditability. The system supports multiple chains:{" "}
-        <strong>Solana</strong> (devnet/mainnet) and <strong>NEAR</strong> (testnet/mainnet).
+        <strong>Solana</strong> (devnet/mainnet) and <strong>NEAR</strong>{" "}
+        (testnet/mainnet).
       </p>
-
       <h2 className="text-2xl font-semibold text-foreground mt-8">Overview</h2>
       <p className="text-muted-foreground">After each event execution:</p>
       <ol className="list-decimal pl-6 space-y-2 text-muted-foreground">
@@ -30,7 +29,8 @@ export default function OnChainOraclePage() {
           PostgreSQL
         </li>
         <li>
-          <strong>On-chain Record</strong>: Event data pushed to selected blockchain(s)
+          <strong>On-chain Record</strong>: Event data pushed to selected
+          blockchain(s)
         </li>
         <li>
           <strong>Attestation</strong>: AI attestation stored on-chain
@@ -39,12 +39,16 @@ export default function OnChainOraclePage() {
       <p className="text-muted-foreground">
         This enables independent verification of event executions.
       </p>
-
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         Target Chain Selection
       </h2>
       <p className="text-muted-foreground">
-        When creating a deployment, specify which chain network(s) to use via the <code className="bg-muted px-1.5 py-0.5 rounded text-sm">targetChains</code> array:
+        When creating a deployment, specify which chain network(s) to use via
+        the{" "}
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+          targetChains
+        </code>{" "}
+        array:
       </p>
       <table className="w-full border-collapse border border-border my-4">
         <thead>
@@ -70,7 +74,9 @@ export default function OnChainOraclePage() {
             <td className="px-4 py-2 text-muted-foreground">
               Push to Solana devnet
             </td>
-            <td className="px-4 py-2 text-muted-foreground">1232 bytes per field</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              1232 bytes per field
+            </td>
           </tr>
           <tr className="border-b border-border">
             <td className="px-4 py-2 text-muted-foreground">
@@ -81,7 +87,9 @@ export default function OnChainOraclePage() {
             <td className="px-4 py-2 text-muted-foreground">
               Push to Solana mainnet
             </td>
-            <td className="px-4 py-2 text-muted-foreground">1232 bytes per field</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              1232 bytes per field
+            </td>
           </tr>
           <tr className="border-b border-border">
             <td className="px-4 py-2 text-muted-foreground">
@@ -92,7 +100,9 @@ export default function OnChainOraclePage() {
             <td className="px-4 py-2 text-muted-foreground">
               Push to NEAR testnet
             </td>
-            <td className="px-4 py-2 text-muted-foreground">Unlimited</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              2048 bytes per field
+            </td>
           </tr>
           <tr>
             <td className="px-4 py-2 text-muted-foreground">
@@ -103,15 +113,17 @@ export default function OnChainOraclePage() {
             <td className="px-4 py-2 text-muted-foreground">
               Push to NEAR mainnet
             </td>
-            <td className="px-4 py-2 text-muted-foreground">Unlimited</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              2048 bytes per field
+            </td>
           </tr>
         </tbody>
       </table>
-
       <p className="text-muted-foreground mt-4">
-        An empty array <code className="bg-muted px-1.5 py-0.5 rounded text-sm">[]</code> (default) means no on-chain storage.
+        An empty array{" "}
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">[]</code>{" "}
+        (default) means no on-chain storage.
       </p>
-
       <CodeBlock
         code={`{
   "worldId": 1,
@@ -122,18 +134,18 @@ export default function OnChainOraclePage() {
         language="json"
         title="Deployment Configuration"
       />
-
       <p className="text-muted-foreground mt-4">
-        When both Solana and NEAR chains are included, the stricter Solana 1232-byte limit applies to size validation.
+        When both Solana and NEAR chains are included, the stricter Solana
+        1232-byte limit applies to size validation.
       </p>
-
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         Selective On-Chain Push
       </h2>
       <p className="text-muted-foreground">
-        Deployments can configure which fields get pushed on-chain via the <code className="bg-muted px-1.5 py-0.5 rounded text-sm">onchain</code> config:
+        Deployments can configure which fields get pushed on-chain via the{" "}
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">onchain</code>{" "}
+        config:
       </p>
-
       <CodeBlock
         code={`{
   "targetChains": ["solana-devnet"],
@@ -144,15 +156,22 @@ export default function OnChainOraclePage() {
 }`}
         language="json"
       />
-
       <p className="text-muted-foreground mt-4">
-        When <code className="bg-muted px-1.5 py-0.5 rounded text-sm">onchain</code> is set, only the specified keys from <code className="bg-muted px-1.5 py-0.5 rounded text-sm">stateChanges</code> and <code className="bg-muted px-1.5 py-0.5 rounded text-sm">result</code> are included in the on-chain push. When omitted or null, all data is pushed.
+        When{" "}
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">onchain</code>{" "}
+        is set, only the specified keys from{" "}
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+          stateChanges
+        </code>{" "}
+        and{" "}
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">result</code>{" "}
+        are included in the on-chain push. When omitted or null, all data is
+        pushed.
       </p>
-
       <p className="text-muted-foreground mt-4">
-        This is particularly useful for Solana deployments where the 1232-byte per-field limit requires careful data selection.
+        This is particularly useful for Solana deployments where the 1232-byte
+        per-field limit requires careful data selection.
       </p>
-
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         What Gets Stored On-chain
       </h2>
@@ -296,16 +315,13 @@ export default function OnChainOraclePage() {
           </tr>
         </tbody>
       </table>
-
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         Solana Integration
       </h2>
-
       <h3 className="text-xl font-semibold text-foreground mt-6">Program ID</h3>
       <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm text-muted-foreground">
         8KAY24esApxCjPs48qSHAmFMH8EpTp59XntNLouyRdmQ
       </pre>
-
       <h3 className="text-xl font-semibold text-foreground mt-6">Accounts</h3>
       <p className="text-muted-foreground">
         <strong>Config Account</strong> (PDA:{" "}
@@ -314,7 +330,6 @@ export default function OnChainOraclePage() {
         </code>
         )
       </p>
-
       <CodeBlock
         code={`pub struct Config {
     pub authority: Pubkey,    // Who can push events
@@ -323,7 +338,6 @@ export default function OnChainOraclePage() {
 }`}
         language="rust"
       />
-
       <p className="text-muted-foreground">
         <strong>Deployment Record Account</strong> (PDA:{" "}
         <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
@@ -334,7 +348,6 @@ export default function OnChainOraclePage() {
       <p className="text-muted-foreground">
         One account per deployment, overwritten on each event push:
       </p>
-
       <CodeBlock
         code={`pub struct DeploymentRecord {
     pub deployment_id: u64,
@@ -353,37 +366,18 @@ export default function OnChainOraclePage() {
 }`}
         language="rust"
       />
-
-      <h3 className="text-xl font-semibold text-foreground mt-6">Network Support</h3>
-      <p className="text-muted-foreground">
-        The Solana client supports both <code className="bg-muted px-1.5 py-0.5 rounded text-sm">devnet</code> and <code className="bg-muted px-1.5 py-0.5 rounded text-sm">mainnet</code> via network-specific environment variables:
-      </p>
-
-      <CodeBlock
-        code={`SOLANA_DEVNET_RPC_URL=...
-SOLANA_DEVNET_PRIVATE_KEY=...
-SOLANA_MAINNET_RPC_URL=...
-SOLANA_MAINNET_PRIVATE_KEY=...`}
-        language="bash"
-      />
-
-      <p className="text-muted-foreground mt-4">
-        Legacy variables (<code className="bg-muted px-1.5 py-0.5 rounded text-sm">SOLANA_RPC_URL</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-sm">SOLANA_PRIVATE_KEY</code>) are used as fallback for devnet.
-      </p>
-
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         NEAR Integration
       </h2>
-
-      <h3 className="text-xl font-semibold text-foreground mt-6">Address</h3>
+      <h3 className="text-xl font-semibold text-foreground mt-6">Addresses</h3>
       <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm text-muted-foreground">
-        narrative-p.testnet
+        oracle-1.narrativeprotocol.near (mainnet)
+        <br />
+        narrative-p.testnet (testnet)
       </pre>
-
       <h3 className="text-xl font-semibold text-foreground mt-6">
         Contract Structure
       </h3>
-
       <CodeBlock
         code={`pub struct Contract {
     authority: AccountId,
@@ -404,28 +398,6 @@ pub struct EventRecord {
 }`}
         language="rust"
       />
-
-      <h3 className="text-xl font-semibold text-foreground mt-6">Network Support</h3>
-      <p className="text-muted-foreground">
-        The NEAR client supports both <code className="bg-muted px-1.5 py-0.5 rounded text-sm">testnet</code> and <code className="bg-muted px-1.5 py-0.5 rounded text-sm">mainnet</code> via network-specific environment variables:
-      </p>
-
-      <CodeBlock
-        code={`NEAR_TESTNET_RPC_URL=...
-NEAR_TESTNET_ACCOUNT_ID=...
-NEAR_TESTNET_PRIVATE_KEY=...
-NEAR_TESTNET_CONTRACT_ID=...
-NEAR_MAINNET_RPC_URL=...
-NEAR_MAINNET_ACCOUNT_ID=...
-NEAR_MAINNET_PRIVATE_KEY=...
-NEAR_MAINNET_CONTRACT_ID=...`}
-        language="bash"
-      />
-
-      <p className="text-muted-foreground mt-4">
-        Legacy variables (<code className="bg-muted px-1.5 py-0.5 rounded text-sm">NEAR_RPC_URL</code>, <code className="bg-muted px-1.5 py-0.5 rounded text-sm">NEAR_ACCOUNT_ID</code>, etc.) are used as fallback for testnet.
-      </p>
-
       <h3 className="text-xl font-semibold text-foreground mt-6">
         Contract Methods
       </h3>
@@ -471,31 +443,18 @@ NEAR_MAINNET_CONTRACT_ID=...`}
           <tr className="border-b border-border">
             <td className="px-4 py-2 text-muted-foreground">
               <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                update_authority
+                get_deployment_event
               </code>
             </td>
             <td className="px-4 py-2 text-muted-foreground">
-              Transfer authority
-            </td>
-            <td className="px-4 py-2 text-muted-foreground">
-              Current authority
-            </td>
-          </tr>
-          <tr className="border-b border-border">
-            <td className="px-4 py-2 text-muted-foreground">
-              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                get_event
-              </code>
-            </td>
-            <td className="px-4 py-2 text-muted-foreground">
-              Get event by history ID
+              Get event by deployment ID and event ID
             </td>
             <td className="px-4 py-2 text-muted-foreground">Public</td>
           </tr>
           <tr>
             <td className="px-4 py-2 text-muted-foreground">
               <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-                get_event_count
+                get_deployment_event_count
               </code>
             </td>
             <td className="px-4 py-2 text-muted-foreground">
@@ -505,14 +464,12 @@ NEAR_MAINNET_CONTRACT_ID=...`}
           </tr>
         </tbody>
       </table>
-
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         Attestation Structure
       </h2>
       <p className="text-muted-foreground">
         Both chains store the same attestation format:
       </p>
-
       <CodeBlock
         code={`pub struct Attestation {
     pub signature: Vec&lt;u8&gt;,        // ECDSA signature (65 bytes)
@@ -522,14 +479,12 @@ NEAR_MAINNET_CONTRACT_ID=...`}
 }`}
         language="rust"
       />
-
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         API Response
       </h2>
       <p className="text-muted-foreground">
         Event execution response includes oracle results for configured chains:
       </p>
-
       <CodeBlock
         code={`{
   "success": true,
@@ -552,7 +507,6 @@ NEAR_MAINNET_CONTRACT_ID=...`}
 }`}
         language="json"
       />
-
       <p className="text-muted-foreground">
         The{" "}
         <code className="bg-muted px-1.5 py-0.5 rounded text-sm">oracle</code>{" "}
@@ -581,7 +535,6 @@ NEAR_MAINNET_CONTRACT_ID=...`}
         <code className="bg-muted px-1.5 py-0.5 rounded text-sm">null</code> if
         that chain family is not configured or not selected.
       </p>
-
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         Verification Flow
       </h2>
@@ -597,7 +550,12 @@ NEAR_MAINNET_CONTRACT_ID=...`}
           </code>
         </li>
         <li>
-          <strong>Compare state_changes and result</strong> - on-chain contains full JSON (or filtered JSON if <code className="bg-muted px-1.5 py-0.5 rounded text-sm">onchain</code> config is set)
+          <strong>Compare state_changes and result</strong> - on-chain contains
+          full JSON (or filtered JSON if{" "}
+          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+            onchain
+          </code>{" "}
+          config is set)
         </li>
         <li>
           <strong>Compute hash</strong> of input
@@ -609,11 +567,9 @@ NEAR_MAINNET_CONTRACT_ID=...`}
           <strong>Verify attestation</strong> - check ECDSA signature
         </li>
       </ol>
-
       <h3 className="text-xl font-semibold text-foreground mt-6">
         Solana Verification
       </h3>
-
       <CodeBlock
         code={`const onChainRecord = await program.account.deploymentRecord.fetch(pda);
 const offChainData = await fetch(\`/api/deployments/\${id}/history/\${historyId}\`);
@@ -626,11 +582,9 @@ assert(inputHash === onChainRecord.inputHash);`}
         language="javascript"
         title="JavaScript"
       />
-
       <h3 className="text-xl font-semibold text-foreground mt-6">
         NEAR Verification
       </h3>
-
       <CodeBlock
         code={`const onChainRecord = await contract.get_event({ event_history_id: historyId });
 const offChainData = await fetch(\`/api/deployments/\${id}/history/\${historyId}\`);
@@ -643,18 +597,19 @@ assert(arrayEquals(inputHash, onChainRecord.input_hash));`}
         language="javascript"
         title="JavaScript"
       />
-
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         Data Size Limits
       </h2>
-
       <Callout type="warning" title="Size Constraints">
         <p className="text-muted-foreground">
           When using Solana chains, be mindful of the 1232-byte per-field limit.
-          Use the <code className="bg-muted px-1.5 py-0.5 rounded text-sm">onchain</code> config on the deployment to select only the fields you need on-chain.
+          Use the{" "}
+          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+            onchain
+          </code>{" "}
+          config on the deployment to select only the fields you need on-chain.
         </p>
       </Callout>
-
       <p className="text-muted-foreground">
         When using on-chain storage, be mindful of data sizes:
       </p>
@@ -676,14 +631,18 @@ assert(arrayEquals(inputHash, onChainRecord.input_hash));`}
           <tr className="border-b border-border">
             <td className="px-4 py-2 text-muted-foreground">Solana</td>
             <td className="px-4 py-2 text-muted-foreground">1232 bytes</td>
-            <td className="px-4 py-2 text-muted-foreground">Use <code className="bg-muted px-1.5 py-0.5 rounded text-sm">onchain</code> config to filter fields</td>
+            <td className="px-4 py-2 text-muted-foreground">
+              Use{" "}
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+                onchain
+              </code>{" "}
+              config to filter fields
+            </td>
           </tr>
           <tr className="border-b border-border">
             <td className="px-4 py-2 text-muted-foreground">NEAR</td>
-            <td className="px-4 py-2 text-muted-foreground">Unlimited</td>
-            <td className="px-4 py-2 text-muted-foreground">
-              No size restrictions
-            </td>
+            <td className="px-4 py-2 text-muted-foreground">2048 bytes</td>
+            <td className="px-4 py-2 text-muted-foreground"></td>
           </tr>
           <tr>
             <td className="px-4 py-2 text-muted-foreground">Both</td>
@@ -701,10 +660,11 @@ assert(arrayEquals(inputHash, onChainRecord.input_hash));`}
         </code>{" "}
         or{" "}
         <code className="bg-muted px-1.5 py-0.5 rounded text-sm">result</code>{" "}
-        exceeds 1232 bytes when using a Solana chain, the event execution will fail with a validation error. Use the{" "}
-        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">onchain</code> config on the deployment to select only the fields you need on-chain.
+        exceeds 1232 bytes when using a Solana chain, the event execution will
+        fail with a validation error. Use the{" "}
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">onchain</code>{" "}
+        config on the deployment to select only the fields you need on-chain.
       </p>
-
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         Related Concepts
       </h2>

@@ -707,21 +707,6 @@ export default function DeploymentsAPIPage() {
         </tbody>
       </table>
 
-      <h4 className="text-lg font-semibold text-foreground mt-4">
-        Constraints
-      </h4>
-      <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-        <li>Event must be bound to the deployment (400 Bad Request)</li>
-        <li>Deployment cannot be locked (400 Bad Request)</li>
-        <li>
-          Requires{" "}
-          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-            NEAR_API_KEY
-          </code>{" "}
-          environment variable (returns mock if not set)
-        </li>
-      </ul>
-
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         Event History
       </h2>

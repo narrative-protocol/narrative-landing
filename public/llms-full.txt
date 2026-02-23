@@ -3,6 +3,12 @@
 ## Overview
 Narrative Protocol is a **World State & Event Engine** that enables you to define, manage, and execute complex world simulations with versioned events, AI-driven execution, and on-chain verification.
 
+## Studio
+```
+https://studio.narrativeprotocol.com
+```
+Use the studio to register, add credits, and create API keys.
+
 ## Base URL
 ```
 https://api.narrativeprotocol.com
@@ -100,6 +106,14 @@ The AI engine:
 7. Records everything in event history with attestation
 8. Pushes to on-chain oracle(s)
 
+### State Change Modes
+
+| Mode | Behavior |
+|------|----------|
+| `partial` | Merge changes into existing state (default) |
+| `full` | Replace entire state |
+| `append` | Append to arrays, merge objects |
+
 ### Deployment Modes
 
 #### Upgradable Mode (Default)
@@ -143,16 +157,30 @@ Every AI response includes a cryptographic attestation for independent verificat
 ### Multi-Chain On-chain Oracle
 Event execution records can be pushed to Solana and/or NEAR networks for immutable on-chain storage. Deployments specify target chains as an array (e.g., `["solana-devnet", "near-testnet"]`).
 
+Note: Solana program is currently only deployed on devnet. NEAR smart contract is currently deployed on mainnet and testnet.
+
 ### Selective On-Chain Push
-Configure which state change and result fields get pushed to the blockchain to stay within Solana's 1232-byte transaction limit.
+Configure which state change and result fields get pushed to the blockchain. When using Solana chains, be mindful of the 1232-byte per-field limit.
 
 ---
 
 ## Environment & Endpoints
 
+### Studio
+```
+https://studio.narrativeprotocol.com
+```
+
 ### API Endpoint
 ```
 https://api.narrativeprotocol.com
+```
+
+### Mainnet Contracts
+
+#### NEAR Smart Contract
+```
+oracle-1.narrativeprotocol.near
 ```
 
 ### Testnet / Devnet Contracts
@@ -387,12 +415,53 @@ DELETE /api/events/:id
 
 ### Deployments
 
+There are two ways to access deployments:
+1. **Nested routes** (recommended): `/api/worlds/:worldId/deployments`
+2. **Direct routes**: `/api/deployments` (for backwards compatibility)
+
+#### List Deployments
+
+Nested route (recommended):
+```
+GET /api/worlds/:worldId/deployments
+```
+
+Direct route:
+```
+GET /api/deployments?worldId=<world-id>
+```
+
 #### Create Deployment
+
+Nested route (recommended):
+```
+POST /api/worlds/:worldId/deployments
+```
+
+Request:
+```json
+{
+  "name": "Season 1",
+  "targetChains": ["solana-devnet"],
+  "aiModelId": "openai/gpt-oss-120b",
+  "onchain": {
+    "stateChanges": ["wins"],
+    "result": ["winner"]
+  },
+  "firstBinding": {
+    "eventId": 1,
+    "eventVersion": 1
+  },
+  "sourceDeploymentId": 2
+}
+```
+
+Direct route:
 ```
 POST /api/deployments
 ```
 
-Request:
+Request (direct route requires `worldId`):
 ```json
 {
   "worldId": 1,
@@ -405,46 +474,49 @@ Request:
   },
   "firstBinding": {
     "eventId": 1,
-    "eventVersionId": 1
+    "eventVersion": 1
   }
 }
 ```
 
 Fields:
-- `targetChains`: Array of chains - `[]`, `["solana-devnet"]`, `["solana-mainnet"]`, `["near-testnet"]`, `["near-mainnet"]`, or multiple
+- `worldId`: Parent world ID (not needed for nested route)
+- `name`: Deployment name (required)
+- `targetChains`: Array of chains - `[]`, `["solana-devnet"]`, `["solana-mainnet"]`, `["near-testnet"]`, `["near-mainnet"]`, or multiple (default: `[]`)
 - `aiModelId`: AI model for execution (default: `openai/gpt-oss-120b`)
 - `onchain.stateChanges`: Keys from stateChanges to push on-chain
 - `onchain.result`: Keys from result to push on-chain
 - `firstBinding`: Initial event binding (required)
-- `sourceDeploymentId`: For snapshotting
+- `firstBinding.eventId`: Event ID to bind
+- `firstBinding.eventVersion`: Relative event version number to bind
+- `sourceDeploymentId`: Copy state from this deployment (snapshotting)
 
 Response:
 ```json
 {
   "success": true,
   "data": {
-    "id": 1,
+    "id": 123456,
     "worldId": 1,
     "name": "Season 1",
     "mode": "upgradable",
     "targetChains": ["solana-devnet"],
+    "aiModelId": "openai/gpt-oss-120b",
+    "onchain": {
+      "stateChanges": ["wins"],
+      "result": ["winner"]
+    },
     "lockedAt": null,
     "eventBindings": [
       {
-        "id": 1,
-        "deploymentId": 1,
+        "id": 123457,
+        "deploymentId": 123456,
         "eventId": 1,
-        "eventVersionId": 1
+        "eventVersion": 1
       }
-    ],
-    "createdAt": "2024-01-01T00:00:00Z"
+    ]
   }
 }
-```
-
-#### List Deployments
-```
-GET /api/deployments?worldId=1
 ```
 
 #### Get Deployment
@@ -452,15 +524,25 @@ GET /api/deployments?worldId=1
 GET /api/deployments/:id
 ```
 
+Returns deployment with entity instances and bindings.
+
 #### Update Deployment
 ```
 PATCH /api/deployments/:id
 ```
 
 #### Lock Deployment
+
+Nested route (recommended):
+```
+POST /api/worlds/:worldId/deployments/:deploymentId/lock
+```
+
+Direct route:
 ```
 POST /api/deployments/:id/lock
 ```
+
 Makes deployment read-only permanently.
 
 Response:
@@ -468,9 +550,9 @@ Response:
 {
   "success": true,
   "data": {
-    "id": 1,
+    "id": 123456,
     "mode": "locked",
-    "lockedAt": "2024-06-15T10:30:00Z"
+    "lockedAt": "2024-01-01T00:00:00Z"
   },
   "message": "Deployment locked successfully"
 }
@@ -480,6 +562,13 @@ Response:
 ```
 DELETE /api/deployments/:id
 ```
+
+Deletes a deployment and all its event bindings.
+
+Constraints:
+- Cannot delete locked deployments (400 Bad Request)
+- Cannot delete if entity instances exist (409 Conflict)
+- Cannot delete if event history exists (409 Conflict)
 
 ---
 
@@ -538,6 +627,13 @@ DELETE /api/entity-instances/:id
 ### Event Execution
 
 #### Execute Event
+
+Nested route (recommended):
+```
+POST /api/worlds/:worldId/deployments/:deploymentId/execute
+```
+
+Direct route:
 ```
 POST /api/deployments/:id/execute
 ```
@@ -555,41 +651,155 @@ Response:
 {
   "success": true,
   "data": {
-    "historyId": 1,
-    "eventVersionId": 1,
+    "historyId": 123458,
+    "eventVersion": 1,
     "stateChanges": {
-      "horse:HORSE_1": { "wins": 1 }
+      "horse:HORSE_1": {
+        "wins": 5,
+        "lastRace": "2024-06-15"
+      }
     },
     "result": {
       "winner": "HORSE_1",
       "time": "1:45.32"
     },
     "attestation": {
-      "signature": "0x77057b...",
-      "signing_address": "0x34B7Bc...",
+      "signature": "0x77057beca063e348d93069e9912d5e31...",
+      "signing_address": "0x34B7BcB4b2b61FCF9fA14715ba8708AC0dBC8Be5",
       "signing_algo": "ecdsa",
-      "text": "eda20c62..."
+      "text": "eda20c62e5fe44e2aa8820c962efef0306f2d0c94805f9105add72ff705a8358:..."
     },
     "oracle": {
-      "solana": { "signature": "5xYz...", "eventRecordPda": "7abc..." },
+      "solana": {
+        "signature": "5xYzABC123def456...",
+        "eventRecordPda": "7abcDEF789ghi012..."
+      },
       "near": null
     }
   }
 }
 ```
 
+Response Fields:
+- `historyId`: Unique ID of this execution record
+- `eventVersion`: Relative version number of the event version that was executed
+- `stateChanges`: Changes applied to entity instances (key: `schemaName:instanceId`)
+- `result`: Public output from AI (matches `resultSchema`)
+- `attestation`: Cryptographic attestation from NEAR AI
+- `oracle`: On-chain records (based on deployment's `targetChains`)
+- `oracle.solana`: Solana record (`null` if no Solana chain configured)
+- `oracle.solana.signature`: Solana transaction signature
+- `oracle.solana.eventRecordPda`: PDA of the on-chain deployment record
+- `oracle.near`: NEAR record (`null` if no NEAR chain configured)
+- `oracle.near.txHash`: NEAR transaction hash
+
+#### State Change Modes
+
+The `stateChangeSchema` in the event version determines how changes are applied:
+
+| Mode | Behavior |
+|------|----------|
+| `partial` | Merge changes into existing state (default) |
+| `full` | Replace entire state |
+| `append` | Append to arrays, merge objects |
+
 ---
 
 ### Event History
 
 #### List Event History
+
+Nested route (recommended):
 ```
-GET /api/deployments/:id/history
+GET /api/worlds/:worldId/deployments/:deploymentId/history?page=1&limit=10
+```
+
+Direct route:
+```
+GET /api/deployments/:id/history?page=1&limit=10
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 123459,
+      "deploymentId": 123456,
+      "input": { "raceId": "RACE_001" },
+      "stateChanges": { ... },
+      "result": { ... },
+      "attestation": { ... },
+      "executedAt": "2024-06-15T10:30:00Z",
+      "eventVersion": {
+        "version": 1,
+        "event": { "id": 123456, "name": "race_result" }
+      }
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 42,
+    "totalPages": 5
+  }
+}
 ```
 
 #### Get Event History
 ```
 GET /api/deployments/:id/history/:historyId
+```
+
+---
+
+### Event Bindings
+
+#### List Bindings
+
+Nested route (recommended):
+```
+GET /api/worlds/:worldId/deployments/:deploymentId/event-bindings
+```
+
+Direct route:
+```
+GET /api/event-bindings?deploymentId=<deployment-id>
+```
+
+#### Create Binding
+
+Nested route (recommended):
+```
+POST /api/worlds/:worldId/deployments/:deploymentId/event-bindings
+```
+
+Request:
+```json
+{
+  "eventId": 1,
+  "eventVersion": 2
+}
+```
+
+Direct route:
+```
+POST /api/event-bindings
+```
+
+Request:
+```json
+{
+  "deploymentId": 1,
+  "eventId": 1,
+  "eventVersion": 2
+}
+```
+
+#### Delete Binding
+```
+DELETE /api/event-bindings/:id
 ```
 
 ---
@@ -624,15 +834,17 @@ Response:
 
 ## On-chain Oracle Details
 
+Note: Solana program is currently only deployed on devnet. NEAR smart contract is currently deployed on mainnet and testnet.
+
 ### Target Chains
 
 | Value | Description | Max Data Size |
 |-------|-------------|---------------|
 | `[]` | No on-chain storage (default) | N/A |
 | `["solana-devnet"]` | Solana devnet | 1232 bytes/field |
-| `["sol` | Solana mainana-mainnet"]net | 1232 bytes/field |
-| `["near-testnet"]` | NEAR testnet | Unlimited |
-| `["near-mainnet"]` | NEAR mainnet | Unlimited |
+| `["solana-mainnet"]` | Solana mainnet | 1232 bytes/field |
+| `["near-testnet"]` | NEAR testnet | 2048 bytes/field |
+| `["near-mainnet"]` | NEAR mainnet | 2048 bytes/field |
 
 ### Selective On-chain Push
 Control which fields get pushed on-chain:
@@ -665,14 +877,15 @@ On-chain record fields:
 - `pushed_at`: When latest record was pushed
 
 ### NEAR
-- Contract: `narrative-p.testnet`
+- Mainnet Contract: `oracle-1.narrativeprotocol.near`
+- Testnet Contract: `narrative-p.testnet`
 
 Contract methods:
 - `initialize`: Set up contract authority
 - `push_event`: Push new event record
 - `update_authority`: Transfer authority
-- `get_event`: Get event by history ID
-- `get_event_count`: Get total event count
+- `get_deployment_event`: Get event by deployment ID and event ID
+- `get_deployment_event_count`: Get total event count
 
 ---
 
@@ -706,6 +919,7 @@ Common status codes:
 - `401 Unauthorized` - Missing/invalid auth
 - `403 Forbidden` - No permission
 - `404 Not Found` - Resource doesn't exist
+- `409 Conflict` - Resource conflict (e.g., deleting deployment with instances)
 - `500 Internal Server Error` - Server error
 
 ---
@@ -745,10 +959,10 @@ curl -X POST https://api.narrativeprotocol.com/api/events \
 
 5. **Create Deployment**
 ```bash
-curl -X POST https://api.narrativeprotocol.com/api/deployments \
+curl -X POST https://api.narrativeprotocol.com/api/worlds/1/deployments \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
-  -d '{"worldId": 1, "name": "Season 1", "firstBinding": {...}}'
+  -d '{"name": "Season 1", "firstBinding": {"eventId": 1, "eventVersion": 1}}'
 ```
 
 6. **Create Entity Instances**
@@ -761,7 +975,7 @@ curl -X POST https://api.narrativeprotocol.com/api/entity-instances \
 
 7. **Execute Event**
 ```bash
-curl -X POST https://api.narrativeprotocol.com/api/deployments/1/execute \
+curl -X POST https://api.narrativeprotocol.com/api/worlds/1/deployments/1/execute \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{"eventId": 1, "input": {"raceId": "RACE_001"}}'

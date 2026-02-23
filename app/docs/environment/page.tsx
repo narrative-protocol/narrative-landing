@@ -36,6 +36,22 @@ export default function EnvironmentPage() {
         title="API Endpoint"
       />
 
+      <h2 className="text-2xl font-semibold text-foreground mt-8">Mainnet</h2>
+      <p className="text-muted-foreground">Oracle smart contract</p>
+
+      <div className="mt-4 space-y-4">
+        <div>
+          <h3 className="text-lg font-medium text-foreground">
+            NEAR Smart Contract
+          </h3>
+          <CodeBlock
+            code={`oracle-1.narrativeprotocol.near`}
+            language="text"
+            title="NEAR smart contract"
+          />
+        </div>
+      </div>
+
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         Testnet / Devnet
       </h2>

@@ -20,6 +20,7 @@ import {
   Dices,
   Repeat,
   Sparkles,
+  LucideExternalLink,
 } from "lucide-react";
 
 const useCases = [
@@ -114,10 +115,16 @@ export default function Home() {
               asChild
               className="hidden sm:inline-flex border-border bg-transparent hover:bg-card"
             >
-              <Link href="https://github.com">GitHub</Link>
+              <Link href="https://unstablesky.xyz" target="_blank">
+                Play Unstable Sky
+                <LucideExternalLink />
+              </Link>
             </Button>
             <Button size="sm" asChild>
-              <Link href="/docs">Get Started</Link>
+              <Link href="https://studio.narrativeprotocol.com" target="_blank">
+                Open Studio
+                <LucideExternalLink />
+              </Link>
             </Button>
           </div>
         </div>
@@ -737,41 +744,114 @@ export default function Home() {
           </div>
         </div>
         {/* Footer */}
-        <footer className="absolute bottom-0 right-0 left-0 py-4">
-          <div className="mx-auto max-w-7xl px-6">
-            <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-              <div className="flex items-center gap-2">
-                <Image
-                  src="/logo.svg"
-                  alt="Narrative Protocol"
-                  width={32}
-                  height={32}
-                  className="h-8 w-8"
-                />
-                <span className="font-medium text-foreground">
-                  Narrative Protocol
-                </span>
+        <footer className="absolute bottom-0 right-0 left-0 border-t border-border/40 bg-background/80 backdrop-blur-sm">
+          <div className="mx-auto max-w-7xl px-6 py-8">
+            <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 md:gap-12">
+              {/* Brand */}
+              <div className="col-span-2 flex flex-col gap-4 sm:col-span-1">
+                <Link href="/" className="flex items-center gap-2 w-fit">
+                  <Image
+                    src="/logo.svg"
+                    alt="Narrative Protocol"
+                    width={32}
+                    height={32}
+                    className="h-8 w-8"
+                  />
+                  <span className="font-medium text-foreground">
+                    Narrative Protocol
+                  </span>
+                </Link>
               </div>
-              <nav className="flex flex-wrap items-center justify-center gap-6">
-                <Link
-                  href="/docs"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Documentation
-                </Link>
-                <Link
-                  href="/docs/quickstart"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Getting Started
-                </Link>
-                <Link
-                  href="https://github.com"
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  GitHub
-                </Link>
-              </nav>
+              {/* Product */}
+              <div>
+                <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Product
+                </h4>
+                <ul className="space-y-2">
+                  <li>
+                    <Link
+                      href="https://studio.narrative.org"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      Narrative Studio
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="https://explorer.narrative.org"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      Explorer
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+              {/* Docs */}
+              <div>
+                <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Docs
+                </h4>
+                <ul className="space-y-2">
+                  <li>
+                    <Link
+                      href="/docs"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      Documentation
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/docs/quickstart"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      Getting Started
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+              {/* Community */}
+              <div>
+                <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Community
+                </h4>
+                <ul className="space-y-2">
+                  <li>
+                    <Link
+                      href="https://github.com/narrative-protocol"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      GitHub
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="https://x.com/NarrativeHQ"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      Twitter
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="https://t.me/narrativeprotocol"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      Telegram
+                    </Link>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </footer>

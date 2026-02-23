@@ -30,8 +30,11 @@ export default function QuickstartPage() {
       <p className="text-muted-foreground mb-6">
         Before making any API calls, you need to authenticate with the system.
         Register at{" "}
-        <a href="https://dashboard.narrativeprotocol.com">
-          https://dashboard.narrativeprotocol.com
+        <a
+          className="text-accent hover:underline"
+          href="https://studio.narrativeprotocol.com"
+        >
+          https://studio.narrativeprotocol.com
         </a>{" "}
         to get API key that will be used for all subsequent requests.
       </p>

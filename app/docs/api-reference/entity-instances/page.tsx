@@ -254,7 +254,7 @@ export default function EntityInstancesAPIPage() {
       <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
         <li><Link href="/docs/api-reference/entity-schemas" className="text-primary hover:underline">Entity Schemas API</Link> - Define entity types</li>
         <li><Link href="/docs/api-reference/deployments" className="text-primary hover:underline">Deployments API</Link> - Parent resource</li>
-        <li><Link href="/docs/concepts/entity-instances" className="text-primary hover:underline">Entity Instances</Link> - Concept documentation</li>
+        <li><Link href="/docs/concepts/entities" className="text-primary hover:underline">Entities</Link> - Concept documentation</li>
       </ul>
     </article>
   )

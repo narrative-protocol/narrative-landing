@@ -3,11 +3,29 @@
 import { useState } from "react"
 import { Check, Copy } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism"
 
 interface CodeBlockProps {
   code: string
   language?: string
   title?: string
+}
+
+const customStyle = {
+  ...oneDark,
+  'pre[class*="language-"]': {
+    ...oneDark['pre[class*="language-"]'],
+    background: "transparent",
+    margin: 0,
+    padding: "1rem",
+  },
+  'code[class*="language-"]': {
+    ...oneDark['code[class*="language-"]'],
+    background: "transparent",
+    fontSize: "0.875rem",
+    lineHeight: "1.5",
+  },
 }
 
 export function CodeBlock({ code, language = "json", title }: CodeBlockProps) {
@@ -41,11 +59,15 @@ export function CodeBlock({ code, language = "json", title }: CodeBlockProps) {
           </Button>
         </div>
       )}
-      <pre className="overflow-x-auto bg-card p-4">
-        <code className={`language-${language} text-sm text-foreground`}>
+      <div className="overflow-x-auto bg-card">
+        <SyntaxHighlighter
+          language={language}
+          style={customStyle}
+          showLineNumbers={false}
+        >
           {code}
-        </code>
-      </pre>
+        </SyntaxHighlighter>
+      </div>
     </div>
   )
 }

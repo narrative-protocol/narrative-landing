@@ -11,6 +11,18 @@ export default function EnvironmentPage() {
         with Narrative Protocol.
       </p>
 
+      <h2 className="text-2xl font-semibold text-foreground mt-8">Dashboard</h2>
+      <p className="text-muted-foreground">
+        Use the following endpoint to access the dashboard to register, add
+        credits, and create API keys.
+      </p>
+
+      <CodeBlock
+        code={`https://dashboard.narrativeprotocol.com`}
+        language="bash"
+        title="Dashboard"
+      />
+
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         API Endpoint
       </h2>
@@ -21,7 +33,7 @@ export default function EnvironmentPage() {
       <CodeBlock
         code={`https://api.narrativeprotocol.com`}
         language="bash"
-        title="Endpoint & Environments"
+        title="API Endpoint"
       />
 
       <h2 className="text-2xl font-semibold text-foreground mt-8">

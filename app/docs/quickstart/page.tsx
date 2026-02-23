@@ -1,5 +1,5 @@
 import { Callout } from "@/components/callout";
-import { CodeBlock } from "@/components/code-block";
+import { CodeTabs } from "@/components/code-tabs";
 import Link from "next/link";
 
 export default function QuickstartPage() {
@@ -14,91 +14,197 @@ export default function QuickstartPage() {
       <Callout type="info" title="Prerequisites">
         <p className="text-muted-foreground">
           Set the{" "}
-          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">URL</code>{" "}
-          environment variable to the API endpoint (
+          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">URL</code> to
+          the API endpoint (
           <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-            export URL=https://api.narrativeprotocol.com
+            https://api.narrativeprotocol.com
           </code>
           )
         </p>
       </Callout>
 
-      <h2 className="text-2xl font-semibold text-foreground mt-8">
-        Get an Auth Token
+      {/* SECTION 1: SETUP */}
+      <h2 className="text-3xl font-bold text-foreground mt-12 mb-4">
+        Getting an API key
       </h2>
-      <p className="text-muted-foreground">
-        First, register to get a debug token:
+      <p className="text-muted-foreground mb-6">
+        Before making any API calls, you need to authenticate with the system.
+        Register at{" "}
+        <a href="https://dashboard.narrativeprotocol.com">
+          https://dashboard.narrativeprotocol.com
+        </a>{" "}
+        to get API key that will be used for all subsequent requests.
       </p>
 
-      <CodeBlock
-        code={`# Register and save the token
-TOKEN=$(curl -s -X POST $URL/DEBUG_register \\
-  -H "Content-Type: application/json" \\
-  -d '{"email": "dev@example.com"}' | jq -r '.data.token')
+      {/* DIVIDER */}
+      <hr className="my-12 border-border" />
 
-echo $TOKEN`}
-        language="bash"
-        title="Shell"
-      />
-
-      <p className="text-muted-foreground">
-        Use this token in the{" "}
-        <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-          Authorization
-        </code>{" "}
-        header for all subsequent requests.
+      {/* SECTION 2: BLUEPRINT LAYER */}
+      <h2 className="text-3xl font-bold text-foreground mt-12 mb-4">
+        Blueprint Layer
+      </h2>
+      <p className="text-muted-foreground mb-6">
+        The Blueprint layer is where you define your world&apos;s structure.
+        This includes creating worlds, entity schemas with attributes, and
+        events with versioned behavior. These definitions are separate from the
+        runtime execution.
       </p>
 
-      <h2 className="text-2xl font-semibold text-foreground mt-8">
+      <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">
         Create Your First World
-      </h2>
+      </h3>
+      <p className="text-muted-foreground mb-4">
+        A World is the top-level container for your simulation. It holds entity
+        schemas, events, and can have multiple deployments. The promptSeed helps
+        the AI understand the overall context of your world.
+      </p>
 
-      <CodeBlock
-        code={`WORLD_ID=$(curl -s -X POST $URL/api/worlds \\
+      <CodeTabs
+        title="Create World"
+        examples={{
+          curl: `curl -X POST https://api.narrativeprotocol.com/api/worlds \\
   -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer $TOKEN" \\
+  -H "Authorization: Bearer <your-token>" \\
   -d '{
     "name": "Horse Racing",
     "description": "A horse racing simulation world",
     "domainTags": ["sports", "simulation"],
     "promptSeed": "This world simulates realistic horse racing events."
-  }' | jq -r '.data.id')
+  }'`,
+          javascript: `const response = await fetch(\`https://api.narrativeprotocol.com/api/worlds\`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <your-token>"
+  },
+  body: JSON.stringify({
+    name: "Horse Racing",
+    description: "A horse racing simulation world",
+    domainTags: ["sports", "simulation"],
+    promptSeed: "This world simulates realistic horse racing events."
+  })
+});
+console.log(await response.json());`,
+          python: `import requests
 
-echo "World ID: $WORLD_ID"`}
-        language="bash"
-        title="Shell"
+response = requests.post(
+    "https://api.narrativeprotocol.com/api/worlds",
+    headers={
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your-token>"
+    },
+    json={
+        "name": "Horse Racing",
+        "description": "A horse racing simulation world",
+        "domainTags": ["sports", "simulation"],
+        "promptSeed": "This world simulates realistic horse racing events."
+    }
+)
+print(response.json())`,
+        }}
+        response={`{
+  "success": true,
+  "data": {
+    "id": 39,
+    "address": "0xd36f777a077ff3825653f6d521f1437b4da69699",
+    "userId": 746631,
+    "name": "Horse Racing",
+    "description": "A horse racing simulation world",
+    "domainTags": [
+      "sports",
+      "simulation"
+    ],
+    "promptSeed": "This world simulates realistic horse racing events.",
+    "isPublic": false,
+    "createdAt": "2026-02-18T04:13:02.315Z",
+    "updatedAt": "2026-02-18T04:13:02.315Z"
+  }
+}`}
       />
 
-      <h2 className="text-2xl font-semibold text-foreground mt-8">
+      <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">
         Define an Entity Schema
-      </h2>
+      </h3>
+      <p className="text-muted-foreground mb-4">
+        An Entity Schema defines the structure for entities in your world. For
+        example, a &quot;horse&quot; schema defines what attributes (name,
+        speed, wins) all horses will have. Individual horses (instances) will
+        then have specific values for these attributes.
+      </p>
 
-      <CodeBlock
-        code={`SCHEMA_ID=$(curl -s -X POST $URL/api/entity-schemas \\
+      <CodeTabs
+        title="Create Entity Schema"
+        examples={{
+          curl: `curl -X POST https://api.narrativeprotocol.com/api/entity-schemas \\
   -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer $TOKEN" \\
+  -H "Authorization: Bearer <your-token>" \\
   -d '{
-    "worldId": '$WORLD_ID',
+    "worldId": <world-id>,
     "name": "horse",
     "description": "A racing horse"
-  }' | jq -r '.data.id')
+  }'`,
+          javascript: `const response = await fetch(\`https://api.narrativeprotocol.com/api/entity-schemas\`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <your-token>"
+  },
+  body: JSON.stringify({
+    worldId: <world-id>,
+    name: "horse",
+    description: "A racing horse"
+  })
+});
+console.log(await response.json());`,
+          python: `import requests
 
-echo "Schema ID: $SCHEMA_ID"`}
-        language="bash"
-        title="Shell"
+response = requests.post(
+    "https://api.narrativeprotocol.com/api/entity-schemas",
+    headers={
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your-token>"
+    },
+    json={
+        "worldId": <world-id>,
+        "name": "horse",
+        "description": "A racing horse"
+    }
+)
+print(response.json())`,
+        }}
+        response={`{
+  "success": true,
+  "data": {
+    "id": 53,
+    "worldId": 39,
+    "name": "horse",
+    "description": "A racing horse",
+    "createdAt": "2026-02-18T04:13:49.117Z",
+    "updatedAt": "2026-02-18T04:13:49.117Z",
+    "attributeDefinitions": []
+  }
+}`}
       />
 
-      <h2 className="text-2xl font-semibold text-foreground mt-8">
+      <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">
         Add Attributes to Entity Schema
-      </h2>
+      </h3>
+      <p className="text-muted-foreground mb-4">
+        Attributes define the specific properties each entity instance can have.
+        You can specify type (string, integer, float, boolean), constraints, and
+        default values. These attributes will be available for all instances of
+        this schema.
+      </p>
 
-      <CodeBlock
-        code={`# Speed rating attribute
-curl -s -X POST $URL/api/attribute-definitions \\
+      <CodeTabs
+        title="Create Attribute Definitions"
+        examples={{
+          curl: `# Speed rating attribute
+curl -X POST https://api.narrativeprotocol.com/api/attribute-definitions \\
   -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer $TOKEN" \\
+  -H "Authorization: Bearer <your-token>" \\
   -d '{
-    "entitySchemaId": '$SCHEMA_ID',
+    "entitySchemaId": <schema-id>,
     "name": "speed_rating",
     "type": "float",
     "constraints": { "min": 0, "max": 1 },
@@ -106,119 +212,405 @@ curl -s -X POST $URL/api/attribute-definitions \\
   }'
 
 # Name attribute
-curl -s -X POST $URL/api/attribute-definitions \\
+curl -X POST https://api.narrativeprotocol.com/api/attribute-definitions \\
   -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer $TOKEN" \\
+  -H "Authorization: Bearer <your-token>" \\
   -d '{
-    "entitySchemaId": '$SCHEMA_ID',
+    "entitySchemaId": <schema-id>,
     "name": "name",
     "type": "string"
   }'
 
 # Wins attribute
-curl -s -X POST $URL/api/attribute-definitions \\
+curl -X POST https://api.narrativeprotocol.com/api/attribute-definitions \\
   -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer $TOKEN" \\
+  -H "Authorization: Bearer <your-token>" \\
   -d '{
-    "entitySchemaId": '$SCHEMA_ID',
+    "entitySchemaId": <schema-id>,
     "name": "wins",
     "type": "integer",
     "defaultValue": 0
-  }'`}
-        language="bash"
-        title="Shell"
+  }'`,
+          javascript: `// Speed rating attribute
+await fetch(\`https://api.narrativeprotocol.com/api/attribute-definitions\`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <your-token>"
+  },
+  body: JSON.stringify({
+    entitySchemaId: <schema-id>,
+    name: "speed_rating",
+    type: "float",
+    constraints: { min: 0, max: 1 },
+    defaultValue: 0.5
+  })
+}).then(r => r.json()).then(console.log);
+
+// Name attribute
+await fetch(\`https://api.narrativeprotocol.com/api/attribute-definitions\`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <your-token>"
+  },
+  body: JSON.stringify({
+    entitySchemaId: <schema-id>,
+    name: "name",
+    type: "string"
+  })
+}).then(r => r.json()).then(console.log);
+
+// Wins attribute
+await fetch(\`https://api.narrativeprotocol.com/api/attribute-definitions\`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <your-token>"
+  },
+  body: JSON.stringify({
+    entitySchemaId: <schema-id>,
+    name: "wins",
+    type: "integer",
+    defaultValue: 0
+  })
+}).then(r => r.json()).then(console.log);`,
+          python: `import requests
+
+# Speed rating attribute
+print(requests.post(
+    "https://api.narrativeprotocol.com/api/attribute-definitions",
+    headers={
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your-token>"
+    },
+    json={
+        "entitySchemaId": <schema-id>,
+        "name": "speed_rating",
+        "type": "float",
+        "constraints": {"min": 0, "max": 1},
+        "defaultValue": 0.5
+    }
+).json())
+
+# Name attribute
+print(requests.post(
+    "https://api.narrativeprotocol.com/api/attribute-definitions",
+    headers={
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your-token>"
+    },
+    json={
+        "entitySchemaId": <schema-id>,
+        "name": "name",
+        "type": "string"
+    }
+).json())
+
+# Wins attribute
+print(requests.post(
+    "https://api.narrativeprotocol.com/api/attribute-definitions",
+    headers={
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your-token>"
+    },
+    json={
+        "entitySchemaId": <schema-id>,
+        "name": "wins",
+        "type": "integer",
+        "defaultValue": 0
+    }
+).json())`,
+        }}
+        response={`{
+  "success": true,
+  "data": {
+    "id": 239,
+    "entitySchemaId": 53,
+    "name": "speed_rating",
+    "type": "float",
+    "constraints": {
+      "max": 1,
+      "min": 0
+    },
+    "defaultValue": 0.5,
+    "createdAt": "2026-02-18T04:15:08.734Z",
+    "updatedAt": "2026-02-18T04:15:08.734Z"
+  }
+}`}
       />
 
-      <h2 className="text-2xl font-semibold text-foreground mt-8">
+      <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">
         Create an Event (with first version)
-      </h2>
+      </h3>
+      <p className="text-muted-foreground mb-4">
+        Events define what can happen in your world. Each event has versions
+        that become immutable once published, ensuring reproducibility. The
+        first version is created along with the event. Key configurations
+        include: inputSchema (what input the event accepts), stateChangeSchema
+        (how entity state changes), and behaviorPrompt (instructions for the
+        AI).
+      </p>
 
-      <CodeBlock
-        code={`EVENT_ID=$(curl -s -X POST $URL/api/events \\
+      <CodeTabs
+        title="Create Event"
+        examples={{
+          curl: `curl -X POST https://api.narrativeprotocol.com/api/events \\
   -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer $TOKEN" \\
+  -H "Authorization: Bearer <your-token>" \\
   -d '{
-    "worldId": '$WORLD_ID',
+    "worldId": <world-id>,
     "name": "race_result",
     "description": "Resolves a race and updates horse stats",
     "firstVersion": {
       "inputSchema": { "raceId": "string" },
-      "reads": ['$SCHEMA_ID'],
+      "reads": [<schema-id>],
       "stateChangeSchema": { "horse": "partial" },
       "resultSchema": { "winner": "string", "time": "string" },
       "behaviorPrompt": "Determine the race winner based on horse speed ratings. Update the winners wins count."
     }
-  }' | jq -r '.data.id')
-
-EVENT_VERSION_ID=$(curl -s $URL/api/events/$EVENT_ID \\
-  -H "Authorization: Bearer $TOKEN" | jq -r '.data.versions[0].id')
-
-echo "Event ID: $EVENT_ID, Version ID: $EVENT_VERSION_ID"`}
-        language="bash"
-        title="Shell"
-      />
-
-      <h2 className="text-2xl font-semibold text-foreground mt-8">
-        Create a Deployment (with first binding)
-      </h2>
-
-      <CodeBlock
-        code={`DEPLOYMENT_ID=$(curl -s -X POST $URL/api/deployments \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer $TOKEN" \\
-  -d '{
-    "worldId": '$WORLD_ID',
-    "name": "Season 1",
-    "targetChain": "solana",
-    "firstBinding": {
-      "eventId": '$EVENT_ID',
-      "eventVersionId": '$EVENT_VERSION_ID'
+  }'`,
+          javascript: `const response = await fetch(\`https://api.narrativeprotocol.com/api/events\`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <your-token>"
+  },
+  body: JSON.stringify({
+    worldId: <world-id>,
+    name: "race_result",
+    description: "Resolves a race and updates horse stats",
+    firstVersion: {
+      inputSchema: { raceId: "string" },
+      reads: [<schema-id>],
+      stateChangeSchema: { horse: "partial" },
+      resultSchema: { winner: "string", time: "string" },
+      behaviorPrompt: "Determine the race winner based on horse speed ratings. Update the winners wins count."
     }
-  }' | jq -r '.data.id')
+  })
+});
+console.log(await response.json());`,
+          python: `import requests
 
-echo "Deployment ID: $DEPLOYMENT_ID"`}
-        language="bash"
-        title="Shell"
+response = requests.post(
+    "https://api.narrativeprotocol.com/api/events",
+    headers={
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your-token>"
+    },
+    json={
+        "worldId": <world-id>,
+        "name": "race_result",
+        "description": "Resolves a race and updates horse stats",
+        "firstVersion": {
+            "inputSchema": {"raceId": "string"},
+            "reads": [<schema-id>],
+            "stateChangeSchema": {"horse": "partial"},
+            "resultSchema": {"winner": "string", "time": "string"},
+            "behaviorPrompt": "Determine the race winner based on horse speed ratings. Update the winners wins count."
+        }
+    }
+)
+print(response.json())`,
+        }}
+        response={`{
+  "success": true,
+  "data": {
+    "id": 29,
+    "worldId": 39,
+    "name": "race_result",
+    "description": "Resolves a race and updates horse stats",
+    "createdAt": "2026-02-18T04:17:00.453Z",
+    "updatedAt": "2026-02-18T04:17:00.453Z",
+    "versions": [
+      {
+        "id": 48,
+        "eventId": 29,
+        "version": 1,
+        "inputSchema": {
+          "raceId": "string"
+        },
+        "reads": [
+          53
+        ],
+        "stateChangeSchema": {
+          "horse": "partial"
+        },
+        "resultSchema": {
+          "time": "string",
+          "winner": "string"
+        },
+        "behaviorPrompt": "Determine the race winner based on horse speed ratings. Update the winners wins count.",
+        "publishedAt": "2026-02-18T04:17:00.458Z",
+        "createdAt": "2026-02-18T04:17:00.453Z"
+      }
+    ]
+  }
+}`}
       />
 
-      <p className="text-muted-foreground">
+      {/* DIVIDER */}
+      <hr className="my-12 border-border" />
+
+      {/* SECTION 3: LIVE LAYER */}
+      <h2 className="text-3xl font-bold text-foreground mt-12 mb-4">
+        Live Layer
+      </h2>
+      <p className="text-muted-foreground mb-6">
+        The Live layer is where your simulation actually runs. Deployments are
+        isolated runtime instances of a world, containing entity instances,
+        event bindings, and execution history. This is where you create
+        entities, execute events, and watch the AI compute state changes.
+      </p>
+
+      <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">
+        Create a Deployment (with first binding)
+      </h3>
+      <p className="text-muted-foreground mb-4">
+        A Deployment is a running instance of a world with its own isolated
+        state. The firstBinding connects an event version to this deployment,
+        allowing that event to be executed. The targetChains array specifies
+        which blockchain networks to push event data to for on-chain
+        verification.
+      </p>
+
+      <CodeTabs
+        title="Create Deployment"
+        examples={{
+          curl: `curl -X POST https://api.narrativeprotocol.com/api/deployments \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer <your-token>" \\
+  -d '{
+    "worldId": <world-id>,
+    "name": "Season 1",
+    "targetChains": ["near-testnet"],
+    "firstBinding": {
+      "eventId": <event-id>,
+      "eventVersion": <event-version>
+    }
+  }'`,
+          javascript: `const response = await fetch(\`https://api.narrativeprotocol.com/api/deployments\`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <your-token>"
+  },
+  body: JSON.stringify({
+    worldId: <world-id>,
+    name: "Season 1",
+    targetChains: ["near-testnet"],
+    firstBinding: {
+      eventId: <event-id>,
+      eventVersion: <event-version>
+    }
+  })
+});
+console.log(await response.json());`,
+          python: `import requests
+
+response = requests.post(
+    "https://api.narrativeprotocol.com/api/deployments",
+    headers={
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your-token>"
+    },
+    json={
+        "worldId": <world-id>,
+        "name": "Season 1",
+        "targetChains": ["near-testnet"],
+        "firstBinding": {
+            "eventId": <event-id>,
+            "eventVersion": <event-version>
+        }
+    }
+)
+print(response.json())`,
+        }}
+        response={`{
+  "success": true,
+  "data": {
+    "id": 28,
+    "address": "0xe4598b767f81d0d95f44d1ab0655d83233a6a6f2",
+    "worldId": 39,
+    "userId": 746631,
+    "name": "Season 1",
+    "description": null,
+    "mode": "upgradable",
+    "targetChains": [
+      "near-testnet"
+    ],
+    "aiModelId": null,
+    "onchain": null,
+    "isPublic": false,
+    "isLLMPublic": false,
+    "lockedAt": null,
+    "createdAt": "2026-02-18T04:19:04.997Z",
+    "updatedAt": "2026-02-18T04:19:04.997Z",
+    "eventBindings": [
+      {
+        "id": 28,
+        "deploymentId": 28,
+        "eventId": 29,
+        "eventVersion": 1,
+        "createdAt": "2026-02-18T04:19:04.997Z",
+        "updatedAt": "2026-02-18T04:19:04.997Z"
+      }
+    ]
+  }
+}`}
+      />
+
+      <p className="text-muted-foreground mt-4 mb-4">
         The{" "}
         <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-          targetChain
+          targetChains
         </code>{" "}
         option determines where event data is stored on-chain:
       </p>
-      <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+      <ul className="list-disc pl-6 space-y-2 text-muted-foreground mb-6">
         <li>
-          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">none</code> -
+          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">[]</code> -
           No on-chain storage (default)
         </li>
         <li>
-          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">solana</code>{" "}
-          - Push to Solana
+          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+            ["solana-devnet"]
+          </code>{" "}
+          - Push to Solana devnet
         </li>
         <li>
-          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">near</code> -
-          Push to NEAR
+          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+            ["near-testnet"]
+          </code>{" "}
+          - Push to NEAR testnet
         </li>
         <li>
-          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">both</code> -
-          Push to both chains
+          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
+            ["solana-devnet", "near-testnet"]
+          </code>{" "}
+          - Push to both chains
         </li>
       </ul>
 
-      <h2 className="text-2xl font-semibold text-foreground mt-8">
+      <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">
         Create Entity Instances
-      </h2>
+      </h3>
+      <p className="text-muted-foreground mb-4">
+        Entity Instances are the actual data in your deployment. They follow the
+        schema you defined but each instance has its own state. Here we create
+        two horses with specific names and speed ratings.
+      </p>
 
-      <CodeBlock
-        code={`# Create first horse
-curl -s -X POST $URL/api/entity-instances \\
+      <CodeTabs
+        title="Create Entity Instances"
+        examples={{
+          curl: `# Create first horse
+curl -X POST https://api.narrativeprotocol.com/api/entity-instances \\
   -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer $TOKEN" \\
+  -H "Authorization: Bearer <your-token>" \\
   -d '{
-    "deploymentId": '$DEPLOYMENT_ID',
-    "entitySchemaId": '$SCHEMA_ID',
+    "deploymentId": <deployment-id>,
+    "entitySchemaId": <schema-id>,
     "instanceId": "HORSE_1",
     "state": {
       "name": "Midnight Comet",
@@ -227,200 +619,278 @@ curl -s -X POST $URL/api/entity-instances \\
   }'
 
 # Create second horse
-curl -s -X POST $URL/api/entity-instances \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer $TOKEN" \\
+curl -X POST https://api.narrativeprotocol.com/api  -H "Content-Type: application/json" \\
+ /entity-instances \\
+ -H "Authorization: Bearer <your-token>" \\
   -d '{
-    "deploymentId": '$DEPLOYMENT_ID',
-    "entitySchemaId": '$SCHEMA_ID',
+    "deploymentId": <deployment-id>,
+    "entitySchemaId": <schema-id>,
     "instanceId": "HORSE_2",
     "state": {
       "name": "Thunder Bolt",
       "speed_rating": 0.78
     }
-  }'`}
-        language="bash"
-        title="Shell"
-      />
+  }'`,
+          javascript: `// Create first horse
+const horse1 = await fetch(\`https://api.narrativeprotocol.com/api/entity-instances\`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <your-token>"
+  },
+  body: JSON.stringify({
+    deploymentId: <deployment-id>,
+    entitySchemaId: <schema-id>,
+    instanceId: "HORSE_1",
+    state: {
+      name: "Midnight Comet",
+      speed_rating: 0.85
+    }
+  })
+});
+console.log(await horse1.json());
 
-      <h2 className="text-2xl font-semibold text-foreground mt-8">
-        Execute an Event
-      </h2>
-      <p className="text-muted-foreground">
-        Now the exciting part - execute the event and watch the AI compute state
-        changes:
-      </p>
+// Create second horse
+const horse2 = await fetch(\`https://api.narrativeprotocol.com/api/entity-instances\`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer <your-token>"
+  },
+  body: JSON.stringify({
+    deploymentId: <deployment-id>,
+    entitySchemaId: <schema-id>,
+    instanceId: "HORSE_2",
+    state: {
+      name: "Thunder Bolt",
+      speed_rating: 0.78
+    }
+  })
+});
+console.log(await horse2.json());`,
+          python: `import requests
 
-      <CodeBlock
-        code={`curl -s -X POST $URL/api/deployments/$DEPLOYMENT_ID/execute \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer $TOKEN" \\
-  -d '{
-    "eventId": '$EVENT_ID',
-    "input": { "raceId": "RACE_001" }
-  }' | jq`}
-        language="bash"
-        title="Shell"
-      />
+# Create first horse
+print(requests.post(
+    "https://api.narrativeprotocol.com/api/entity-instances",
+    headers={
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your-token>"
+    },
+    json={
+        "deploymentId": <deployment-id>,
+        "entitySchemaId": <schema-id>,
+        "instanceId": "HORSE_1",
+        "state": {
+            "name": "Midnight Comet",
+            "speed_rating": 0.85
+        }
+    }
+).json())
 
-      <p className="text-muted-foreground">
-        <strong>Response:</strong>
-      </p>
-
-      <CodeBlock
-        code={`{
+# Create second horse
+print(requests.post(
+    "https://api.narrativeprotocol.com/api/entity-instances",
+    headers={
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your-token>"
+    },
+    json={
+        "deploymentId": <deployment-id>,
+        "entitySchemaId": <schema-id>,
+        "instanceId": "HORSE_2",
+        "state": {
+            "name": "Thunder Bolt",
+            "speed_rating": 0.78
+        }
+    }
+).json())`,
+        }}
+        response={`{
   "success": true,
   "data": {
-    "historyId": 1,
-    "eventVersionId": 1,
+    "id": 107,
+    "deploymentId": 28,
+    "entitySchemaId": 53,
+    "instanceId": "HORSE_1",
+    "state": {
+      "name": "Midnight Comet",
+      "wins": 0,
+      "speed_rating": 0.85
+    },
+    "createdAt": "2026-02-18T04:20:39.855Z",
+    "updatedAt": "2026-02-18T04:20:39.855Z"
+  }
+}`}
+      />
+
+      <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">
+        Execute an Event
+      </h3>
+      <p className="text-muted-foreground mb-4">
+        This is where the magic happens! Executing an event triggers the AI
+        engine to process the event based on the world definition, current
+        entity states, and the behavior prompt. The AI computes state changes
+        and returns the results along with cryptographic attestation.
+      </p>
+
+      <CodeTabs
+        title="Execute Event"
+        examples={{
+          curl: `curl -X POST https://api.narrativeprotocol.com/api/deployments/<deployment-id>/execute \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer <your-token>" \\
+  -d '{
+    "eventId": <event-id>,
+    "input": { "raceId": "RACE_001" }
+  }'`,
+          javascript: `const response = await fetch(
+  \`https://api.narrativeprotocol.com/api/deployments/<deployment-id>/execute\`,
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer <your-token>"
+    },
+    body: JSON.stringify({
+      eventId: <event-id>,
+      input: { raceId: "RACE_001" }
+    })
+  }
+);
+console.log(await response.json());`,
+          python: `import requests
+
+response = requests.post(
+    "https://api.narrativeprotocol.com/api/deployments/<deployment-id>/execute",
+    headers={
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your-token>"
+    },
+    json={
+        "eventId": <event-id>,
+        "input": {"raceId": "RACE_001"}
+    }
+)
+print(response.json())`,
+        }}
+        response={`{
+  "success": true,
+  "data": {
+    "historyId": 11133,
+    "eventVersion": 1,
     "stateChanges": {
-      "horse:HORSE_1": { "wins": 1 }
+      "horse:HORSE_1": {
+        "wins": 1
+      }
     },
     "result": {
-      "winner": "HORSE_1",
-      "time": "1:45.32"
+      "time": "2026-02-18T00:00:00Z",
+      "winner": "Midnight Comet"
     },
     "attestation": {
-      "signature": "0x77057b...",
-      "signing_address": "0x34B7Bc...",
+      "signature": "0x0b09aa672cde45034a1091532b1e7f7e31b476181fd06ca4faafc566245a823f3ff0e8a65afd102b64a1370170e5819f242480e727d449cbdcc338d7324b9a191c",
+      "signing_address": "0xbBC409e6b529817D257aD61D5738D8e3a39b5791",
       "signing_algo": "ecdsa",
-      "text": "eda20c62..."
+      "text": "d3fc5ada116a1c0c9359ea6b7297b210cfecd393facc04c5d20209002a2dd126:ad558a6182aa4c55374cbd5eae218d6b2dae1957780630ecc6a0f01e49214af9"
     },
     "oracle": {
-      "solana": { "signature": "5xYz...", "eventRecordPda": "7abc..." },
-      "near": null
+      "solana": null,
+      "near": {
+        "txHash": "8LjP9sqX26oQgScPy5RGzs8dEzwZiNSQHKrTpCLrP5yy",
+        "receiptId": "ZWsNXEXPp1KyQWB68psjypi1PHGjMC8MrAomHBQLpGr"
+      }
     }
   }
 }`}
-        language="json"
-        title="Response"
       />
 
-      <h2 className="text-2xl font-semibold text-foreground mt-8">
+      <h3 className="text-xl font-semibold text-foreground mt-8 mb-4">
         View Updated State
-      </h2>
-      <p className="text-muted-foreground">
-        Check the entity instances to see the updated state:
+      </h3>
+      <p className="text-muted-foreground mb-4">
+        After executing an event, you can query the entity instances to see how
+        the state has changed. The AI modified HORSE_1&apos;s state based on the
+        event outcome.
       </p>
 
-      <CodeBlock
-        code={`curl -s $URL/api/entity-instances?deploymentId=$DEPLOYMENT_ID \\
-  -H "Authorization: Bearer $TOKEN" | jq '.data'`}
-        language="bash"
-        title="Shell"
+      <CodeTabs
+        title="Get Entity Instances"
+        examples={{
+          curl: `curl https://api.narrativeprotocol.com/api/entity-instances?deploymentId=<deployment-id> \\
+  -H "Authorization: Bearer <your-token>"`,
+          javascript: `const response = await fetch(
+  \`https://api.narrativeprotocol.com/api/entity-instances?deploymentId=<deployment-id>\`,
+  {
+    headers: { Authorization: "Bearer <your-token>" }
+  }
+);
+console.log(await response.json());`,
+          python: `import requests
+
+response = requests.get(
+    "https://api.narrativeprotocol.com/api/entity-instances",
+    params={"deploymentId": <deployment-id>},
+    headers={"Authorization": "Bearer <your-token>"}
+)
+print(response.json())`,
+        }}
+        response={`{
+  "success": true,
+  "data": [
+    {
+      "id": 108,
+      "deploymentId": 28,
+      "entitySchemaId": 53,
+      "instanceId": "HORSE_2",
+      "state": {
+        "name": "Thunder Bolt",
+        "wins": 0,
+        "speed_rating": 0.78
+      },
+      "createdAt": "2026-02-18T04:25:07.459Z",
+      "updatedAt": "2026-02-18T04:25:07.459Z",
+      "entitySchema": {
+        "id": 53,
+        "worldId": 39,
+        "name": "horse",
+        "description": "A racing horse",
+        "createdAt": "2026-02-18T04:13:49.117Z",
+        "updatedAt": "2026-02-18T04:13:49.117Z"
+      }
+    },
+    {
+      "id": 107,
+      "deploymentId": 28,
+      "entitySchemaId": 53,
+      "instanceId": "HORSE_1",
+      "state": {
+        "name": "Midnight Comet",
+        "wins": 1,
+        "speed_rating": 0.85
+      },
+      "createdAt": "2026-02-18T04:20:39.855Z",
+      "updatedAt": "2026-02-18T04:22:46.166Z",
+      "entitySchema": {
+        "id": 53,
+        "worldId": 39,
+        "name": "horse",
+        "description": "A racing horse",
+        "createdAt": "2026-02-18T04:13:49.117Z",
+        "updatedAt": "2026-02-18T04:13:49.117Z"
+      }
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 2,
+    "totalPages": 1
+  }
+}`}
       />
 
-      <h2 className="text-2xl font-semibold text-foreground mt-8">
-        Full Script
-      </h2>
-
-      <Callout type="tip" title="Quick Start">
-        <p className="text-muted-foreground">
-          Save this script as{" "}
-          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-            setup.sh
-          </code>
-          , make it executable with{" "}
-          <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-            chmod +x setup.sh
-          </code>
-          , and run it to get started in seconds.
-        </p>
-      </Callout>
-
-      <p className="text-muted-foreground">
-        Here&apos;s a complete script to run all steps:
-      </p>
-
-      <CodeBlock
-        code={`#!/bin/bash
-set -e
-
-URL="http://localhost:3000"
-
-# Get token
-TOKEN=$(curl -s -X POST $URL/DEBUG_register \\
-  -H "Content-Type: application/json" \\
-  -d '{"email": "dev@example.com"}' | jq -r '.data.token')
-
-# Create world
-WORLD_ID=$(curl -s -X POST $URL/api/worlds \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer $TOKEN" \\
-  -d '{"name": "Horse Racing", "description": "A simulation"}' | jq -r '.data.id')
-
-# Create schema
-SCHEMA_ID=$(curl -s -X POST $URL/api/entity-schemas \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer $TOKEN" \\
-  -d '{"worldId": '$WORLD_ID', "name": "horse"}' | jq -r '.data.id')
-
-# Create event with first version
-EVENT_RESPONSE=$(curl -s -X POST $URL/api/events \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer $TOKEN" \\
-  -d '{
-    "worldId": '$WORLD_ID',
-    "name": "race_result",
-    "firstVersion": {
-      "inputSchema": { "raceId": "string" },
-      "reads": ['$SCHEMA_ID'],
-      "stateChangeSchema": { "horse": "partial" },
-      "behaviorPrompt": "Determine winner based on speed."
-    }
-  }')
-
-EVENT_ID=$(echo $EVENT_RESPONSE | jq -r '.data.id')
-EVENT_VERSION_ID=$(echo $EVENT_RESPONSE | jq -r '.data.versions[0].id')
-
-# Create deployment with first binding (targetChain: none|solana|near|both)
-DEPLOYMENT_ID=$(curl -s -X POST $URL/api/deployments \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer $TOKEN" \\
-  -d '{
-    "worldId": '$WORLD_ID',
-    "name": "Season 1",
-    "targetChain": "solana",
-    "firstBinding": {
-      "eventId": '$EVENT_ID',
-      "eventVersionId": '$EVENT_VERSION_ID'
-    }
-  }' | jq -r '.data.id')
-
-# Create instances
-curl -s -X POST $URL/api/entity-instances \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer $TOKEN" \\
-  -d '{
-    "deploymentId": '$DEPLOYMENT_ID',
-    "entitySchemaId": '$SCHEMA_ID',
-    "instanceId": "HORSE_1",
-    "state": {"name": "Midnight", "speed_rating": 0.85}
-  }' > /dev/null
-
-curl -s -X POST $URL/api/entity-instances \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer $TOKEN" \\
-  -d '{
-    "deploymentId": '$DEPLOYMENT_ID',
-    "entitySchemaId": '$SCHEMA_ID',
-    "instanceId": "HORSE_2",
-    "state": {"name": "Thunder", "speed_rating": 0.78}
-  }' > /dev/null
-
-# Execute event
-echo "Executing event..."
-curl -s -X POST $URL/api/deployments/$DEPLOYMENT_ID/execute \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer $TOKEN" \\
-  -d '{"eventId": '$EVENT_ID', "input": {"raceId": "RACE_001"}}' | jq
-
-echo "Done! World: $WORLD_ID, Deployment: $DEPLOYMENT_ID"`}
-        language="bash"
-        title="full-setup.sh"
-      />
-
-      <h2 className="text-2xl font-semibold text-foreground mt-8">
+      <h2 className="text-2xl font-semibold text-foreground mt-12 mb-4">
         Next Steps
       </h2>
       <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
@@ -434,12 +904,12 @@ echo "Done! World: $WORLD_ID, Deployment: $DEPLOYMENT_ID"`}
         <li>
           Explore{" "}
           <Link
-            href="/docs/concepts/ai-execution"
+            href="/docs/concepts/ai-engine"
             className="text-primary hover:underline"
           >
-            AI Execution
+            AI Engine
           </Link>{" "}
-          - How events are processed
+          - How events are processed and model selection
         </li>
         <li>
           See{" "}

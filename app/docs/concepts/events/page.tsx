@@ -5,9 +5,7 @@ import Link from "next/link";
 export default function EventPage() {
   return (
     <article className="prose prose-invert max-w-none">
-      <h1 className="text-4xl font-bold text-foreground">
-        Events &amp; Versioning
-      </h1>
+      <h1 className="text-4xl font-bold text-foreground">Events</h1>
 
       <h2 className="text-2xl font-semibold text-foreground mt-8">
         What is an Event?
@@ -213,7 +211,7 @@ Version 2 (published) ─── immutable, can be bound`}
       <p className="text-muted-foreground">
         Once published via{" "}
         <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-          POST /api/event-versions/:id/publish
+          POST /api/events/:eventId/versions/:version/publish
         </code>
         :
       </p>
@@ -392,11 +390,10 @@ Version 2 (published) ─── immutable, can be bound`}
         Creating a New Version
       </h2>
 
-      <CodeBlock code={`POST /api/event-versions`} language="http" />
+      <CodeBlock code={`POST /api/events/:eventId/versions`} language="http" />
 
       <CodeBlock
         code={`{
-  "eventId": 1,
   "inputSchema": { "raceId": "string", "weather": "string" },
   "reads": [1, 2],
   "stateChangeSchema": { "horse": "partial" },
@@ -444,25 +441,25 @@ Version 2 (published) ─── immutable, can be bound`}
         </li>
         <li>
           <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-            POST /api/event-versions
+            POST /api/events/:eventId/versions
           </code>{" "}
           - Create additional versions
         </li>
         <li>
           <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-            PUT /api/event-versions/:id
+            PUT /api/events/:eventId/versions/:version
           </code>{" "}
           - Update draft version
         </li>
         <li>
           <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-            POST /api/event-versions/:id/publish
+            POST /api/events/:eventId/versions/:version/publish
           </code>{" "}
           - Publish (make immutable)
         </li>
         <li>
           <code className="bg-muted px-1.5 py-0.5 rounded text-sm">
-            DELETE /api/event-versions/:id
+            DELETE /api/events/:eventId/versions/:version
           </code>{" "}
           - Delete (drafts only)
         </li>
@@ -474,10 +471,10 @@ Version 2 (published) ─── immutable, can be bound`}
       <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
         <li>
           <Link
-            href="/docs/concepts/ai-execution"
+            href="/docs/concepts/ai-engine"
             className="text-primary hover:underline"
           >
-            AI Execution
+            AI Engine
           </Link>{" "}
           - How events are processed
         </li>

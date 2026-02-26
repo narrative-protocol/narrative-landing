@@ -17,8 +17,8 @@ import * as __fd_glob_6 from "../content/docs/api-reference/ai-models.mdx?collec
 import * as __fd_glob_5 from "../content/docs/quickstart.mdx?collection=docs"
 import * as __fd_glob_4 from "../content/docs/index.mdx?collection=docs"
 import * as __fd_glob_3 from "../content/docs/environment.mdx?collection=docs"
-import { default as __fd_glob_2 } from "../content/docs/api-reference/meta.json?collection=docs"
-import { default as __fd_glob_1 } from "../content/docs/concepts/meta.json?collection=docs"
+import { default as __fd_glob_2 } from "../content/docs/concepts/meta.json?collection=docs"
+import { default as __fd_glob_1 } from "../content/docs/api-reference/meta.json?collection=docs"
 import { default as __fd_glob_0 } from "../content/docs/meta.json?collection=docs"
 import { server } from 'fumadocs-mdx/runtime/server';
 import type * as Config from '../source.config';
@@ -28,4 +28,4 @@ const create = server<typeof Config, import("fumadocs-mdx/runtime/types").Intern
   }
 }>({"doc":{"passthroughs":["extractedReferences"]}});
 
-export const docs = await create.docs("docs", "content/docs", {"meta.json": __fd_glob_0, "concepts/meta.json": __fd_glob_1, "api-reference/meta.json": __fd_glob_2, }, {"environment.mdx": __fd_glob_3, "index.mdx": __fd_glob_4, "quickstart.mdx": __fd_glob_5, "api-reference/ai-models.mdx": __fd_glob_6, "api-reference/authentication.mdx": __fd_glob_7, "api-reference/deployments.mdx": __fd_glob_8, "api-reference/entity-instances.mdx": __fd_glob_9, "api-reference/entity-schemas.mdx": __fd_glob_10, "api-reference/events.mdx": __fd_glob_11, "api-reference/index.mdx": __fd_glob_12, "api-reference/worlds.mdx": __fd_glob_13, "concepts/ai-engine.mdx": __fd_glob_14, "concepts/architecture.mdx": __fd_glob_15, "concepts/deployment.mdx": __fd_glob_16, "concepts/entities.mdx": __fd_glob_17, "concepts/events.mdx": __fd_glob_18, "concepts/index.mdx": __fd_glob_19, "concepts/on-chain-oracle.mdx": __fd_glob_20, });
+export const docs = await create.docs("docs", "content/docs", {"meta.json": __fd_glob_0, "api-reference/meta.json": __fd_glob_1, "concepts/meta.json": __fd_glob_2, }, {"environment.mdx": __fd_glob_3, "index.mdx": __fd_glob_4, "quickstart.mdx": __fd_glob_5, "api-reference/ai-models.mdx": __fd_glob_6, "api-reference/authentication.mdx": __fd_glob_7, "api-reference/deployments.mdx": __fd_glob_8, "api-reference/entity-instances.mdx": __fd_glob_9, "api-reference/entity-schemas.mdx": __fd_glob_10, "api-reference/events.mdx": __fd_glob_11, "api-reference/index.mdx": __fd_glob_12, "api-reference/worlds.mdx": __fd_glob_13, "concepts/ai-engine.mdx": __fd_glob_14, "concepts/architecture.mdx": __fd_glob_15, "concepts/deployment.mdx": __fd_glob_16, "concepts/entities.mdx": __fd_glob_17, "concepts/events.mdx": __fd_glob_18, "concepts/index.mdx": __fd_glob_19, "concepts/on-chain-oracle.mdx": __fd_glob_20, });

@@ -7,6 +7,7 @@ import {
   DocsTitle,
 } from "fumadocs-ui/page";
 import defaultMdxComponents from "fumadocs-ui/mdx";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "fumadocs-ui/components/tabs";
 
 interface PageProps {
   params: Promise<{
@@ -29,7 +30,15 @@ export default async function Page(props: PageProps) {
       <DocsTitle>{title}</DocsTitle>
       <DocsDescription>{description}</DocsDescription>
       <DocsBody>
-        <Content components={defaultMdxComponents} />
+        <Content
+          components={{
+            ...defaultMdxComponents,
+            Tabs,
+            TabsList,
+            TabsTrigger,
+            TabsContent,
+          }}
+        />
       </DocsBody>
     </DocsPage>
   );

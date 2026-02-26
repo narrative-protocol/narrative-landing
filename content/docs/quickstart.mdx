@@ -25,113 +25,309 @@ The Blueprint layer is where you define your world's structure. This includes cr
 
 A World is the top-level container for your simulation. It holds entity schemas, events, and can have multiple deployments. The promptSeed helps the AI understand the overall context of your world.
 
-**Request:**
+<Tabs defaultValue="curl">
+  <TabsList>
+    <TabsTrigger value="curl">cURL</TabsTrigger>
+    <TabsTrigger value="javascript">JavaScript</TabsTrigger>
+    <TabsTrigger value="python">Python</TabsTrigger>
+  </TabsList>
+  <TabsContent value="curl">
+    ```bash
+    curl -X POST https://api.narrativeprotocol.com/api/worlds \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer <your-token>" \
+      -d '{
+        "name": "Horse Racing",
+        "description": "A horse racing simulation world",
+        "domainTags": ["sports", "simulation"],
+        "promptSeed": "This world simulates realistic horse racing events."
+      }'
+    ```
+  </TabsContent>
+  <TabsContent value="javascript">
+    ```javascript
+    const response = await fetch(`https://api.narrativeprotocol.com/api/worlds`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your-token>"
+      },
+      body: JSON.stringify({
+        name: "Horse Racing",
+        description: "A horse racing simulation world",
+        domainTags: ["sports", "simulation"],
+        promptSeed: "This world simulates realistic horse racing events."
+      })
+    });
+    console.log(await response.json());
+    ```
+  </TabsContent>
+  <TabsContent value="python">
+    ```python
+    import requests
 
-```bash
-curl -X POST https://api.narrativeprotocol.com/api/worlds \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <your-token>" \
-  -d '{
-    "name": "Horse Racing",
-    "description": "A horse racing simulation world",
-    "domainTags": ["sports", "simulation"],
-    "promptSeed": "This world simulates realistic horse racing events."
-  }'
-```
+    response = requests.post(
+        "https://api.narrativeprotocol.com/api/worlds",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": "Bearer <your-token>"
+        },
+        json={
+            "name": "Horse Racing",
+            "description": "A horse racing simulation world",
+            "domainTags": ["sports", "simulation"],
+            "promptSeed": "This world simulates realistic horse racing events."
+        }
+    )
+    print(response.json())
+    ```
+  </TabsContent>
+</Tabs>
 
-**Response:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": 39,
-    "address": "0xd36f777a077ff3825653f6d521f1437b4da69699",
-    "userId": 746631,
-    "name": "Horse Racing",
-    "description": "A horse racing simulation world",
-    "domainTags": ["sports", "simulation"],
-    "promptSeed": "This world simulates realistic horse racing events.",
-    "isPublic": false,
-    "createdAt": "2026-02-18T04:13:02.315Z",
-    "updatedAt": "2026-02-18T04:13:02.315Z"
+<Callout type="info" title="Response">
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": 39,
+      "address": "0xd36f777a077ff3825653f6d521f1437b4da69699",
+      "userId": 746631,
+      "name": "Horse Racing",
+      "description": "A horse racing simulation world",
+      "domainTags": ["sports", "simulation"],
+      "promptSeed": "This world simulates realistic horse racing events.",
+      "isPublic": false,
+      "createdAt": "2026-02-18T04:13:02.315Z",
+      "updatedAt": "2026-02-18T04:13:02.315Z"
+    }
   }
-}
-```
+  ```
+</Callout>
 
 ### Define an Entity Schema
 
 An Entity Schema defines the structure for entities in your world. For example, a "horse" schema defines what attributes (name, speed, wins) all horses will have.
 
-**Request:**
+<Tabs defaultValue="curl">
+  <TabsList>
+    <TabsTrigger value="curl">cURL</TabsTrigger>
+    <TabsTrigger value="javascript">JavaScript</TabsTrigger>
+    <TabsTrigger value="python">Python</TabsTrigger>
+  </TabsList>
+  <TabsContent value="curl">
+    ```bash
+    curl -X POST https://api.narrativeprotocol.com/api/entity-schemas \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer <your-token>" \
+      -d '{
+        "worldId": <world-id>,
+        "name": "horse",
+        "description": "A racing horse"
+      }'
+    ```
+  </TabsContent>
+  <TabsContent value="javascript">
+    ```javascript
+    const response = await fetch(`https://api.narrativeprotocol.com/api/entity-schemas`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your-token>"
+      },
+      body: JSON.stringify({
+        worldId: <world-id>,
+        name: "horse",
+        description: "A racing horse"
+      })
+    });
+    console.log(await response.json());
+    ```
+  </TabsContent>
+  <TabsContent value="python">
+    ```python
+    import requests
 
-```bash
-curl -X POST https://api.narrativeprotocol.com/api/entity-schemas \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <your-token>" \
-  -d '{
-    "worldId": <world-id>,
-    "name": "horse",
-    "description": "A racing horse"
-  }'
-```
+    response = requests.post(
+        "https://api.narrativeprotocol.com/api/entity-schemas",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": "Bearer <your-token>"
+        },
+        json={
+            "worldId": <world-id>,
+            "name": "horse",
+            "description": "A racing horse"
+        }
+    )
+    print(response.json())
+    ```
+  </TabsContent>
+</Tabs>
 
-**Response:**
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": 53,
-    "worldId": 39,
-    "name": "horse",
-    "description": "A racing horse",
-    "createdAt": "2026-02-18T04:13:49.117Z",
-    "updatedAt": "2026-02-18T04:13:49.117Z",
-    "attributeDefinitions": []
+<Callout type="info" title="Response">
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": 53,
+      "worldId": 39,
+      "name": "horse",
+      "description": "A racing horse",
+      "createdAt": "2026-02-18T04:13:49.117Z",
+      "updatedAt": "2026-02-18T04:13:49.117Z",
+      "attributeDefinitions": []
+    }
   }
-}
-```
+  ```
+</Callout>
 
 ### Add Attributes to Entity Schema
 
 Attributes define the specific properties each entity instance can have. You can specify type (string, integer, float, boolean), constraints, and default values.
 
-```bash
-# Speed rating attribute
-curl -X POST https://api.narrativeprotocol.com/api/attribute-definitions \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <your-token>" \
-  -d '{
-    "entitySchemaId": <schema-id>,
-    "name": "speed_rating",
-    "type": "float",
-    "constraints": { "min": 0, "max": 1 },
-    "defaultValue": 0.5
-  }'
-```
+<Tabs defaultValue="curl">
+  <TabsList>
+    <TabsTrigger value="curl">cURL</TabsTrigger>
+    <TabsTrigger value="javascript">JavaScript</TabsTrigger>
+    <TabsTrigger value="python">Python</TabsTrigger>
+  </TabsList>
+  <TabsContent value="curl">
+    ```bash
+    # Speed rating attribute
+    curl -X POST https://api.narrativeprotocol.com/api/attribute-definitions \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer <your-token>" \
+      -d '{
+        "entitySchemaId": <schema-id>,
+        "name": "speed_rating",
+        "type": "float",
+        "constraints": { "min": 0, "max": 1 },
+        "defaultValue": 0.5
+      }'
+    ```
+  </TabsContent>
+  <TabsContent value="javascript">
+    ```javascript
+    const response = await fetch(`https://api.narrativeprotocol.com/api/attribute-definitions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your-token>"
+      },
+      body: JSON.stringify({
+        entitySchemaId: <schema-id>,
+        name: "speed_rating",
+        type: "float",
+        constraints: { min: 0, max: 1 },
+        defaultValue: 0.5
+      })
+    });
+    console.log(await response.json());
+    ```
+  </TabsContent>
+  <TabsContent value="python">
+    ```python
+    import requests
+
+    response = requests.post(
+        "https://api.narrativeprotocol.com/api/attribute-definitions",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": "Bearer <your-token>"
+        },
+        json={
+            "entitySchemaId": <schema-id>,
+            "name": "speed_rating",
+            "type": "float",
+            "constraints": { "min": 0, "max": 1 },
+            "defaultValue": 0.5
+        }
+    )
+    print(response.json())
+    ```
+  </TabsContent>
+</Tabs>
 
 ### Create an Event
 
 Events define what can happen in your world. Each event has versions that become immutable once published, ensuring reproducibility.
 
-```bash
-curl -X POST https://api.narrativeprotocol.com/api/events \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <your-token>" \
-  -d '{
-    "worldId": <world-id>,
-    "name": "race_result",
-    "description": "Resolves a race and updates horse stats",
-    "firstVersion": {
-      "inputSchema": { "raceId": "string" },
-      "reads": [<schema-id>],
-      "stateChangeSchema": { "horse": "partial" },
-      "resultSchema": { "winner": "string", "time": "string" },
-      "behaviorPrompt": "Determine the race winner based on horse speed ratings. Update the winners wins count."
-    }
-  }'
-```
+<Tabs defaultValue="curl">
+  <TabsList>
+    <TabsTrigger value="curl">cURL</TabsTrigger>
+    <TabsTrigger value="javascript">JavaScript</TabsTrigger>
+    <TabsTrigger value="python">Python</TabsTrigger>
+  </TabsList>
+  <TabsContent value="curl">
+    ```bash
+    curl -X POST https://api.narrativeprotocol.com/api/events \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer <your-token>" \
+      -d '{
+        "worldId": <world-id>,
+        "name": "race_result",
+        "description": "Resolves a race and updates horse stats",
+        "firstVersion": {
+          "inputSchema": { "raceId": "string" },
+          "reads": [<schema-id>],
+          "stateChangeSchema": { "horse": "partial" },
+          "resultSchema": { "winner": "string", "time": "string" },
+          "behaviorPrompt": "Determine the race winner based on horse speed ratings. Update the winners wins count."
+        }
+      }'
+    ```
+  </TabsContent>
+  <TabsContent value="javascript">
+    ```javascript
+    const response = await fetch(`https://api.narrativeprotocol.com/api/events`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your-token>"
+      },
+      body: JSON.stringify({
+        worldId: <world-id>,
+        name: "race_result",
+        description: "Resolves a race and updates horse stats",
+        firstVersion: {
+          inputSchema: { raceId: "string" },
+          reads: [<schema-id>],
+          stateChangeSchema: { horse: "partial" },
+          resultSchema: { winner: "string", time: "string" },
+          behaviorPrompt: "Determine the race winner based on horse speed ratings. Update the winners wins count."
+        }
+      })
+    });
+    console.log(await response.json());
+    ```
+  </TabsContent>
+  <TabsContent value="python">
+    ```python
+    import requests
+
+    response = requests.post(
+        "https://api.narrativeprotocol.com/api/events",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": "Bearer <your-token>"
+        },
+        json={
+            "worldId": <world-id>,
+            "name": "race_result",
+            "description": "Resolves a race and updates horse stats",
+            "firstVersion": {
+                "inputSchema": { "raceId": "string" },
+                "reads": [<schema-id>],
+                "stateChangeSchema": { "horse": "partial" },
+                "resultSchema": { "winner": "string", "time": "string" },
+                "behaviorPrompt": "Determine the race winner based on horse speed ratings. Update the winners wins count."
+            }
+        }
+    )
+    print(response.json())
+    ```
+  </TabsContent>
+</Tabs>
 
 ---
 
@@ -143,20 +339,73 @@ The Live layer is where your simulation actually runs. Deployments are isolated 
 
 A Deployment is a running instance of a world with its own isolated state.
 
-```bash
-curl -X POST https://api.narrativeprotocol.com/api/deployments \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <your-token>" \
-  -d '{
-    "worldId": <world-id>,
-    "name": "Season 1",
-    "targetChains": ["near-testnet"],
-    "firstBinding": {
-      "eventId": <event-id>,
-      "eventVersion": <event-version>
-    }
-  }'
-```
+<Tabs defaultValue="curl">
+  <TabsList>
+    <TabsTrigger value="curl">cURL</TabsTrigger>
+    <TabsTrigger value="javascript">JavaScript</TabsTrigger>
+    <TabsTrigger value="python">Python</TabsTrigger>
+  </TabsList>
+  <TabsContent value="curl">
+    ```bash
+    curl -X POST https://api.narrativeprotocol.com/api/deployments \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer <your-token>" \
+      -d '{
+        "worldId": <world-id>,
+        "name": "Season 1",
+        "targetChains": ["near-testnet"],
+        "firstBinding": {
+          "eventId": <event-id>,
+          "eventVersion": <event-version>
+        }
+      }'
+    ```
+  </TabsContent>
+  <TabsContent value="javascript">
+    ```javascript
+    const response = await fetch(`https://api.narrativeprotocol.com/api/deployments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your-token>"
+      },
+      body: JSON.stringify({
+        worldId: <world-id>,
+        name: "Season 1",
+        targetChains: ["near-testnet"],
+        firstBinding: {
+          eventId: <event-id>,
+          eventVersion: <event-version>
+        }
+      })
+    });
+    console.log(await response.json());
+    ```
+  </TabsContent>
+  <TabsContent value="python">
+    ```python
+    import requests
+
+    response = requests.post(
+        "https://api.narrativeprotocol.com/api/deployments",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": "Bearer <your-token>"
+        },
+        json={
+            "worldId": <world-id>,
+            "name": "Season 1",
+            "targetChains": ["near-testnet"],
+            "firstBinding": {
+                "eventId": <event-id>,
+                "eventVersion": <event-version>
+            }
+        }
+    )
+    print(response.json())
+    ```
+  </TabsContent>
+</Tabs>
 
 The `targetChains` option determines where event data is stored on-chain:
 
@@ -169,77 +418,205 @@ The `targetChains` option determines where event data is stored on-chain:
 
 Entity Instances are the actual data in your deployment.
 
-```bash
-curl -X POST https://api.narrativeprotocol.com/api/entity-instances \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <your-token>" \
-  -d '{
-    "deploymentId": <deployment-id>,
-    "entitySchemaId": <schema-id>,
-    "instanceId": "HORSE_1",
-    "state": {
-      "name": "Midnight Comet",
-      "speed_rating": 0.85
-    }
-  }'
-```
+<Tabs defaultValue="curl">
+  <TabsList>
+    <TabsTrigger value="curl">cURL</TabsTrigger>
+    <TabsTrigger value="javascript">JavaScript</TabsTrigger>
+    <TabsTrigger value="python">Python</TabsTrigger>
+  </TabsList>
+  <TabsContent value="curl">
+    ```bash
+    curl -X POST https://api.narrativeprotocol.com/api/entity-instances \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer <your-token>" \
+      -d '{
+        "deploymentId": <deployment-id>,
+        "entitySchemaId": <schema-id>,
+        "instanceId": "HORSE_1",
+        "state": {
+          "name": "Midnight Comet",
+          "speed_rating": 0.85
+        }
+      }'
+    ```
+  </TabsContent>
+  <TabsContent value="javascript">
+    ```javascript
+    const response = await fetch(`https://api.narrativeprotocol.com/api/entity-instances`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your-token>"
+      },
+      body: JSON.stringify({
+        deploymentId: <deployment-id>,
+        entitySchemaId: <schema-id>,
+        instanceId: "HORSE_1",
+        state: {
+          name: "Midnight Comet",
+          speed_rating: 0.85
+        }
+      })
+    });
+    console.log(await response.json());
+    ```
+  </TabsContent>
+  <TabsContent value="python">
+    ```python
+    import requests
+
+    response = requests.post(
+        "https://api.narrativeprotocol.com/api/entity-instances",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": "Bearer <your-token>"
+        },
+        json={
+            "deploymentId": <deployment-id>,
+            "entitySchemaId": <schema-id>,
+            "instanceId": "HORSE_1",
+            "state": {
+                "name": "Midnight Comet",
+                "speed_rating": 0.85
+            }
+        }
+    )
+    print(response.json())
+    ```
+  </TabsContent>
+</Tabs>
 
 ### Execute an Event
 
 This is where the magic happens! Executing an event triggers the AI engine.
 
-```bash
-curl -X POST https://api.narrativeprotocol.com/api/deployments/<deployment-id>/execute \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <your-token>" \
-  -d '{
-    "eventId": <event-id>,
-    "input": { "raceId": "RACE_001" }
-  }'
-```
+<Tabs defaultValue="curl">
+  <TabsList>
+    <TabsTrigger value="curl">cURL</TabsTrigger>
+    <TabsTrigger value="javascript">JavaScript</TabsTrigger>
+    <TabsTrigger value="python">Python</TabsTrigger>
+  </TabsList>
+  <TabsContent value="curl">
+    ```bash
+    curl -X POST https://api.narrativeprotocol.com/api/deployments/<deployment-id>/execute \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer <your-token>" \
+      -d '{
+        "eventId": <event-id>,
+        "input": { "raceId": "RACE_001" }
+      }'
+    ```
+  </TabsContent>
+  <TabsContent value="javascript">
+    ```javascript
+    const response = await fetch(`https://api.narrativeprotocol.com/api/deployments/<deployment-id>/execute`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your-token>"
+      },
+      body: JSON.stringify({
+        eventId: <event-id>,
+        input: { raceId: "RACE_001" }
+      })
+    });
+    console.log(await response.json());
+    ```
+  </TabsContent>
+  <TabsContent value="python">
+    ```python
+    import requests
 
-**Response:**
+    response = requests.post(
+        f"https://api.narrativeprotocol.com/api/deployments/<deployment-id>/execute",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": "Bearer <your-token>"
+        },
+        json={
+            "eventId": <event-id>,
+            "input": { "raceId": "RACE_001" }
+        }
+    )
+    print(response.json())
+    ```
+  </TabsContent>
+</Tabs>
 
-```json
-{
-  "success": true,
-  "data": {
-    "historyId": 11133,
-    "eventVersion": 1,
-    "stateChanges": {
-      "horse:HORSE_1": {
-        "wins": 1
-      }
-    },
-    "result": {
-      "time": "2026-02-18T00:00:00Z",
-      "winner": "Midnight Comet"
-    },
-    "attestation": {
-      "signature": "0x0b09aa672cde45034a1091532b1e7f7e31b476181fd06ca4faafc566245a823f3ff0e8a65afd102b64a1370170e5819f242480e727d449cbdcc338d7324b9a191c",
-      "signing_address": "0xbBC409e6b529817D257aD61D5738D8e3a39b5791",
-      "signing_algo": "ecdsa",
-      "text": "d3fc5ada116a1c0c9359ea6b7297b210cfecd393facc04c5d20209002a2dd126:ad558a6182aa4c55374cbd5eae218d6b2dae1957780630ecc6a0f01e49214af9"
-    },
-    "oracle": {
-      "solana": null,
-      "near": {
-        "txHash": "8LjP9sqX26oQgScPy5RGzs8dEzwZiNSQHKrTpCLrP5yy",
-        "receiptId": "ZWsNXEXPp1KyQWB68psjypi1PHGjMC8MrAomHBQLpGr"
+<Callout type="info" title="Response">
+  ```json
+  {
+    "success": true,
+    "data": {
+      "historyId": 11133,
+      "eventVersion": 1,
+      "stateChanges": {
+        "horse:HORSE_1": {
+          "wins": 1
+        }
+      },
+      "result": {
+        "time": "2026-02-18T00:00:00Z",
+        "winner": "Midnight Comet"
+      },
+      "attestation": {
+        "signature": "0x0b09aa672cde45034a1091532b1e7f7e31b476181fd06ca4faafc566245a823f3ff0e8a65afd102b64a1370170e5819f242480e727d449cbdcc338d7324b9a191c",
+        "signing_address": "0xbBC409e6b529817D257aD61D5738D8e3a39b5791",
+        "signing_algo": "ecdsa",
+        "text": "d3fc5ada116a1c0c9359ea6b7297b210cfecd393facc04c5d20209002a2dd126:ad558a6182aa4c55374cbd5eae218d6b2dae1957780630ecc6a0f01e49214af9"
+      },
+      "oracle": {
+        "solana": null,
+        "near": {
+          "txHash": "8LjP9sqX26oQgScPy5RGzs8dEzwZiNSQHKrTpCLrP5yy",
+          "receiptId": "ZWsNXEXPp1KyQWB68psjypi1PHGjMC8MrAomHBQLpGr"
+        }
       }
     }
   }
-}
-```
+  ```
+</Callout>
 
 ### View Updated State
 
 After executing an event, you can query the entity instances to see how the state has changed.
 
-```bash
-curl https://api.narrativeprotocol.com/api/entity-instances?deploymentId=<deployment-id> \
-  -H "Authorization: Bearer <your-token>"
-```
+<Tabs defaultValue="curl">
+  <TabsList>
+    <TabsTrigger value="curl">cURL</TabsTrigger>
+    <TabsTrigger value="javascript">JavaScript</TabsTrigger>
+    <TabsTrigger value="python">Python</TabsTrigger>
+  </TabsList>
+  <TabsContent value="curl">
+    ```bash
+    curl https://api.narrativeprotocol.com/api/entity-instances?deploymentId=<deployment-id> \
+      -H "Authorization: Bearer <your-token>"
+    ```
+  </TabsContent>
+  <TabsContent value="javascript">
+    ```javascript
+    const response = await fetch(`https://api.narrativeprotocol.com/api/entity-instances?deploymentId=<deployment-id>`, {
+      headers: {
+        "Authorization": "Bearer <your-token>"
+      }
+    });
+    console.log(await response.json());
+    ```
+  </TabsContent>
+  <TabsContent value="python">
+    ```python
+    import requests
+
+    response = requests.get(
+        f"https://api.narrativeprotocol.com/api/entity-instances?deploymentId=<deployment-id>",
+        headers={
+            "Authorization": "Bearer <your-token>"
+        }
+    )
+    print(response.json())
+    ```
+  </TabsContent>
+</Tabs>
 
 ## Next Steps
 

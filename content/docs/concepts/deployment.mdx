@@ -1,0 +1,212 @@
+---
+title: Deployments
+description: Running instances of worlds
+---
+
+# Deployments
+
+A **Deployment** is a running instance of a world. It contains the actual runtime state - entity instances, event bindings, and execution history. Multiple deployments can exist for a single world, each with isolated state.
+
+## Creating a Deployment
+
+Deployments are created with a first event binding:
+
+```json
+POST /api/deployments
+{
+  "worldId": 1,
+  "name": "Season 1",
+  "description": "First season of the racing simulation",
+  "targetChains": ["solana-devnet"],
+  "aiModelId": "openai/gpt-oss-120b",
+  "onchain": {
+    "stateChanges": ["wins", "speed_rating"],
+    "result": ["winner"]
+  },
+  "firstBinding": {
+    "eventId": 1,
+    "eventVersion": 1
+  }
+}
+```
+
+### Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `worldId` | integer | Yes | The world this deployment belongs to |
+| `name` | string | Yes | Human-readable name |
+| `description` | string | No | Optional description |
+| `targetChains` | string[] | No | On-chain oracle targets (see below) |
+| `aiModelId` | string | No | AI model to use (default: `openai/gpt-oss-120b`) |
+| `onchain` | object | No | Selective on-chain push config |
+| `mode` | enum | No | `upgradable` (default) or `locked` |
+| `firstBinding` | object | Yes | Initial event binding |
+
+### Target Chains
+
+The `targetChains` field is an array of network-specific chain identifiers. An empty array (default) means no on-chain storage.
+
+| Value | Description | Max Data Size |
+|-------|-------------|---------------|
+| `solana-devnet` | Push to Solana devnet | 1232 bytes per field |
+| `solana-mainnet` | Push to Solana mainnet | 1232 bytes per field |
+| `near-testnet` | Push to NEAR testnet | Unlimited |
+| `near-mainnet` | Push to NEAR mainnet | Unlimited |
+
+You can specify multiple chains:
+
+```json
+{
+  "targetChains": ["solana-devnet", "near-testnet"]
+}
+```
+
+When both Solana and NEAR chains are included, the stricter Solana size limit applies.
+
+### AI Model Selection
+
+Each deployment can specify which AI model to use for event execution via `aiModelId`. Available models are listed at `GET /api/ai-models`. If not specified, the default model (`openai/gpt-oss-120b`) is used.
+
+### Selective On-Chain Push
+
+The `onchain` config controls which fields from `stateChanges` and `result` get pushed to the blockchain:
+
+```json
+{
+  "onchain": {
+    "stateChanges": ["wins", "speed_rating"],
+    "result": ["winner"]
+  }
+}
+```
+
+When set, only the specified keys are included in the on-chain push. When omitted or null, all data is pushed. This is useful for staying within Solana's 1232-byte per-field limit.
+
+## What a Deployment Contains
+
+```
+Deployment
+├── Entity Instances (actual data)
+│   ├── horse:HORSE_1 { name: "Midnight", speed: 0.85 }
+│   ├── horse:HORSE_2 { name: "Thunder", speed: 0.78 }
+│   └── ...
+├── Event Bindings (which event versions to use)
+│   ├── race_result -> version 1
+│   └── ...
+└── Event History (execution records)
+    ├── History #1: race_result executed at 2024-06-15
+    └── ...
+```
+
+## Deployment Modes
+
+Deployments operate in one of two modes: `upgradable` (default) or `locked`.
+
+### Upgradable Mode
+
+The default mode for new deployments. All operations are permitted.
+
+**Allowed Operations:**
+
+- Execute events
+- Create/update entity instances
+- Add event bindings
+- Update deployment metadata
+- Transition to locked mode
+
+### Locked Mode
+
+<Callout type="warning" title="Irreversible Action">
+  Locking a deployment is **permanent and cannot be undone**. Once locked, the deployment becomes read-only forever. Make sure to create a snapshot before locking if you need to continue the simulation.
+</Callout>
+
+A frozen state where no modifications are allowed. **This transition is irreversible.**
+
+**Blocked Operations:**
+
+- Execute events
+- Create/update/delete entity instances
+- Add event bindings
+- Delete the deployment
+
+**Allowed Operations:**
+
+- Read deployment data
+- Read entity instances
+- Read event history
+
+### Locking a Deployment
+
+```http
+POST /api/deployments/:id/lock
+```
+
+<Callout type="warning" title="Irreversible Action">
+  Locking a deployment is **permanent and cannot be undone**. Once locked, the deployment becomes read-only forever.
+</Callout>
+
+### Mode Comparison
+
+| Feature | Upgradable | Locked |
+|---------|------------|--------|
+| Execute events | Yes | No |
+| Modify instances | Yes | No |
+| Add bindings | Yes | No |
+| Read data | Yes | Yes |
+| View history | Yes | Yes |
+| Delete deployment | Yes | No |
+| Transition | To locked | None (final) |
+
+## Snapshotting
+
+Snapshotting allows you to create a new deployment by copying the state from an existing one. This is useful for forking simulations, creating test environments, or preserving state before major changes.
+
+### How It Works
+
+When creating a deployment with a `sourceDeploymentId`, the system:
+
+1. Creates the new deployment
+2. Copies all entity instances from the source
+3. Copies event bindings (except duplicates of `firstBinding`)
+4. New deployment starts as `upgradable`
+
+```json title="Request Body"
+{
+  "worldId": 1,
+  "name": "Season 2",
+  "firstBinding": { "eventId": 1, "eventVersion": 2 },
+  "sourceDeploymentId": 123
+}
+```
+
+### What Gets Copied
+
+| Component | Copied | Notes |
+|-----------|--------|-------|
+| Entity instances | Yes | Full state at time of snapshot |
+| Event bindings | Yes | Except if duplicate of firstBinding |
+| Event history | No | New deployment starts fresh |
+| Deployment mode | No | Always starts as upgradable |
+| Deployment name | No | Must provide new name |
+
+### Use Cases
+
+- **Forking Simulations**: Create parallel timelines from a common point
+- **Testing**: Test new event versions without affecting production
+- **Pre-Lock Preservation**: Create a snapshot before locking to continue later
+- **Version Migration**: Upgrade to new event versions while preserving state
+
+<Callout type="info" title="Snapshot Requirements">
+- Source deployment must be from the **same world**
+- You must own the source deployment
+- Source deployment can be in any mode (upgradable or locked)
+</Callout>
+
+## Related Concepts
+
+- [Architecture](/docs/concepts/architecture) - Blueprint vs Live layer
+- [Entities](/docs/concepts/entities) - Data within deployments
+- [Events](/docs/concepts/events) - Event versioning
+- [On-chain Oracle](/docs/concepts/on-chain-oracle) - On-chain verification
+- [AI Engine](/docs/concepts/ai-engine) - Model selection and execution

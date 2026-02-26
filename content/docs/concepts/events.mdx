@@ -1,0 +1,180 @@
+---
+title: Events
+description: Event definitions and versioning
+---
+
+# Events
+
+An **Event** in Narrative Protocol defines something that can happen in your world. Events are the actions, triggers, or occurrences that drive state changes in your simulation.
+
+## What is an Event?
+
+Events describe behavior, not data. They answer the question: "What can happen in this world?"
+
+Examples:
+
+- `race_result` - A horse race is completed
+- `training_session` - A horse undergoes training
+- `injury_occurred` - A horse gets injured
+- `weather_change` - Weather conditions shift
+
+## Event Structure
+
+Each event belongs to a world and has:
+
+| Field | Description |
+|-------|-------------|
+| `name` | Unique identifier within the world |
+| `description` | Human-readable explanation |
+| `versions` | One or more versioned implementations |
+
+## Creating an Event
+
+Events are always created with their first version:
+
+```http title="Request"
+POST /api/events
+```
+
+```json title="Request Body"
+{
+  "worldId": 1,
+  "name": "race_result",
+  "description": "Resolves a race and updates horse statistics",
+  "firstVersion": {
+    "inputSchema": { "raceId": "string" },
+    "reads": [1, 2],
+    "stateChangeSchema": { "horse": "partial" },
+    "resultSchema": { "winner": "string", "time": "string" },
+    "behaviorPrompt": "Determine the race winner based on horse stats."
+  }
+}
+```
+
+## Event Versioning
+
+Events have versions that become immutable once published. This ensures reproducibility and auditability of state changes over time.
+
+### Why Versioning?
+
+Event behavior may need to change over time:
+
+- Fix bugs in behavior prompts
+- Add new input fields
+- Adjust state change logic
+
+Without versioning, changing an event would make historical executions impossible to reproduce.
+
+### Version Lifecycle
+
+```
+Version 1 (draft)
+    │
+    ▼ [publish]
+Version 1 (published) ─── immutable, bound to deployments
+    │
+    ▼ [create new version]
+Version 2 (draft)
+    │
+    ▼ [publish]
+Version 2 (published) ─── immutable, can be bound
+```
+
+### Draft State
+
+New versions start as drafts. You can modify:
+
+- `inputSchema` - What data the event accepts
+- `reads` - Which entity schemas to read
+- `stateChangeSchema` - How state changes (partial/full/append)
+- `resultSchema` - What gets returned publicly
+- `behaviorPrompt` - AI resolution instructions
+
+### Published State
+
+Once published via `POST /api/events/:eventId/versions/:version/publish`:
+
+- Version becomes **immutable**
+- Can be bound to deployments
+- Cannot be deleted
+
+<Callout type="warning" title="Irreversible Action">
+  Publishing a version is **permanent**. Once published, the version cannot be modified or deleted. Always test drafts thoroughly before publishing.
+</Callout>
+
+## Version Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `inputSchema` | object | Expected input fields and types |
+| `reads` | integer[] | Entity schema IDs the AI can read |
+| `stateChangeSchema` | object | Per-schema change mode |
+| `resultSchema` | object | Public output structure |
+| `behaviorPrompt` | string | Instructions for AI resolution |
+
+### State Change Modes
+
+The `stateChangeSchema` maps entity schema names to change modes:
+
+```json title="State Change Schema"
+{
+  "horse": "partial",
+  "race_record": "append"
+}
+```
+
+| Mode | Behavior |
+|------|----------|
+| `partial` | Merge changes into existing state (default) |
+| `full` | Replace entire state |
+| `append` | Append to arrays, merge objects |
+
+## Binding Versions to Deployments
+
+Deployments bind to specific versions. Multiple deployments can use different versions:
+
+```
+Event: "race_result"
+├── Version 1 (published) ─── bound to "Production"
+├── Version 2 (published) ─── bound to "Staging"
+└── Version 3 (draft) ─── not yet published
+```
+
+## Creating a New Version
+
+```http title="Request"
+POST /api/events/:eventId/versions
+```
+
+```json title="Request Body"
+{
+  "inputSchema": { "raceId": "string", "weather": "string" },
+  "reads": [1, 2],
+  "stateChangeSchema": { "horse": "partial" },
+  "behaviorPrompt": "Consider weather conditions when determining the winner."
+}
+```
+
+Version numbers auto-increment based on existing versions.
+
+## Best Practices
+
+<Callout type="tip" title="Version Management Tips">
+1. **Test drafts thoroughly** before publishing
+2. **Document changes** in version descriptions
+3. **Use staging deployments** to test new versions
+4. **Never rely on modifying published versions** - create new ones instead
+</Callout>
+
+## API Reference
+
+- `POST /api/events` - Create event with first version
+- `POST /api/events/:eventId/versions` - Create additional versions
+- `PUT /api/events/:eventId/versions/:version` - Update draft version
+- `POST /api/events/:eventId/versions/:version/publish` - Publish (make immutable)
+- `DELETE /api/events/:eventId/versions/:version` - Delete (drafts only)
+
+## Related Concepts
+
+- [AI Engine](/docs/concepts/ai-engine) - How events are processed
+- [Deployments](/docs/concepts/deployment) - Where events are bound and executed

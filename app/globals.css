@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -140,4 +142,49 @@
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;  /* Chrome, Safari and Opera */
+}
+
+/* Fumadocs Custom Styles - Match Landing Page */
+:root {
+  --fd-colors-sidebar: #141821;
+  --fd-colors-sidebar-foreground: #E6E8EB;
+  --fd-colors-sidebar-border: #1F2430;
+  --fd-colors-sidebar-accent: #1F2430;
+  --fd-colors-sidebar-accent-foreground: #A9AFBA;
+  --fd-colors-sidebar-primary: #E0A94F;
+  --fd-colors-sidebar-primary-foreground: #0B0D10;
+}
+
+/* Force dark mode */
+[data-theme="light"] {
+  --background: #0B0D10;
+  --foreground: #E6E8EB;
+}
+
+[data-theme="dark"],
+:root {
+  --background: #0B0D10;
+  --foreground: #E6E8EB;
+  --card: #141821;
+  --card-foreground: #E6E8EB;
+  --popover: #141821;
+  --popover-foreground: #E6E8EB;
+  --primary: #E0A94F;
+  --primary-foreground: #0B0D10;
+  --secondary: #141821;
+  --secondary-foreground: #A9AFBA;
+  --muted: #141821;
+  --muted-foreground: #6F7684;
+  --accent: #E0A94F;
+  --accent-foreground: #0B0D10;
+  --destructive: #A8742A;
+  --destructive-foreground: #E6E8EB;
+  --border: #1F2430;
+  --input: #141821;
+  --ring: #E0A94F;
+}
+
+/* Hide theme toggle */
+[data-fd-theme-toggle] {
+  display: none !important;
 }

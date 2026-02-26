@@ -1,0 +1,71 @@
+---
+title: Deployments
+description: Create and manage deployments
+---
+
+# Deployments API
+
+Create and manage deployments within worlds.
+
+## Endpoints
+
+### List Deployments
+
+```http
+GET /api/deployments?worldId=:worldId
+```
+
+### Create Deployment
+
+```http
+POST /api/deployments
+```
+
+### Get Deployment
+
+```http
+GET /api/deployments/:id
+```
+
+### Execute Event
+
+```http
+POST /api/deployments/:id/execute
+```
+
+### Lock Deployment
+
+```http
+POST /api/deployments/:id/lock
+```
+
+## Examples
+
+### Create Deployment
+
+```bash
+curl -X POST https://api.narrativeprotocol.com/api/deployments \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "worldId": 39,
+    "name": "Season 1",
+    "targetChains": ["near-testnet"],
+    "firstBinding": {
+      "eventId": 29,
+      "eventVersion": 1
+    }
+  }'
+```
+
+### Execute Event
+
+```bash
+curl -X POST https://api.narrativeprotocol.com/api/deployments/28/execute \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "eventId": 29,
+    "input": { "raceId": "RACE_001" }
+  }'
+```

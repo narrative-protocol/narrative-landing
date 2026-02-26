@@ -1,0 +1,23 @@
+{
+  "index": {
+    "title": "Overview"
+  },
+  "architecture": {
+    "title": "Architecture"
+  },
+  "entities": {
+    "title": "Entities"
+  },
+  "events": {
+    "title": "Events"
+  },
+  "deployment": {
+    "title": "Deployments"
+  },
+  "ai-engine": {
+    "title": "AI Engine"
+  },
+  "on-chain-oracle": {
+    "title": "On-chain Oracle"
+  }
+}

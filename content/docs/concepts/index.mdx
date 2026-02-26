@@ -1,0 +1,64 @@
+---
+title: Overview
+description: Core concepts of Narrative Protocol
+---
+
+# Core Concepts
+
+Narrative Protocol is a **World State & Event Engine** that manages complex simulations with versioned events, immutable state transitions, and AI-driven event execution.
+
+## System Architecture
+
+The system uses a two-layer architecture:
+
+| Layer | Purpose | Components |
+|-------|---------|------------|
+| Blueprint | Design-time definitions | Worlds, Entity Schemas, Events, Event Versions |
+| Live | Runtime state & execution | Deployments, Entity Instances, Event Bindings, History |
+
+## Key Concepts
+
+### [Architecture](/docs/concepts/architecture)
+
+Blueprint vs Live layer separation. How design-time definitions become runtime instances.
+
+### [Entities](/docs/concepts/entities)
+
+Multiple instances per schema, each with their own state.
+
+### [Events](/docs/concepts/events)
+
+Events are the actions, triggers, or occurrences that drive state changes in your simulation.
+
+### [Deployments](/docs/concepts/deployment)
+
+Running instances of a world with isolated state and on-chain oracle support.
+
+### [AI Engine](/docs/concepts/ai-engine)
+
+Events are executed by an AI engine that computes state changes.
+
+### [On-chain Oracle](/docs/concepts/on-chain-oracle)
+
+Event records are pushed to Solana and/or NEAR for on-chain immutability.
+
+## Data Flow
+
+```
+World (Blueprint)
+├── Entity Schemas (define structure)
+│   └── Attribute Definitions
+└── Events (define behavior)
+    └── Event Versions (immutable after publish)
+
+Deployment (Live, targetChains: ["solana-devnet"], etc.)
+├── Entities (actual data)
+├── Event Bindings (which versions to use)
+└── Event History (execution records)
+    ├── Solana Records (on-chain verification)
+    └── NEAR Records (on-chain verification)
+```
+
+<Callout type="info" title="Getting Started">
+  New to Narrative Protocol? Start with the [Quickstart Guide](/docs/quickstart) to get running in 5 minutes.
+</Callout>

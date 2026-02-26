@@ -1,0 +1,62 @@
+---
+title: Events
+description: Create and manage events
+---
+
+# Events API
+
+Create and manage events within worlds.
+
+## Endpoints
+
+### List Events
+
+```http
+GET /api/events?worldId=:worldId
+```
+
+### Create Event
+
+```http
+POST /api/events
+```
+
+### Get Event
+
+```http
+GET /api/events/:id
+```
+
+### Create Event Version
+
+```http
+POST /api/events/:eventId/versions
+```
+
+### Publish Event Version
+
+```http
+POST /api/events/:eventId/versions/:version/publish
+```
+
+## Examples
+
+### Create Event
+
+```bash
+curl -X POST https://api.narrativeprotocol.com/api/events \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "worldId": 39,
+    "name": "race_result",
+    "description": "Resolves a race and updates horse stats",
+    "firstVersion": {
+      "inputSchema": { "raceId": "string" },
+      "reads": [53],
+      "stateChangeSchema": { "horse": "partial" },
+      "resultSchema": { "winner": "string", "time": "string" },
+      "behaviorPrompt": "Determine the race winner based on horse speed ratings."
+    }
+  }'
+```

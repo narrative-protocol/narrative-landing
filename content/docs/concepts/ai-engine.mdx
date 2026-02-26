@@ -1,0 +1,236 @@
+---
+title: AI Engine
+description: AI-powered event execution
+---
+
+# AI Engine
+
+Events in Narrative Protocol are executed by an AI engine that computes state changes based on world context, current state, event configuration, and user input.
+
+## Execution Flow
+
+```
+1. User calls POST /api/deployments/:id/execute
+   │
+   ▼
+2. System gathers context
+   ├── World definition (name, description, tags, promptSeed)
+   ├── Current entity states
+   └── Event version config (behaviorPrompt, schemas)
+   │
+   ▼
+3. AI Engine processes (AI / configurable model)
+   ├── Understands world context
+   ├── Reads current state
+   ├── Applies behavior prompt
+   └── Generates state changes + public result
+   │
+   ▼
+4. System applies changes
+   ├── Updates entity instances
+   ├── Records in event history
+   └── Pushes to chain(s) (if configured)
+   │
+   ▼
+5. Returns response with stateChanges, result, attestation, oracle
+```
+
+## AI Model Selection
+
+Each deployment can specify which AI model to use via the `aiModelId` field. If not set, the default model `openai/gpt-oss-120b` is used.
+
+### Available Models
+
+List them via:
+
+```http
+GET /api/ai-models
+```
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "modelId": "openai/gpt-oss-120b",
+      "modelDisplayName": "GPT OSS 120B",
+      "modelDescription": "...",
+      "contextLength": 131000,
+      "attestationSupported": true,
+      "verifiable": true,
+      "isDefault": true
+    }
+  ]
+}
+```
+
+### Setting a Model on Deployment
+
+```json
+POST /api/deployments
+{
+  "worldId": 1,
+  "name": "Season 1",
+  "aiModelId": "openai/gpt-oss-120b",
+  "firstBinding": { "eventId": 1, "eventVersion": 1 }
+}
+```
+
+## Request Format
+
+```http
+POST /api/deployments/:id/execute
+```
+
+```json title="Request Body"
+{
+  "eventId": 1,
+  "input": {
+    "raceId": "RACE_2024_001",
+    "trackCondition": "wet"
+  }
+}
+```
+
+## Response Format
+
+```json title="Response"
+{
+  "success": true,
+  "data": {
+    "historyId": 42,
+    "eventVersion": 1,
+    "stateChanges": {
+      "horse:HORSE_1": { "wins": 6, "lastRace": "2024-06-15" },
+      "horse:HORSE_2": { "stamina": 0.72 }
+    },
+    "result": {
+      "winner": "HORSE_1",
+      "time": "1:45.32",
+      "conditions": "wet track"
+    },
+    "attestation": {
+      "signature": "0x77057b...",
+      "signing_address": "0x34B7Bc...",
+      "signing_algo": "ecdsa",
+      "text": "eda20c62..."
+    },
+    "oracle": {
+      "solana": {
+        "signature": "5xYz...",
+        "eventRecordPda": "7abc..."
+      },
+      "near": null
+    }
+  }
+}
+```
+
+## AI Context
+
+The AI engine receives structured context:
+
+### World Context
+
+```json
+{
+  "name": "Horse Racing",
+  "description": "A horse racing simulation",
+  "domainTags": ["sports", "simulation"],
+  "promptSeed": "This world simulates realistic horse racing."
+}
+```
+
+### Current State
+
+```json
+[
+  {
+    "schemaName": "horse",
+    "instanceId": "HORSE_1",
+    "state": { "name": "Midnight", "speed": 0.85, "wins": 5 }
+  },
+  {
+    "schemaName": "horse",
+    "instanceId": "HORSE_2",
+    "state": { "name": "Thunder", "speed": 0.78, "wins": 2 }
+  }
+]
+```
+
+### Event Configuration
+
+```json
+{
+  "name": "race_result",
+  "behaviorPrompt": "Determine the race winner based on horse stats and conditions.",
+  "inputSchema": { "raceId": "string", "trackCondition": "string" },
+  "stateChangeSchema": { "horse": "partial" },
+  "resultSchema": { "winner": "string", "time": "string" }
+}
+```
+
+## Attestation
+
+Every AI response includes a cryptographic attestation:
+
+| Field | Description |
+|-------|-------------|
+| `signature` | ECDSA signature (65 bytes hex) |
+| `signing_address` | Ethereum-style address (20 bytes hex) |
+| `signing_algo` | Algorithm used (`"ecdsa"`) |
+| `text` | Hash of signed content |
+
+<Callout type="info" title="Verifiable Execution">
+  The attestation allows independent verification that the response came from NEAR AI and the content hasn't been modified. This is crucial for auditability and trust in AI-driven state changes.
+</Callout>
+
+This allows independent verification that:
+
+1. The response came from AI
+2. The content hasn't been modified
+
+## LLM Metadata
+
+Event history records include LLM metadata for debugging and transparency:
+
+| Field | Description |
+|-------|-------------|
+| `llmModel` | The model used (e.g., `openai/gpt-oss-120b`) |
+| `plainTextRequest` | The full prompt sent to the LLM |
+| `plainTextResponse` | The raw response from the LLM |
+
+## State Change Application
+
+After AI returns, the system applies changes based on `stateChangeSchema`:
+
+```json
+// stateChangeSchema
+{ "horse": "partial", "race_log": "append" }
+
+// AI returns
+{
+  "horse:HORSE_1": { "wins": 6 },
+  "race_log:LOG_1": { "entries": ["HORSE_1 won"] }
+}
+
+// Applied:
+// - horse:HORSE_1 gets wins merged (partial)
+// - race_log:LOG_1 gets entries appended (append)
+```
+
+## Error Handling
+
+| Scenario | Response |
+|----------|----------|
+| Event not bound | 400 Bad Request |
+| Deployment locked | 400 Bad Request |
+| AI unavailable | 500 Internal Server Error |
+| Invalid input | 400 Bad Request |
+
+## Related Concepts
+
+- [Event Versioning](/docs/concepts/events) - Behavior prompts and schemas
+- [Entity Instances](/docs/concepts/entities) - State change application
+- [On-chain Oracle](/docs/concepts/on-chain-oracle) - On-chain recording
+- [Deployments](/docs/concepts/deployment) - AI model selection per deployment

@@ -1,0 +1,141 @@
+---
+title: Architecture
+description: System architecture and layer separation
+---
+
+# Architecture
+
+Narrative Protocol uses a two-layer architecture that separates **design-time** definitions from **runtime** state.
+
+## Blueprint Layer (Design-Time)
+
+The Blueprint layer contains definitions that describe the structure and behavior of your world. These don't hold runtime data.
+
+### Worlds
+
+Top-level containers that group related definitions together.
+
+```json title="World Definition"
+{
+  "name": "Horse Racing",
+  "description": "A horse racing simulation",
+  "domainTags": ["sports", "simulation"],
+  "promptSeed": "This world simulates realistic horse racing events."
+}
+```
+
+**Fields:**
+
+- `name` - Human-readable identifier
+- `description` - What this world simulates
+- `domainTags` - Categories for organization
+- `promptSeed` - Base context for AI-driven event resolution
+
+### Entity Schemas
+
+Define the shape of entities. They are templates, not data containers.
+
+```json title="Entity Schema"
+{
+  "name": "horse",
+  "description": "A racing horse",
+  "attributeDefinitions": [
+    { "name": "speed_rating", "type": "float", "defaultValue": 0.5 },
+    { "name": "stamina", "type": "float", "defaultValue": 0.5 }
+  ]
+}
+```
+
+**Attribute Types:**
+
+| Type | Description |
+|------|-------------|
+| `string` | Text values |
+| `integer` | Whole numbers |
+| `float` | Floating-point numbers |
+| `boolean` | True/false values |
+| `json` | Complex nested data |
+
+### Events
+
+Define what can happen in the world. Events have versioned behavior.
+
+```json title="Event Definition"
+{
+  "name": "race_result",
+  "description": "Resolves a race",
+  "firstVersion": {
+    "inputSchema": { "raceId": "string" },
+    "stateChangeSchema": { "horse": "partial" },
+    "behaviorPrompt": "Determine the winner based on horse stats"
+  }
+}
+```
+
+## Live Layer (Runtime)
+
+The Live layer contains actual runtime state and execution records.
+
+### Deployments
+
+Running instances of a world with their own isolated state.
+
+```json title="Deployment"
+{
+  "worldId": 1,
+  "name": "Season 1",
+  "mode": "upgradable",
+  "firstBinding": { "eventId": 1, "eventVersion": 1 }
+}
+```
+
+### Entity Instances
+
+Actual data belonging to a deployment. Multiple instances can share a schema.
+
+```json title="Entity Instance"
+{
+  "deploymentId": 1,
+  "entitySchemaId": 1,
+  "instanceId": "HORSE_1",
+  "state": { "name": "Midnight Comet", "speed_rating": 0.85 }
+}
+```
+
+### Event Bindings
+
+Connect deployments to specific event versions.
+
+### Event History
+
+Records of every event execution with inputs, outputs, and attestations.
+
+## Relationship Diagram
+
+```
+Blueprint Layer                 Live Layer
+────────────────              ─────────────────
+World ─────────────────────── Deployment (targetChain)
+  │                               │
+  ├── Entity Schema ────────── Entity Instance
+  │     └── Attribute             └── state (JSON)
+  │
+  └── Event ───────────────── Event Binding
+        └── Event Version         └── History Record
+                                        ├── Solana Record
+                                        └── NEAR Record
+```
+
+## Design Principles
+
+1. **Separation of Concerns**: Definitions (what can exist) vs State (what does exist)
+2. **Immutability**: Published versions and locked deployments cannot change
+3. **Auditability**: Full history with cryptographic attestations
+4. **Verifiability**: On-chain records for independent verification
+
+## Related Concepts
+
+- [Events](/docs/concepts/events) - Event versioning
+- [Deployments](/docs/concepts/deployment) - Deployments
+- [Entities](/docs/concepts/entities) - Entities
+- [On-chain Oracle](/docs/concepts/on-chain-oracle) - On-chain verification

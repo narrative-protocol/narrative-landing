@@ -1,0 +1,74 @@
+---
+title: Worlds
+description: Create and manage worlds
+---
+
+# Worlds API
+
+Create and manage worlds in Narrative Protocol.
+
+## Endpoints
+
+### List Worlds
+
+```http
+GET /api/worlds
+```
+
+### Create World
+
+```http
+POST /api/worlds
+```
+
+### Get World
+
+```http
+GET /api/worlds/:id
+```
+
+### Update World
+
+```http
+PUT /api/worlds/:id
+```
+
+### Delete World
+
+```http
+DELETE /api/worlds/:id
+```
+
+## Examples
+
+### Create World
+
+```bash
+curl -X POST https://api.narrativeprotocol.com/api/worlds \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "name": "Horse Racing",
+    "description": "A horse racing simulation world",
+    "domainTags": ["sports", "simulation"],
+    "promptSeed": "This world simulates realistic horse racing events."
+  }'
+```
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 39,
+    "address": "0xd36f777a077ff3825653f6d521f1437b4da69699",
+    "userId": 746631,
+    "name": "Horse Racing",
+    "description": "A horse racing simulation world",
+    "domainTags": ["sports", "simulation"],
+    "promptSeed": "This world simulates realistic horse racing events.",
+    "isPublic": false,
+    "createdAt": "2026-02-18T04:13:02.315Z",
+    "updatedAt": "2026-02-18T04:13:02.315Z"
+  }
+}
+```

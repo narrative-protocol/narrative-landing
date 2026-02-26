@@ -1,0 +1,249 @@
+---
+title: Quickstart
+description: Get started with Narrative Protocol in 5 minutes
+---
+
+# Quickstart
+
+This guide will walk you through creating your first world, defining entities, executing events, and seeing AI-driven state changes.
+
+<Callout type="info" title="Prerequisites">
+  Set the `URL` to the API endpoint (`https://api.narrativeprotocol.com`)
+</Callout>
+
+## Getting an API key
+
+Before making any API calls, you need to authenticate with the system. Register at [https://studio.narrativeprotocol.com](https://studio.narrativeprotocol.com) to get API key that will be used for all subsequent requests.
+
+---
+
+## Blueprint Layer
+
+The Blueprint layer is where you define your world's structure. This includes creating worlds, entity schemas with attributes, and events with versioned behavior. These definitions are separate from the runtime execution.
+
+### Create Your First World
+
+A World is the top-level container for your simulation. It holds entity schemas, events, and can have multiple deployments. The promptSeed helps the AI understand the overall context of your world.
+
+**Request:**
+
+```bash
+curl -X POST https://api.narrativeprotocol.com/api/worlds \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-token>" \
+  -d '{
+    "name": "Horse Racing",
+    "description": "A horse racing simulation world",
+    "domainTags": ["sports", "simulation"],
+    "promptSeed": "This world simulates realistic horse racing events."
+  }'
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 39,
+    "address": "0xd36f777a077ff3825653f6d521f1437b4da69699",
+    "userId": 746631,
+    "name": "Horse Racing",
+    "description": "A horse racing simulation world",
+    "domainTags": ["sports", "simulation"],
+    "promptSeed": "This world simulates realistic horse racing events.",
+    "isPublic": false,
+    "createdAt": "2026-02-18T04:13:02.315Z",
+    "updatedAt": "2026-02-18T04:13:02.315Z"
+  }
+}
+```
+
+### Define an Entity Schema
+
+An Entity Schema defines the structure for entities in your world. For example, a "horse" schema defines what attributes (name, speed, wins) all horses will have.
+
+**Request:**
+
+```bash
+curl -X POST https://api.narrativeprotocol.com/api/entity-schemas \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-token>" \
+  -d '{
+    "worldId": <world-id>,
+    "name": "horse",
+    "description": "A racing horse"
+  }'
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 53,
+    "worldId": 39,
+    "name": "horse",
+    "description": "A racing horse",
+    "createdAt": "2026-02-18T04:13:49.117Z",
+    "updatedAt": "2026-02-18T04:13:49.117Z",
+    "attributeDefinitions": []
+  }
+}
+```
+
+### Add Attributes to Entity Schema
+
+Attributes define the specific properties each entity instance can have. You can specify type (string, integer, float, boolean), constraints, and default values.
+
+```bash
+# Speed rating attribute
+curl -X POST https://api.narrativeprotocol.com/api/attribute-definitions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-token>" \
+  -d '{
+    "entitySchemaId": <schema-id>,
+    "name": "speed_rating",
+    "type": "float",
+    "constraints": { "min": 0, "max": 1 },
+    "defaultValue": 0.5
+  }'
+```
+
+### Create an Event
+
+Events define what can happen in your world. Each event has versions that become immutable once published, ensuring reproducibility.
+
+```bash
+curl -X POST https://api.narrativeprotocol.com/api/events \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-token>" \
+  -d '{
+    "worldId": <world-id>,
+    "name": "race_result",
+    "description": "Resolves a race and updates horse stats",
+    "firstVersion": {
+      "inputSchema": { "raceId": "string" },
+      "reads": [<schema-id>],
+      "stateChangeSchema": { "horse": "partial" },
+      "resultSchema": { "winner": "string", "time": "string" },
+      "behaviorPrompt": "Determine the race winner based on horse speed ratings. Update the winners wins count."
+    }
+  }'
+```
+
+---
+
+## Live Layer
+
+The Live layer is where your simulation actually runs. Deployments are isolated runtime instances of a world.
+
+### Create a Deployment
+
+A Deployment is a running instance of a world with its own isolated state.
+
+```bash
+curl -X POST https://api.narrativeprotocol.com/api/deployments \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-token>" \
+  -d '{
+    "worldId": <world-id>,
+    "name": "Season 1",
+    "targetChains": ["near-testnet"],
+    "firstBinding": {
+      "eventId": <event-id>,
+      "eventVersion": <event-version>
+    }
+  }'
+```
+
+The `targetChains` option determines where event data is stored on-chain:
+
+- `[]` - No on-chain storage (default)
+- `["solana-devnet"]` - Push to Solana devnet
+- `["near-testnet"]` - Push to NEAR testnet
+- `["solana-devnet", "near-testnet"]` - Push to both chains
+
+### Create Entity Instances
+
+Entity Instances are the actual data in your deployment.
+
+```bash
+curl -X POST https://api.narrativeprotocol.com/api/entity-instances \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-token>" \
+  -d '{
+    "deploymentId": <deployment-id>,
+    "entitySchemaId": <schema-id>,
+    "instanceId": "HORSE_1",
+    "state": {
+      "name": "Midnight Comet",
+      "speed_rating": 0.85
+    }
+  }'
+```
+
+### Execute an Event
+
+This is where the magic happens! Executing an event triggers the AI engine.
+
+```bash
+curl -X POST https://api.narrativeprotocol.com/api/deployments/<deployment-id>/execute \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-token>" \
+  -d '{
+    "eventId": <event-id>,
+    "input": { "raceId": "RACE_001" }
+  }'
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "historyId": 11133,
+    "eventVersion": 1,
+    "stateChanges": {
+      "horse:HORSE_1": {
+        "wins": 1
+      }
+    },
+    "result": {
+      "time": "2026-02-18T00:00:00Z",
+      "winner": "Midnight Comet"
+    },
+    "attestation": {
+      "signature": "0x0b09aa672cde45034a1091532b1e7f7e31b476181fd06ca4faafc566245a823f3ff0e8a65afd102b64a1370170e5819f242480e727d449cbdcc338d7324b9a191c",
+      "signing_address": "0xbBC409e6b529817D257aD61D5738D8e3a39b5791",
+      "signing_algo": "ecdsa",
+      "text": "d3fc5ada116a1c0c9359ea6b7297b210cfecd393facc04c5d20209002a2dd126:ad558a6182aa4c55374cbd5eae218d6b2dae1957780630ecc6a0f01e49214af9"
+    },
+    "oracle": {
+      "solana": null,
+      "near": {
+        "txHash": "8LjP9sqX26oQgScPy5RGzs8dEzwZiNSQHKrTpCLrP5yy",
+        "receiptId": "ZWsNXEXPp1KyQWB68psjypi1PHGjMC8MrAomHBQLpGr"
+      }
+    }
+  }
+}
+```
+
+### View Updated State
+
+After executing an event, you can query the entity instances to see how the state has changed.
+
+```bash
+curl https://api.narrativeprotocol.com/api/entity-instances?deploymentId=<deployment-id> \
+  -H "Authorization: Bearer <your-token>"
+```
+
+## Next Steps
+
+- Learn about [Core Concepts](/docs/concepts) - Architecture, versioning, modes
+- Explore [AI Engine](/docs/concepts/ai-engine) - How events are processed and model selection
+- See [On-chain Oracle](/docs/concepts/on-chain-oracle) - Multi-chain verification
+- Check the [API Reference](/docs/api-reference/authentication) - Complete endpoints

@@ -1,0 +1,67 @@
+---
+title: Introduction
+description: Welcome to Narrative Protocol documentation
+---
+
+# Narrative Protocol
+
+Narrative Protocol is a **World State & Event Engine** that enables you to define, manage, and execute complex world simulations with versioned events, AI-driven execution, and on-chain verification.
+
+<Callout type="info" title="Machine-Readable Documentation">
+  The documentation is also available for machine readers at [](/llms.txt) (concise) and [](/llms-full.txt) (complete).
+</Callout>
+
+## Key Concepts
+
+### Blueprint vs Live
+
+The system separates **design-time** (World/Blueprint) from **runtime** (Deployment/Live):
+
+- **World (Blueprint)**: Define your entity schemas and events with versioned behavior
+- **Deployment (Live)**: Create instances, execute events via AI, and track history
+
+### Core Components
+
+| Component | Layer | Description |
+|-----------|-------|-------------|
+| Worlds | Blueprint | Container for all definitions (title, tags, prompt seed) |
+| Entity Schemas | Blueprint | Define the shape of entities (e.g., Horse, Track, Jockey) |
+| Events | Blueprint | Define what can happen (with versioned behavior) |
+| Deployments | Live | Running instance of a world with its own state |
+| Entity Instances | Live | Actual entities (e.g., HORSE_1, HORSE_2) |
+
+## Features
+
+### Event Versioning
+
+Events have versions that become immutable once published, ensuring reproducibility and auditability.
+
+### AI Event Execution
+
+Events are executed by an AI engine with configurable model selection (default: `openai/gpt-oss-120b`). Each deployment can use a different AI model.
+
+### Deployment Modes
+
+Deployments can be `upgradable` (default) or `locked` (irreversible freeze for archival).
+
+### Snapshotting
+
+Create new deployments by copying state from existing ones - useful for forking simulations or creating test environments.
+
+### Cryptographic Attestation
+
+Every AI response includes a cryptographic attestation for independent verification.
+
+### Multi-Chain On-chain Oracle
+
+Event execution records can be pushed to Solana and/or NEAR networks for immutable on-chain storage. Deployments specify target chains as an array (e.g., `["solana-devnet", "near-testnet"]`).
+
+### Selective On-Chain Push
+
+Configure which state change and result fields get pushed to the blockchain.
+
+<Callout type="tip" title="Quick Links">
+- [Quickstart Guide](/docs/quickstart) - Get running in 5 minutes
+- [Core Concepts](/docs/concepts) - Understand the architecture
+- [API Reference](/docs/api-reference/authentication) - Complete API documentation
+</Callout>

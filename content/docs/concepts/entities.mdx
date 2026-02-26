@@ -1,0 +1,166 @@
+---
+title: Entities
+description: Entity schemas and instances
+---
+
+# Entities
+
+Entity Instances are the actual data in a deployment. They follow a schema but each instance has its own state.
+
+## Schema vs Instance
+
+```
+Entity Schema: "horse"
+│
+├── HORSE_1: { name: "Midnight Comet", speed: 0.85, wins: 3 }
+├── HORSE_2: { name: "Thunder Bolt", speed: 0.78, wins: 1 }
+└── HORSE_3: { name: "Golden Arrow", speed: 0.92, wins: 5 }
+```
+
+- **Schema**: Defines structure (what fields exist, their types, defaults)
+- **Instance**: Holds actual values for a specific entity
+
+## Creating Instances
+
+```http title="Request"
+POST /api/entity-instances
+```
+
+```json title="Request Body"
+{
+  "deploymentId": 1,
+  "entitySchemaId": 1,
+  "instanceId": "HORSE_1",
+  "state": {
+    "name": "Midnight Comet",
+    "speed_rating": 0.85
+  }
+}
+```
+
+### Instance IDs
+
+The `instanceId` is a unique string identifier within the deployment:
+
+- Must be unique per deployment + schema combination
+- Used in state change references (e.g., `"horse:HORSE_1"`)
+- Case-sensitive
+
+### Default Values
+
+Attributes not provided in `state` use schema defaults:
+
+```json title="Default Values Example"
+// Schema defaults: speed_rating=0.5, stamina=0.5, wins=0
+
+// Create with partial state
+{ "instanceId": "HORSE_1", "state": { "name": "Star" } }
+
+// Result
+{
+  "instanceId": "HORSE_1",
+  "state": {
+    "name": "Star",
+    "speed_rating": 0.5,
+    "stamina": 0.5,
+    "wins": 0
+  }
+}
+```
+
+## Updating State
+
+### Direct Update
+
+```http title="Request"
+PUT /api/entity-instances/:id
+```
+
+```json title="Request Body"
+{
+  "state": { "wins": 4, "lastRace": "2024-06-15" }
+}
+```
+
+Direct updates **merge** with existing state (partial update).
+
+### Via Event Execution
+
+Events update state through AI-computed changes:
+
+```json title="State Changes"
+// AI returns stateChanges
+{
+  "horse:HORSE_1": { "wins": 4, "lastRace": "2024-06-15" },
+  "horse:HORSE_2": { "stamina": 0.65 }
+}
+```
+
+The key format is `"schemaName:instanceId"`.
+
+## State Change Modes
+
+When events execute, the `stateChangeSchema` determines how changes apply:
+
+| Mode | Behavior | Use Case |
+|------|----------|----------|
+| `partial` | Merge changes into existing state | Most updates |
+| `full` | Replace entire state | Complete resets |
+| `append` | Append to arrays, merge objects | Logs, history |
+
+### Partial Example
+
+```json
+// Existing: { name: "Star", speed: 0.8, wins: 3 }
+// Change: { wins: 4 }
+// Result: { name: "Star", speed: 0.8, wins: 4 }
+```
+
+### Full Example
+
+```json
+// Existing: { name: "Star", speed: 0.8, wins: 3 }
+// Change: { name: "Star", wins: 4 }
+// Result: { name: "Star", wins: 4 }  // speed is gone
+```
+
+### Append Example
+
+```json
+// Existing: { name: "Star", raceLog: ["race1"] }
+// Change: { raceLog: ["race2"] }
+// Result: { name: "Star", raceLog: ["race1", "race2"] }
+```
+
+## Querying Instances
+
+### List by Deployment
+
+```http
+GET /api/entity-instances?deploymentId=1
+```
+
+### List by Schema
+
+```http
+GET /api/entity-instances?deploymentId=1&entitySchemaId=1
+```
+
+### Get Single Instance
+
+```http
+GET /api/entity-instances/:id
+```
+
+## Constraints
+
+<Callout type="info" title="Important Limitations">
+- Cannot modify instances in locked deployments
+- Cannot delete instances if deployment has event history
+- Instance IDs must be unique within deployment + schema
+</Callout>
+
+## Related Concepts
+
+- [Architecture](/docs/concepts/architecture) - Schema vs Instance relationship
+- [AI Engine](/docs/concepts/ai-engine) - How events modify state

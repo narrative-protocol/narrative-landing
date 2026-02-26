@@ -1,0 +1,61 @@
+---
+title: AI Models
+description: Available AI models for event execution
+---
+
+# AI Models API
+
+List available AI models for event execution.
+
+## Endpoints
+
+### List AI Models
+
+```http
+GET /api/ai-models
+```
+
+## Examples
+
+### Get Available Models
+
+```bash
+curl https://api.narrativeprotocol.com/api/ai-models \
+  -H "Authorization: Bearer <token>"
+```
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "modelId": "openai/gpt-oss-120b",
+      "modelDisplayName": "GPT OSS 120B",
+      "modelDescription": "Default model for event execution",
+      "contextLength": 131000,
+      "attestationSupported": true,
+      "verifiable": true,
+      "isDefault": true
+    }
+  ]
+}
+```
+
+## Usage
+
+Set the AI model when creating a deployment:
+
+```bash
+curl -X POST https://api.narrativeprotocol.com/api/deployments \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "worldId": 39,
+    "name": "Season 1",
+    "aiModelId": "openai/gpt-oss-120b",
+    "firstBinding": {
+      "eventId": 29,
+      "eventVersion": 1
+    }
+  }'
+```

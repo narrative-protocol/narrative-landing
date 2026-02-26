@@ -1,0 +1,263 @@
+---
+title: On-chain Oracle
+description: Blockchain integration for verification
+---
+
+<Callout type="warning" title="Deployment Status">
+  Solana program is currently only deployed on devnet, NEAR smart contract is currently only deployed on mainnet and testnet.
+</Callout>
+
+# On-chain Oracle
+
+Narrative Protocol pushes event execution records to blockchain networks, providing immutable on-chain records for verification and auditability. The system supports multiple chains: **Solana** (devnet/mainnet) and **NEAR** (testnet/mainnet).
+
+## Overview
+
+After each event execution:
+
+1. **Database Storage**: Full event data stored in PostgreSQL
+2. **On-chain Record**: Event data pushed to selected blockchain(s)
+3. **Attestation**: AI attestation stored on-chain
+
+This enables independent verification of event executions.
+
+## Target Chain Selection
+
+When creating a deployment, specify which chain network(s) to use via the `targetChains` array:
+
+| Value | Description | Max Data Size |
+|-------|-------------|---------------|
+| `solana-devnet` | Push to Solana devnet | 1232 bytes per field |
+| `solana-mainnet` | Push to Solana mainnet | 1232 bytes per field |
+| `near-testnet` | Push to NEAR testnet | 2048 bytes per field |
+| `near-mainnet` | Push to NEAR mainnet | 2048 bytes per field |
+
+An empty array `[]` (default) means no on-chain storage.
+
+```json title="Deployment Configuration"
+{
+  "worldId": 1,
+  "name": "Season 1",
+  "targetChains": ["solana-devnet", "near-testnet"],
+  "firstBinding": { "eventId": 1, "eventVersion": 1 }
+}
+```
+
+When both Solana and NEAR chains are included, the stricter Solana 1232-byte limit applies to size validation.
+
+## Selective On-Chain Push
+
+Deployments can configure which fields get pushed on-chain via the `onchain` config:
+
+```json
+{
+  "targetChains": ["solana-devnet"],
+  "onchain": {
+    "stateChanges": ["wins", "speed_rating"],
+    "result": ["winner"]
+  }
+}
+```
+
+When `onchain` is set, only the specified keys from `stateChanges` and `result` are included in the on-chain push. When omitted or null, all data is pushed.
+
+This is particularly useful for Solana deployments where the 1232-byte per-field limit requires careful data selection.
+
+## What Gets Stored On-chain
+
+The Solana program uses a **single account per deployment** (PDA: `["deployment", deployment_id]`). Each `push_event` overwrites the account with the latest event data, so rent is paid only once per deployment.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `deployment_id` | u64 | Deployment identifier |
+| `event_version_id` | u64 | Event version of the latest event |
+| `event_history_id` | u64 | History ID of the latest event |
+| `event_count` | u64 | Total events pushed for this deployment |
+| `input_hash` | [u8; 32] | SHA-256 of latest input JSON |
+| `state_changes` | String | Latest state changes JSON |
+| `result` | String | Latest result JSON |
+| `attestation` | struct | Attestation from the latest event |
+| `executed_at` | i64 | When latest event was executed |
+| `pushed_at` | i64 | When latest record was pushed |
+
+## Solana Integration
+
+### Program ID
+
+```
+8KAY24esApxCjPs48qSHAmFMH8EpTp59XntNLouyRdmQ
+```
+
+### Accounts
+
+**Config Account** (PDA: `["config"]`)
+
+```rust
+pub struct Config {
+    pub authority: Pubkey,    // Who can push events
+    pub event_count: u64,     // Total events pushed
+    pub bump: u8,             // PDA bump
+}
+```
+
+**Deployment Record Account** (PDA: `["deployment", deployment_id_bytes]`)
+
+```rust
+pub struct DeploymentRecord {
+    pub deployment_id: u64,
+    pub event_version_id: u64,
+    pub event_history_id: u64,
+    pub event_count: u64,
+    pub input_hash: [u8; 32],
+    #[max_len(1232)]
+    pub state_changes: String,
+    #[max_len(1232)]
+    pub result: String,
+    pub attestation: Attestation,
+    pub executed_at: i64,
+    pub pushed_at: i64,
+    pub bump: u8,
+}
+```
+
+## NEAR Integration
+
+### Addresses
+
+```
+oracle-1.narrativeprotocol.near (mainnet)
+narrative-p.testnet (testnet)
+```
+
+### Contract Structure
+
+```rust
+pub struct Contract {
+    authority: AccountId,
+    event_count: u64,
+    events: LookupMap<u64, EventRecord>,
+}
+
+pub struct EventRecord {
+    pub deployment_id: u64,
+    pub event_version_id: u64,
+    pub event_history_id: u64,
+    pub input_hash: [u8; 32],
+    pub state_changes: String,
+    pub result: String,
+    pub attestation: Attestation,
+    pub executed_at: u64,
+    pub pushed_at: u64,
+}
+```
+
+### Contract Methods
+
+| Method | Description | Access |
+|--------|-------------|--------|
+| `initialize` | Set up contract authority | Once per contract |
+| `push_event` | Push new event record | Authority only |
+| `get_deployment_event` | Get event by deployment ID and event ID | Public |
+| `get_deployment_event_count` | Get total event count | Public |
+
+## Attestation Structure
+
+Both chains store the same attestation format:
+
+```rust
+pub struct Attestation {
+    pub signature: Vec<u8>,        // ECDSA signature (65 bytes)
+    pub signing_address: [u8; 20], // Ethereum address
+    pub signing_algo: String,      // "ecdsa"
+    pub text: String,              // Signed content hash
+}
+```
+
+## API Response
+
+Event execution response includes oracle results for configured chains:
+
+```json
+{
+  "success": true,
+  "data": {
+    "historyId": 42,
+    "stateChanges": { ... },
+    "result": { ... },
+    "attestation": { ... },
+    "oracle": {
+      "solana": {
+        "signature": "5xYzABC123def456...",
+        "eventRecordPda": "7abcDEF789ghi012..."
+      },
+      "near": {
+        "txHash": "Abc123...xyz",
+        "receiptId": "Def456...uvw"
+      }
+    }
+  }
+}
+```
+
+The `oracle` object contains:
+
+- `solana` - Solana transaction details (if any Solana network is in `targetChains`)
+- `near` - NEAR transaction details (if any NEAR network is in `targetChains`)
+
+Either field will be `null` if that chain family is not configured or not selected.
+
+## Verification Flow
+
+To verify an event:
+
+1. **Fetch on-chain record** from the appropriate chain
+2. **Fetch off-chain data** from API: `GET /api/deployments/:id/history`
+3. **Compare state_changes and result** - on-chain contains full JSON (or filtered JSON if `onchain` config is set)
+4. **Compute hash** of input
+5. **Compare hash** - it must match on-chain value
+6. **Verify attestation** - check ECDSA signature
+
+### Solana Verification
+
+```javascript
+const onChainRecord = await program.account.deploymentRecord.fetch(pda);
+const offChainData = await fetch(`/api/deployments/${id}/history/${historyId}`);
+
+const onChainStateChanges = JSON.parse(onChainRecord.stateChanges);
+assert.deepEqual(onChainStateChanges, offChainData.stateChanges);
+
+const inputHash = sha256(JSON.stringify(offChainData.input));
+assert(inputHash === onChainRecord.inputHash);
+```
+
+### NEAR Verification
+
+```javascript
+const onChainRecord = await contract.get_event({ event_history_id: historyId });
+const offChainData = await fetch(`/api/deployments/${id}/history/${historyId}`);
+
+const onChainStateChanges = JSON.parse(onChainRecord.state_changes);
+assert.deepEqual(onChainStateChanges, offChainData.stateChanges);
+
+const inputHash = sha256(JSON.stringify(offChainData.input));
+assert(arrayEquals(inputHash, onChainRecord.input_hash));
+```
+
+## Data Size Limits
+
+<Callout type="warning" title="Size Constraints">
+  When using Solana chains, be mindful of the 1232-byte per-field limit. Use the `onchain` config on the deployment to select only the fields you need on-chain.
+</Callout>
+
+| Chain Family | Max per field | Notes |
+|--------------|---------------|-------|
+| Solana | 1232 bytes | Use `onchain` config to filter fields |
+| NEAR | 2048 bytes | |
+| Both | 1232 bytes | Uses stricter Solana limit |
+
+If your `stateChanges` or `result` exceeds 1232 bytes when using a Solana chain, the event execution will fail with a validation error.
+
+## Related Concepts
+
+- [AI Engine](/docs/concepts/ai-engine) - Generates attestations
+- [Deployments](/docs/concepts/deployment) - Target chains and onchain config

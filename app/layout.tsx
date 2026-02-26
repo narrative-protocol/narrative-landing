@@ -3,17 +3,18 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import Script from 'next/script'
+import { RootProvider } from 'fumadocs-ui/provider/next'
 import './globals.css'
 
 const geist = Geist({ 
   subsets: ["latin"],
   variable: '--font-geist-sans',
-});
+})
 
 const geistMono = Geist_Mono({ 
   subsets: ["latin"],
   variable: '--font-geist-mono',
-});
+})
 
 export const metadata: Metadata = {
   title: 'Narrative Protocol - World State & Event Engine',
@@ -37,9 +38,17 @@ export default function RootLayout({
   const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
-        {children}
+        <RootProvider
+          theme={{
+            attribute: "class",
+            defaultTheme: "dark",
+            enableSystem: false,
+          }}
+        >
+          {children}
+        </RootProvider>
         <Analytics />
         {gaMeasurementId && (
           <>

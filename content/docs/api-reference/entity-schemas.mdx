@@ -1,0 +1,91 @@
+---
+title: Entity Schemas
+description: Define entity structures
+---
+
+# Entity Schemas API
+
+Create and manage entity schemas within worlds.
+
+## Endpoints
+
+### List Entity Schemas
+
+```http
+GET /api/entity-schemas?worldId=:worldId
+```
+
+### Create Entity Schema
+
+```http
+POST /api/entity-schemas
+```
+
+### Get Entity Schema
+
+```http
+GET /api/entity-schemas/:id
+```
+
+### Update Entity Schema
+
+```http
+PUT /api/entity-schemas/:id
+```
+
+### Delete Entity Schema
+
+```http
+DELETE /api/entity-schemas/:id
+```
+
+### Create Attribute Definition
+
+```http
+POST /api/attribute-definitions
+```
+
+## Examples
+
+### Create Entity Schema
+
+```bash
+curl -X POST https://api.narrativeprotocol.com/api/entity-schemas \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "worldId": 39,
+    "name": "horse",
+    "description": "A racing horse"
+  }'
+```
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 53,
+    "worldId": 39,
+    "name": "horse",
+    "description": "A racing horse",
+    "createdAt": "2026-02-18T04:13:49.117Z",
+    "updatedAt": "2026-02-18T04:13:49.117Z",
+    "attributeDefinitions": []
+  }
+}
+```
+
+### Add Attribute Definition
+
+```bash
+curl -X POST https://api.narrativeprotocol.com/api/attribute-definitions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "entitySchemaId": 53,
+    "name": "speed_rating",
+    "type": "float",
+    "constraints": { "min": 0, "max": 1 },
+    "defaultValue": 0.5
+  }'
+```

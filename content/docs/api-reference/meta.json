@@ -1,0 +1,26 @@
+{
+  "index": {
+    "title": "Overview"
+  },
+  "authentication": {
+    "title": "Authentication"
+  },
+  "worlds": {
+    "title": "Worlds"
+  },
+  "entity-schemas": {
+    "title": "Entity Schemas"
+  },
+  "events": {
+    "title": "Events"
+  },
+  "deployments": {
+    "title": "Deployments"
+  },
+  "entity-instances": {
+    "title": "Entity Instances"
+  },
+  "ai-models": {
+    "title": "AI Models"
+  }
+}

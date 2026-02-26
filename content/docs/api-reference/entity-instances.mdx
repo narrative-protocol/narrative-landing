@@ -1,0 +1,78 @@
+---
+title: Entity Instances
+description: Manage entity data
+---
+
+# Entity Instances API
+
+Create and manage entity instances within deployments.
+
+## Endpoints
+
+### List Entity Instances
+
+```http
+GET /api/entity-instances?deploymentId=:deploymentId
+```
+
+### Create Entity Instance
+
+```http
+POST /api/entity-instances
+```
+
+### Get Entity Instance
+
+```http
+GET /api/entity-instances/:id
+```
+
+### Update Entity Instance
+
+```http
+PUT /api/entity-instances/:id
+```
+
+### Delete Entity Instance
+
+```http
+DELETE /api/entity-instances/:id
+```
+
+## Examples
+
+### Create Entity Instance
+
+```bash
+curl -X POST https://api.narrativeprotocol.com/api/entity-instances \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "deploymentId": 28,
+    "entitySchemaId": 53,
+    "instanceId": "HORSE_1",
+    "state": {
+      "name": "Midnight Comet",
+      "speed_rating": 0.85
+    }
+  }'
+```
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 107,
+    "deploymentId": 28,
+    "entitySchemaId": 53,
+    "instanceId": "HORSE_1",
+    "state": {
+      "name": "Midnight Comet",
+      "wins": 0,
+      "speed_rating": 0.85
+    },
+    "createdAt": "2026-02-18T04:20:39.855Z",
+    "updatedAt": "2026-02-18T04:20:39.855Z"
+  }
+}
+```

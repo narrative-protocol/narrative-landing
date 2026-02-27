@@ -3,11 +3,7 @@ import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import { source } from "@/lib/source";
 import { Header } from "@/components/header";
 
-export default function Layout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Header />
@@ -16,7 +12,8 @@ export default function Layout({
           tree={source.pageTree}
           {...source}
           themeSwitch={{ enabled: false }}
-          nav={{ enabled: false }}
+          nav={{ title: "Narrative Protocol" }}
+          sidebar={{ enabled: true }}
         >
           {children}
         </DocsLayout>

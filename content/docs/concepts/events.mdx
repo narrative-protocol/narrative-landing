@@ -43,9 +43,11 @@ POST /api/worlds/:worldId/events
   "firstVersion": {
     "inputSchema": { "raceId": "string" },
     "readEntities": [{ "schemaId": 1 }, { "schemaId": 2 }],
-    "entityChangeSettings": { "horse": "partial" },
+    "stateChanges": { "horse": "partial" },
     "outputSchema": { "winner": "string", "time": "string" },
-    "behaviorPrompt": "Determine the race winner based on horse stats."
+    "behaviorPrompt": "Determine the race winner based on horse stats.",
+    "mutationSettings": { "mode": "ai" },
+    "executionSettings": { "visibility": "admin" }
   }
 }
 ```
@@ -85,7 +87,7 @@ New versions start as drafts. You can modify:
 
 - `inputSchema` - What data the event accepts
 - `readEntities` - Which entity schemas to read
-- `entityChangeSettings` - How state changes (partial/full/append)
+- `stateChanges` - How state changes (partial/full/append)
 - `outputSchema` - What gets returned publicly
 - `behaviorPrompt` - AI resolution instructions
 
@@ -107,15 +109,192 @@ Once published via `POST /api/worlds/:worldId/events/:eventId/event-versions/:ve
 |-------|------|-------------|
 | `inputSchema` | object | Expected input fields and types |
 | `readEntities` | object[] | Entity schema read config (`schemaId`, optional `filter`) |
-| `entityChangeSettings` | object | Per-schema change mode |
+| `stateChanges` | object | Per-schema change mode |
 | `outputSchema` | object | Public output structure |
 | `behaviorPrompt` | string | Instructions for AI resolution |
 | `mutationSettings` | object | Execution mode: `ai` or `direct` (templated) |
 | `executionSettings` | object | Visibility: `admin`, `public`, or `cron` (+ price/cron config) |
 
+## Mutation Settings
+
+`mutationSettings` controls how entity states are mutated during execution.
+
+State mutation always ends as runtime `stateChanges`, and the version `stateChanges` map decides how those changes apply (`partial`, `full`, `append`).
+
+### AI Mutation (`mode: "ai"`)
+
+In AI mode, the engine builds execution context from:
+
+- world definition (`name`, `description`, `domainTags`, `promptSeed`)
+- event version config (`inputSchema`, `readEntities`, `behaviorPrompt`, `outputSchema`)
+- current deployment state (filtered by `readEntities`)
+- runtime input
+
+The model returns structured `stateChanges` and `result`, then the system validates and applies the changes.
+
+Use AI mode when mutation logic depends on interpretation, simulation, or generative reasoning.
+
+### Direct Mutation (`mode: "direct"`)
+
+In direct mode, execution does not rely on LLM reasoning for mutation. The system resolves a deterministic `mutationSettings.template` and produces `stateChanges`/`result` directly.
+
+Use direct mode when:
+
+- updates should be deterministic and explainable from input/template
+- you want lower variance than prompt-based execution
+- event logic is mostly transform/map/set operations
+
+<Callout type="info" title="Direct Mode Requirement">
+  `mutationSettings.template` is required when `mode` is `direct`.
+</Callout>
+
+Example (`direct` mutation):
+
+```json
+{
+  "inputSchema": { "winner": "string" },
+  "outputSchema": { "winner": "string" },
+  "readEntities": [{ "schemaId": 1 }],
+  "stateChanges": { "horse": "partial" },
+  "mutationSettings": {
+    "mode": "direct",
+    "template": {
+      "stateChanges": {
+        "horse:{{input.winner}}": { "wins": { "$increment": 1 } }
+      },
+      "result": {
+        "winner": "{{input.winner}}"
+      }
+    }
+  },
+  "executionSettings": { "visibility": "admin" }
+}
+```
+
+### Template Engine (Direct + Cron)
+
+Direct mutation templates and cron input templates use the same resolver.
+
+Template syntax:
+
+- `{{input.someKey}}` from execution input
+- `{{walletAddress}}` wallet executing public app route (if present)
+- `{{timestamp}}` execution timestamp (ISO string)
+- `{{date}}`, `{{unix}}`, `{{counter}}`, `{{cronState.someKey}}` (cron context)
+
+Type behavior:
+
+- If a value is exactly `{{...}}`, the resolver preserves primitive type when possible (for example number).
+- If `{{...}}` appears inside a larger string, it is interpolated as text.
+
+Operator support (applied against current instance state):
+
+- `$set`: set value directly
+- `$increment`: increment number (defaults to `+1` if value omitted/non-numeric)
+- `$append`: append item to array
+
+Direct template shape:
+
+```json
+{
+  "horse:HORSE_1": {
+    "wins": { "$increment": 1 },
+    "lastWinnerWallet": { "$set": "{{walletAddress}}" },
+    "raceLog": { "$append": "{{input.raceId}}" }
+  }
+}
+```
+
+Notes:
+
+- Top-level keys should be `schemaName:instanceId`.
+- Missing instances can be auto-created during direct execution.
+- Input is validated before resolution (size/depth limits and blocked patterns).
+
+## Execution Settings
+
+`executionSettings` controls who can run an event version and when it can run.
+
+### Visibility Modes
+
+| Value | Meaning |
+|---|---|
+| `admin` | API-key authenticated execution via `/api/worlds/:worldId/deployments/:deploymentId/execute` |
+| `public` | Wallet-signed execution via `/app/deployments/:address/execute` |
+| `cron` | Scheduled execution by the background cron executor |
+
+### Public Execution Details
+
+When `visibility` is `public`:
+
+- deployment must be public
+- caller must provide `wallet`, `signature`, `message`
+- if `priceUsd > 0`, caller must provide a valid x402 `X-Payment` header
+
+Example (`public` with price):
+
+```json
+{
+  "executionSettings": {
+    "visibility": "public",
+    "priceUsd": 0.5
+  }
+}
+```
+
+Caller executes via:
+
+```http
+POST /app/deployments/:address/execute
+```
+
+### Cron Execution Details
+
+When `visibility` is `cron`:
+
+- set `executionSettings.cron.schedule` (valid cron expression)
+- optionally set `executionSettings.cron.input` template
+- executor runs periodically and triggers due events automatically
+
+Example (`cron` visibility):
+
+```json
+{
+  "executionSettings": {
+    "visibility": "cron",
+    "cron": {
+      "schedule": "*/5 * * * *",
+      "input": {
+        "tick": "{{counter}}",
+        "timestamp": "{{timestamp}}"
+      }
+    }
+  }
+}
+```
+
+Cron input template example:
+
+```json
+{
+  "executionSettings": {
+    "visibility": "cron",
+    "cron": {
+      "schedule": "0 * * * *",
+      "input": {
+        "tick": "{{counter}}",
+        "runAt": "{{timestamp}}",
+        "day": "{{date}}",
+        "lastCounter": "{{cronState.counter}}"
+      }
+    }
+  }
+}
+```
+
 ### State Change Modes
 
-The `entityChangeSettings` maps entity schema names to change modes:
+The `stateChanges` maps entity schema names to change modes:
 
 ```json title="State Change Schema"
 {
@@ -151,7 +330,7 @@ POST /api/worlds/:worldId/events/:eventId/event-versions
 {
   "inputSchema": { "raceId": "string", "weather": "string" },
   "readEntities": [{ "schemaId": 1 }, { "schemaId": 2 }],
-  "entityChangeSettings": { "horse": "partial" },
+  "stateChanges": { "horse": "partial" },
   "behaviorPrompt": "Consider weather conditions when determining the winner."
 }
 ```

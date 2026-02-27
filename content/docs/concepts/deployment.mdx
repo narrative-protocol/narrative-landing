@@ -16,6 +16,7 @@ POST /api/worlds/:worldId/deployments
 {
   "name": "Season 1",
   "description": "First season of the racing simulation",
+  "isLLMPublic": false,
   "targetChains": ["solana-devnet"],
   "aiModelId": "openai/gpt-oss-120b",
   "payToAddress": "6Q2...wallet",
@@ -32,27 +33,32 @@ POST /api/worlds/:worldId/deployments
 
 ### Fields
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | Yes | Human-readable name |
-| `description` | string | No | Optional description |
-| `targetChains` | string[] | No | On-chain oracle targets (see below) |
-| `aiModelId` | string | No | AI model to use (default: `openai/gpt-oss-120b`) |
-| `onchain` | object | No | Selective on-chain push config |
-| `payToAddress` | string | No | Receiver wallet for paid public execution |
-| `mode` | enum | No | `upgradable` (default) or `locked` |
-| `firstBinding` | object | Yes | Initial event binding |
+Use this table when creating a deployment payload.
+
+| Field          | Type     | Required | Description                                          |
+| -------------- | -------- | -------- | ---------------------------------------------------- |
+| `name`         | string   | Yes      | Human-readable name                                  |
+| `description`  | string   | No       | Optional description                                 |
+| `targetChains` | string[] | No       | On-chain oracle targets (see below)                  |
+| `aiModelId`    | string   | No       | AI model to use (default: `openai/gpt-oss-120b`)     |
+| `isLLMPublic`  | boolean  | No       | Whether LLM prompt/response data is publicly visible |
+| `onchain`      | object   | No       | Selective on-chain push config                       |
+| `payToAddress` | string   | No       | Receiver wallet (solana) for paid public execution   |
+| `mode`         | enum     | No       | `upgradable` (default) or `locked`                   |
+| `firstBinding` | object   | Yes      | Initial event binding                                |
 
 ### Target Chains
 
+Use `targetChains` to choose where execution records are pushed.
+
 The `targetChains` field is an array of network-specific chain identifiers. An empty array (default) means no on-chain storage.
 
-| Value | Description | Max Data Size |
-|-------|-------------|---------------|
-| `solana-devnet` | Push to Solana devnet | 1232 bytes per field |
+| Value            | Description            | Max Data Size        |
+| ---------------- | ---------------------- | -------------------- |
+| `solana-devnet`  | Push to Solana devnet  | 1232 bytes per field |
 | `solana-mainnet` | Push to Solana mainnet | 1232 bytes per field |
-| `near-testnet` | Push to NEAR testnet | Unlimited |
-| `near-mainnet` | Push to NEAR mainnet | Unlimited |
+| `near-testnet`   | Push to NEAR testnet   | 2048 bytes per field |
+| `near-mainnet`   | Push to NEAR mainnet   | 2048 bytes per field |
 
 You can specify multiple chains:
 
@@ -124,7 +130,9 @@ The default mode for new deployments. All operations are permitted.
 ### Locked Mode
 
 <Callout type="warning" title="Irreversible Action">
-  Locking a deployment is **permanent and cannot be undone**. Once locked, the deployment becomes read-only forever. Make sure to create a snapshot before locking if you need to continue the simulation.
+  Locking a deployment is **permanent and cannot be undone**. Once locked, the
+  deployment becomes read-only forever. Make sure to create a snapshot before
+  locking if you need to continue the simulation.
 </Callout>
 
 A frozen state where no modifications are allowed. **This transition is irreversible.**
@@ -149,20 +157,21 @@ POST /api/worlds/:worldId/deployments/:deploymentId/lock
 ```
 
 <Callout type="warning" title="Irreversible Action">
-  Locking a deployment is **permanent and cannot be undone**. Once locked, the deployment becomes read-only forever.
+  Locking a deployment is **permanent and cannot be undone**. Once locked, the
+  deployment becomes read-only forever.
 </Callout>
 
 ### Mode Comparison
 
-| Feature | Upgradable | Locked |
-|---------|------------|--------|
-| Execute events | Yes | No |
-| Modify instances | Yes | No |
-| Add bindings | Yes | No |
-| Read data | Yes | Yes |
-| View history | Yes | Yes |
-| Delete deployment | Yes | No |
-| Transition | To locked | None (final) |
+| Feature           | Upgradable | Locked       |
+| ----------------- | ---------- | ------------ |
+| Execute events    | Yes        | No           |
+| Modify instances  | Yes        | No           |
+| Add bindings      | Yes        | No           |
+| Read data         | Yes        | Yes          |
+| View history      | Yes        | Yes          |
+| Delete deployment | Yes        | No           |
+| Transition        | To locked  | None (final) |
 
 ## Snapshotting
 
@@ -187,13 +196,13 @@ When creating a deployment with a `sourceDeploymentId`, the system:
 
 ### What Gets Copied
 
-| Component | Copied | Notes |
-|-----------|--------|-------|
-| Entity instances | Yes | Full state at time of snapshot |
-| Event bindings | Yes | Except if duplicate of firstBinding |
-| Event history | No | New deployment starts fresh |
-| Deployment mode | No | Always starts as upgradable |
-| Deployment name | No | Must provide new name |
+| Component        | Copied | Notes                               |
+| ---------------- | ------ | ----------------------------------- |
+| Entity instances | Yes    | Full state at time of snapshot      |
+| Event bindings   | Yes    | Except if duplicate of firstBinding |
+| Event history    | No     | New deployment starts fresh         |
+| Deployment mode  | No     | Always starts as upgradable         |
+| Deployment name  | No     | Must provide new name               |
 
 ### Use Cases
 
@@ -203,9 +212,8 @@ When creating a deployment with a `sourceDeploymentId`, the system:
 - **Version Migration**: Upgrade to new event versions while preserving state
 
 <Callout type="info" title="Snapshot Requirements">
-- Source deployment must be from the **same world**
-- You must own the source deployment
-- Source deployment can be in any mode (upgradable or locked)
+  - Source deployment must be from the **same world** - You must own the source
+  deployment - Source deployment can be in any mode (upgradable or locked)
 </Callout>
 
 ## Related Concepts

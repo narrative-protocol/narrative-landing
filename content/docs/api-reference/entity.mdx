@@ -12,7 +12,7 @@ Entity schema routes are world-scoped.
 ### List Entity Schemas
 
 ```http
-GET /api/worlds/:worldId/entity-schemas
+GET /api/worlds/:worldId/entity-schemas?page=1&limit=20
 ```
 
 ### Create Entity Schema
@@ -21,10 +21,40 @@ GET /api/worlds/:worldId/entity-schemas
 POST /api/worlds/:worldId/entity-schemas
 ```
 
+```json title="Request Body"
+{
+  "name": "horse",
+  "description": "A racing horse",
+  "attributes": [
+    {
+      "name": "speed_rating",
+      "type": "float",
+      "constraints": { "min": 0, "max": 1 },
+      "defaultValue": 0.5
+    }
+  ]
+}
+```
+
+| Field                               | Type       | Required | Description                                     |
+| ----------------------------------- | ---------- | -------- | ----------------------------------------------- |
+| `name`                              | `string`   | Yes      | Schema name, 1-255 chars                        |
+| `description`                       | `string`   | No       | Schema description                              |
+| `attributes`                        | `object[]` | No       | Inline attributes created with the schema       |
+| `attributes[].name`                 | `string`   | Yes      | Attribute key                                   |
+| `attributes[].type`                 | `enum`     | Yes      | `integer \| float \| string \| boolean \| json` |
+| `attributes[].constraints`          | `object`   | No       | Validation rules for attribute values           |
+| `attributes[].constraints.min`      | `number`   | No       | Lower bound                                     |
+| `attributes[].constraints.max`      | `number`   | No       | Upper bound                                     |
+| `attributes[].constraints.enum`     | `string[]` | No       | Allowed string values                           |
+| `attributes[].constraints.pattern`  | `string`   | No       | Regex for string attributes                     |
+| `attributes[].constraints.required` | `boolean`  | No       | Required semantics flag                         |
+| `attributes[].defaultValue`         | `any`      | No       | Default state value                             |
+
 ### List Attributes for a Schema
 
 ```http
-GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes
+GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes?page=1&limit=20
 ```
 
 ### Create Attribute
@@ -32,6 +62,27 @@ GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes
 ```http
 POST /api/worlds/:worldId/entity-schemas/:schemaId/attributes
 ```
+
+```json title="Request Body"
+{
+  "name": "wins",
+  "type": "integer",
+  "constraints": { "min": 0 },
+  "defaultValue": 0
+}
+```
+
+| Field                  | Type       | Required | Description                                     |
+| ---------------------- | ---------- | -------- | ----------------------------------------------- |
+| `name`                 | `string`   | Yes      | Attribute key                                   |
+| `type`                 | `enum`     | Yes      | `integer \| float \| string \| boolean \| json` |
+| `constraints`          | `object`   | No       | Validation rules                                |
+| `constraints.min`      | `number`   | No       | Lower bound                                     |
+| `constraints.max`      | `number`   | No       | Upper bound                                     |
+| `constraints.enum`     | `string[]` | No       | Allowed string values                           |
+| `constraints.pattern`  | `string`   | No       | Regex for string attributes                     |
+| `constraints.required` | `boolean`  | No       | Required semantics flag                         |
+| `defaultValue`         | `any`      | No       | Default state value                             |
 
 ### Get Attribute by Name
 
@@ -45,36 +96,27 @@ GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name
 PUT /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name
 ```
 
+```json title="Request Body"
+{
+  "name": "wins",
+  "type": "integer",
+  "constraints": {
+    "min": 0,
+    "required": true
+  },
+  "defaultValue": 0
+}
+```
+
+| Field          | Type     | Required | Description                                                                        |
+| -------------- | -------- | -------- | ---------------------------------------------------------------------------------- |
+| `name`         | `string` | No       | New attribute key                                                                  |
+| `type`         | `enum`   | No       | `integer                                    \| float \| string \| boolean \| json` |
+| `constraints`  | `object` | No       | Validation rules (same shape as create)                                            |
+| `defaultValue` | `any`    | No       | Default value for future merges/defaulting                                         |
+
 ### Delete Attribute by Name
 
 ```http
 DELETE /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name
-```
-
-## Examples
-
-### Create Entity Schema
-
-```bash
-curl -X POST https://api.narrativeprotocol.com/api/worlds/39/entity-schemas \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "name": "horse",
-    "description": "A racing horse"
-  }'
-```
-
-### Add Attribute
-
-```bash
-curl -X POST https://api.narrativeprotocol.com/api/worlds/39/entity-schemas/53/attributes \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "name": "speed_rating",
-    "type": "float",
-    "constraints": { "min": 0, "max": 1 },
-    "defaultValue": 0.5
-  }'
 ```

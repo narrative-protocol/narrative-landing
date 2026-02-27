@@ -12,7 +12,7 @@ Create and manage worlds in Narrative Protocol.
 ### List Worlds
 
 ```http
-GET /api/worlds
+GET /api/worlds?page=1&limit=20
 ```
 
 ### Create World
@@ -20,6 +20,22 @@ GET /api/worlds
 ```http
 POST /api/worlds
 ```
+
+```json title="Request Body"
+{
+  "name": "Horse Racing",
+  "description": "A horse racing simulation world",
+  "domainTags": ["sports", "simulation"],
+  "promptSeed": "This world simulates realistic horse racing events."
+}
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | `string` | Yes | World name, 1-255 chars. |
+| `description` | `string` | No | Human-readable description. |
+| `domainTags` | `string[]` | No | Domain/category tags. Defaults to `[]`. |
+| `promptSeed` | `string` | No | Base context used for event execution prompts. |
 
 ### Get World
 
@@ -33,42 +49,36 @@ GET /api/worlds/:id
 PUT /api/worlds/:id
 ```
 
+```json title="Request Body"
+{
+  "name": "Horse Racing v2",
+  "description": "Updated description",
+  "domainTags": ["sports", "simulation", "strategy"],
+  "promptSeed": "Updated world guidance"
+}
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | `string` | No | Same as create; updates world name. |
+| `description` | `string` | No | Same as create; updates description. |
+| `domainTags` | `string[]` | No | Same as create; updates domain tags. |
+| `promptSeed` | `string` | No | Same as create; updates prompt seed. |
+
+### Publish World
+
+```http
+POST /api/worlds/:id/publish
+```
+
+### Unpublish World
+
+```http
+POST /api/worlds/:id/unpublish
+```
+
 ### Delete World
 
 ```http
 DELETE /api/worlds/:id
-```
-
-## Examples
-
-### Create World
-
-```bash
-curl -X POST https://api.narrativeprotocol.com/api/worlds \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "name": "Horse Racing",
-    "description": "A horse racing simulation world",
-    "domainTags": ["sports", "simulation"],
-    "promptSeed": "This world simulates realistic horse racing events."
-  }'
-```
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": 39,
-    "address": "0xd36f777a077ff3825653f6d521f1437b4da69699",
-    "userId": 746631,
-    "name": "Horse Racing",
-    "description": "A horse racing simulation world",
-    "domainTags": ["sports", "simulation"],
-    "promptSeed": "This world simulates realistic horse racing events.",
-    "isPublic": false,
-    "createdAt": "2026-02-18T04:13:02.315Z",
-    "updatedAt": "2026-02-18T04:13:02.315Z"
-  }
-}
 ```

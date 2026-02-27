@@ -21,6 +21,23 @@ GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances
 POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances
 ```
 
+```json title="Request Body"
+{
+  "entitySchemaId": 53,
+  "instanceId": "HORSE_1",
+  "state": {
+    "name": "Midnight Comet",
+    "speed_rating": 0.85
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `entitySchemaId` | `number` | Yes | Entity schema ID. |
+| `instanceId` | `string` | Yes | Instance key unique in deployment+schema. |
+| `state` | `object` | No | Initial state. Defaults to `{}`. |
+
 ## Example
 
 ```bash

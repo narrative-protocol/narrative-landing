@@ -12,7 +12,7 @@ Event routes are world-scoped.
 ### List Events
 
 ```http
-GET /api/worlds/:worldId/events
+GET /api/worlds/:worldId/events?page=1&limit=20
 ```
 
 ### Create Event
@@ -21,10 +21,45 @@ GET /api/worlds/:worldId/events
 POST /api/worlds/:worldId/events
 ```
 
+```json title="Request Body"
+{
+  "name": "race_result",
+  "description": "Resolves a race and updates horse stats",
+  "firstVersion": {
+    "inputSchema": { "raceId": "string" },
+    "outputSchema": { "winner": "string", "time": "string" },
+    "readEntities": [{ "schemaId": 53 }],
+    "stateChanges": { "horse": "partial" },
+    "behaviorPrompt": "Determine the race winner based on horse speed ratings.",
+    "mutationSettings": { "mode": "ai" },
+    "executionSettings": { "visibility": "admin" }
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | `string` | Yes | Event name, unique within world. |
+| `description` | `string` | No | Event description. |
+| `firstVersion` | `object` | Yes | Initial event-version definition. |
+| `firstVersion.inputSchema` | `object` | No | Execution input contract. |
+| `firstVersion.outputSchema` | `object` | No | Public result contract. |
+| `firstVersion.readEntities` | `object[]` | No | Read access config. |
+| `firstVersion.readEntities[].schemaId` | `number` | Yes | Entity schema ID to read. |
+| `firstVersion.readEntities[].filter` | `string[]` | No | Filter expressions. |
+| `firstVersion.stateChanges` | `object` | No | Per-schema mode map. |
+| `firstVersion.behaviorPrompt` | `string` | No | Prompt for AI mode. |
+| `firstVersion.mutationSettings.mode` | `enum` | No | `ai | direct`. |
+| `firstVersion.mutationSettings.template` | `object` | Conditionally | Required when mode is `direct`. |
+| `firstVersion.executionSettings.visibility` | `enum` | No | `admin | public | cron`. |
+| `firstVersion.executionSettings.priceUsd` | `number` | No | Price for public execution. |
+| `firstVersion.executionSettings.cron.schedule` | `string` | Conditionally | Required for cron visibility; must be valid cron. |
+| `firstVersion.executionSettings.cron.input` | `object` | No | Cron input template. |
+
 ### List Event Versions
 
 ```http
-GET /api/worlds/:worldId/events/:eventId/event-versions
+GET /api/worlds/:worldId/events/:eventId/event-versions?page=1&limit=20
 ```
 
 ### Create Event Version
@@ -33,39 +68,39 @@ GET /api/worlds/:worldId/events/:eventId/event-versions
 POST /api/worlds/:worldId/events/:eventId/event-versions
 ```
 
+```json title="Request Body"
+{
+  "inputSchema": { "raceId": "string", "weather": "string" },
+  "outputSchema": { "winner": "string", "time": "string", "weather": "string" },
+  "readEntities": [{ "schemaId": 53, "filter": ["eq:instanceId:HORSE_1"] }],
+  "stateChanges": { "horse": "partial" },
+  "behaviorPrompt": "Consider weather conditions.",
+  "mutationSettings": { "mode": "direct", "template": { "result": { "winner": "{{input.winner}}" } } },
+  "executionSettings": {
+    "visibility": "cron",
+    "cron": { "schedule": "*/5 * * * *", "input": { "tick": "{{counter}}" } }
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `inputSchema` | `object` | No | Execution input contract. |
+| `outputSchema` | `object` | No | Public result contract. |
+| `readEntities` | `object[]` | No | Read access config. |
+| `readEntities[].schemaId` | `number` | Yes | Entity schema ID to read. |
+| `readEntities[].filter` | `string[]` | No | Filter expressions. |
+| `stateChanges` | `object` | No | Per-schema mode map (`partial|full|append`). |
+| `behaviorPrompt` | `string` | No | Prompt for AI mode. |
+| `mutationSettings.mode` | `enum` | No | `ai | direct`. |
+| `mutationSettings.template` | `object` | Conditionally | Required when mode is `direct`. |
+| `executionSettings.visibility` | `enum` | No | `admin | public | cron`. |
+| `executionSettings.priceUsd` | `number` | No | Price for public execution. |
+| `executionSettings.cron.schedule` | `string` | Conditionally | Required for cron visibility; must be valid cron. |
+| `executionSettings.cron.input` | `object` | No | Cron input template. |
+
 ### Publish Event Version
 
 ```http
 POST /api/worlds/:worldId/events/:eventId/event-versions/:version/publish
-```
-
-## Event Version Fields
-
-- `inputSchema`
-- `outputSchema`
-- `readEntities` (`[{ schemaId, filter? }]`)
-- `entityChangeSettings` (`{ [schemaName]: "partial" | "full" | "append" }`)
-- `behaviorPrompt`
-- `mutationSettings` (`{ mode: "ai" | "direct", template? }`)
-- `executionSettings` (`{ visibility: "admin" | "public" | "cron", priceUsd?, cron? }`)
-
-## Example
-
-```bash
-curl -X POST https://api.narrativeprotocol.com/api/worlds/39/events \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "name": "race_result",
-    "description": "Resolves a race and updates horse stats",
-    "firstVersion": {
-      "inputSchema": { "raceId": "string" },
-      "readEntities": [{ "schemaId": 53 }],
-      "entityChangeSettings": { "horse": "partial" },
-      "outputSchema": { "winner": "string", "time": "string" },
-      "behaviorPrompt": "Determine the race winner based on horse speed ratings.",
-      "mutationSettings": { "mode": "ai" },
-      "executionSettings": { "visibility": "admin" }
-    }
-  }'
 ```

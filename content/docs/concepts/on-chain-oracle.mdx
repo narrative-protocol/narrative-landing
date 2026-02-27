@@ -11,13 +11,15 @@ Narrative Protocol pushes event execution records to blockchain networks, provid
 
 After each event execution:
 
-1. **Database Storage**: Full event data stored in PostgreSQL
+1. **Database Storage**: Full event data is stored
 2. **On-chain Record**: Event data pushed to selected blockchain(s)
 3. **Attestation**: AI attestation stored on-chain
 
 This enables independent verification of event executions.
 
 ## Target Chain Selection
+
+Use this section when deciding which chains a deployment should write to.
 
 When creating a deployment, specify which chain network(s) to use via the `targetChains` array:
 
@@ -217,7 +219,9 @@ To verify an event:
 
 ```javascript
 const onChainRecord = await program.account.deploymentRecord.fetch(pda);
-const offChainData = await fetch(`/api/worlds/${worldId}/deployments/${id}/history?page=1&limit=10`);
+const offChainData = await fetch(
+  `/api/worlds/${worldId}/deployments/${id}/history?page=1&limit=10`,
+);
 
 const onChainStateChanges = JSON.parse(onChainRecord.stateChanges);
 assert.deepEqual(onChainStateChanges, offChainData.stateChanges);
@@ -230,7 +234,9 @@ assert(inputHash === onChainRecord.inputHash);
 
 ```javascript
 const onChainRecord = await contract.get_event({ event_history_id: historyId });
-const offChainData = await fetch(`/api/worlds/${worldId}/deployments/${id}/history?page=1&limit=10`);
+const offChainData = await fetch(
+  `/api/worlds/${worldId}/deployments/${id}/history?page=1&limit=10`,
+);
 
 const onChainStateChanges = JSON.parse(onChainRecord.state_changes);
 assert.deepEqual(onChainStateChanges, offChainData.stateChanges);
@@ -240,6 +246,8 @@ assert(arrayEquals(inputHash, onChainRecord.input_hash));
 ```
 
 ## Data Size Limits
+
+Use these limits to validate `stateChanges` and `result` payload sizes before execution.
 
 <Callout type="warning" title="Size Constraints">
   When using Solana chains, be mindful of the 1232-byte per-field limit. Use the
@@ -258,4 +266,4 @@ If your `stateChanges` or `result` exceeds 1232 bytes when using a Solana chain,
 ## Related Concepts
 
 - [AI Engine](/docs/concepts/ai-engine) - Generates attestations
-- [Deployments](/docs/concepts/deployment) - Target chains and onchain config
+- [Deployments](/docs/concepts/deployment) - Target chains and `onchain` configuration

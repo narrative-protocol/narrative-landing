@@ -164,7 +164,7 @@ The AI engine receives structured context:
   "name": "race_result",
   "behaviorPrompt": "Determine the race winner based on horse stats and conditions.",
   "inputSchema": { "raceId": "string", "trackCondition": "string" },
-  "entityChangeSettings": { "horse": "partial" },
+  "stateChanges": { "horse": "partial" },
   "outputSchema": { "winner": "string", "time": "string" },
   "mutationSettings": { "mode": "ai" },
   "executionSettings": { "visibility": "admin" }
@@ -203,10 +203,10 @@ Event history records include LLM metadata for debugging and transparency:
 
 ## State Change Application
 
-After AI returns, the system applies changes based on `entityChangeSettings`:
+After AI returns, the system applies changes based on `stateChanges`:
 
 ```json
-// entityChangeSettings
+// stateChanges
 { "horse": "partial", "race_log": "append" }
 
 // AI returns

@@ -12,7 +12,7 @@ Deployment routes are world-scoped.
 ### List Deployments
 
 ```http
-GET /api/worlds/:worldId/deployments
+GET /api/worlds/:worldId/deployments?page=1&limit=20
 ```
 
 ### Create Deployment
@@ -21,11 +21,61 @@ GET /api/worlds/:worldId/deployments
 POST /api/worlds/:worldId/deployments
 ```
 
+```json title="Request Body"
+{
+  "name": "Season 1",
+  "description": "Runtime deployment",
+  "mode": "upgradable",
+  "targetChains": ["near-testnet"],
+  "aiModelId": "openai/gpt-oss-120b",
+  "onchain": {
+    "stateChanges": ["wins", "speed_rating"],
+    "result": ["winner"]
+  },
+  "isLLMPublic": false,
+  "payToAddress": "6Q2...wallet",
+  "firstBinding": {
+    "eventId": 29,
+    "eventVersion": 1
+  },
+  "sourceDeploymentId": 12
+}
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | `string` | Yes | Deployment name. |
+| `description` | `string` | No | Description. |
+| `mode` | `enum` | No | `upgradable | locked` (default `upgradable`). |
+| `targetChains` | `enum[]` | No | `solana-devnet | solana-mainnet | near-testnet | near-mainnet`. |
+| `aiModelId` | `string` | No | Selected model ID. |
+| `onchain` | `object` | No | Field filter for on-chain push. |
+| `onchain.stateChanges` | `string[]` | No | Allowed state-change keys. |
+| `onchain.result` | `string[]` | No | Allowed result keys. |
+| `isLLMPublic` | `boolean` | No | Whether LLM prompt/response data is public. |
+| `payToAddress` | `string` | No | Payment receiver Solana address for paid public execution. |
+| `firstBinding` | `object` | Yes | Initial bound event version. |
+| `firstBinding.eventId` | `number` | Yes | Event ID. |
+| `firstBinding.eventVersion` | `number` | Yes | Relative version number. |
+| `sourceDeploymentId` | `number` | No | Clone entity state and bindings from source deployment. |
+
 ### Execute Event
 
 ```http
 POST /api/worlds/:worldId/deployments/:deploymentId/execute
 ```
+
+```json title="Request Body"
+{
+  "eventId": 29,
+  "input": { "raceId": "RACE_001" }
+}
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `eventId` | `number` | Yes | Bound event to execute. |
+| `input` | `object` | No | Event input payload. |
 
 ### Lock Deployment
 
@@ -51,10 +101,22 @@ GET /api/worlds/:worldId/deployments/:deploymentId/event-bindings
 POST /api/worlds/:worldId/deployments/:deploymentId/event-bindings
 ```
 
+```json title="Request Body"
+{
+  "eventId": 29,
+  "eventVersion": 2
+}
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `eventId` | `number` | Yes | Event to bind. |
+| `eventVersion` | `number` | Yes | Relative version number to bind. |
+
 ### List Entity Instances
 
 ```http
-GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances
+GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances?page=1&limit=20
 ```
 
 ### Create Entity Instance
@@ -63,39 +125,50 @@ GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances
 POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances
 ```
 
+```json title="Request Body"
+{
+  "entitySchemaId": 53,
+  "instanceId": "HORSE_1",
+  "state": {
+    "name": "Midnight Comet",
+    "speed_rating": 0.85
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `entitySchemaId` | `number` | Yes | Entity schema for the instance. |
+| `instanceId` | `string` | Yes | Unique per deployment+schema. |
+| `state` | `object` | No | Initial state. Defaults to `{}`. |
+
 ## Public Execution
 
-Public app execution is available at:
+Public execution is available via app route:
 
 ```http
 POST /app/deployments/:address/execute
 ```
 
-Requires wallet signature (`wallet`, `signature`, `message`) and optional x402 payment (`X-Payment`) when `executionSettings.priceUsd` is set.
-
-## Examples
-
-```bash
-curl -X POST https://api.narrativeprotocol.com/api/worlds/39/deployments \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "name": "Season 1",
-    "targetChains": ["near-testnet"],
-    "payToAddress": "6Q2...wallet",
-    "firstBinding": {
-      "eventId": 29,
-      "eventVersion": 1
-    }
-  }'
+```json title="Request Body"
+{
+  "eventId": 29,
+  "input": { "raceId": "RACE_001" },
+  "wallet": "<solana-wallet>",
+  "signature": "<base58-signature>",
+  "message": "narrativeprotocol:<deploymentAddress>:<eventId>:<timestamp>"
+}
 ```
 
-```bash
-curl -X POST https://api.narrativeprotocol.com/api/worlds/39/deployments/28/execute \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "eventId": 29,
-    "input": { "raceId": "RACE_001" }
-  }'
-```
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `eventId` | `number` | Yes | Bound event to execute. |
+| `input` | `object` | No | Event input payload. |
+| `wallet` | `string` | Yes | Signer wallet (base58 public key). |
+| `signature` | `string` | Yes | Signature over `message`. |
+| `message` | `string` | Yes | `narrativeprotocol:{deploymentAddress}:{eventId}:{timestamp}`. |
+
+Rules:
+
+- Event must allow public execution.
+- If `executionSettings.priceUsd > 0`, provide valid `X-Payment` header (x402).

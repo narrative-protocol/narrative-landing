@@ -5,25 +5,25 @@ description: Get started with Narrative Protocol in 5 minutes
 
 # Quickstart
 
-This guide will walk you through creating your first world, defining entities, executing events, and seeing AI-driven state changes.
+This guide walks through creating a world, defining schemas and events, running a deployment, and executing an event.
 
 <Callout type="info" title="Prerequisites">
-  Set the `URL` to the API endpoint (`https://api.narrativeprotocol.com`)
+  Set your base API URL to `https://api.narrativeprotocol.com`.
 </Callout>
 
 ## Getting an API key
 
-Before making any API calls, you need to authenticate with the system. Register at [https://studio.narrativeprotocol.com](https://studio.narrativeprotocol.com) to get API key that will be used for all subsequent requests.
+Before making API calls, create an API key in [https://studio.narrativeprotocol.com](https://studio.narrativeprotocol.com). You will use this key in the `Authorization` header for all `/api/*` requests.
 
 ---
 
 ## Blueprint Layer
 
-The Blueprint layer is where you define your world's structure. This includes creating worlds, entity schemas with attributes, and events with versioned behavior. These definitions are separate from the runtime execution.
+The Blueprint layer is where you define your world structure. This includes creating worlds, entity schemas with attributes, and events with versioned behavior. These definitions are separate from runtime execution.
 
-### Create Your World
+### Step 1: Create your world
 
-A World is the top-level container for your simulation. It holds `entities`, `events`, and can have multiple `deployments`. The `promptSeed` helps the AI understand the overall context of your world.
+A world is the top-level container for your simulation. It holds `entities`, `events`, and can have multiple `deployments`. The `promptSeed` helps the AI understand your world context.
 
 <Tabs defaultValue="curl">
   <TabsList>
@@ -105,7 +105,7 @@ A World is the top-level container for your simulation. It holds `entities`, `ev
   ```
 </Callout>
 
-### Define an Entity Schema
+### Step 2: Define an entity schema
 
 An Entity Schema defines the structure for entities in your world. For example, a "horse" schema defines what attributes (name, speed, wins) all horses will have. You can define attributes during entity schema creation, including `type`, `constraints`, and `defaultValue`.
 
@@ -115,6 +115,7 @@ Attribute `type` values:
 - `integer`
 - `float`
 - `boolean`
+- `json`
 
 Attribute `constraints` fields:
 
@@ -136,7 +137,7 @@ Attribute `constraints` fields:
       -d '{
         "name": "horse",
         "description": "A racing horse",
-        "attributeDefinitions": [
+        "attributes": [
           {
             "name": "speed_rating",
             "type": "float",
@@ -164,7 +165,7 @@ Attribute `constraints` fields:
       body: JSON.stringify({
         name: "horse",
         description: "A racing horse",
-        attributeDefinitions: [
+        attributes: [
           {
             name: "speed_rating",
             type: "float",
@@ -196,7 +197,7 @@ Attribute `constraints` fields:
         json={
             "name": "horse",
             "description": "A racing horse",
-            "attributeDefinitions": [
+            "attributes": [
                 {
                     "name": "speed_rating",
                     "type": "float",
@@ -229,7 +230,7 @@ Attribute `constraints` fields:
       "description": "A racing horse",
       "createdAt": "2026-02-18T04:13:49.117Z",
       "updatedAt": "2026-02-18T04:13:49.117Z",
-      "attributeDefinitions": [
+      "attributes": [
         {
           "name": "speed_rating",
           "type": "float",
@@ -248,21 +249,21 @@ Attribute `constraints` fields:
   ```
 </Callout>
 
-### Create an Event
+### Step 3: Create an event
 
 Events define what can happen in your world.
 
 `firstVersion` fields:
 
-- `inputSchema`: Defines the input payload expected when executing the event. Input is expected during event execution.
+- `inputSchema`: Defines the input payload expected at execution time.
 - `readEntities`: Lists entity schemas the event can read.
-- `entityChangeSettings`: Per-schema mutation mode (`partial`, `full`, `append`). `partial` will merge into existing values, `full` will replace existing values, `append` means appending the values to as array.
-- `outputSchema`: Defines the execution result, you can declare any field here and the AI will fill-in.
-- `behaviorPrompt`: prompt used by AI during execution mode.
+- `stateChanges`: Per-schema mutation mode (`partial`, `full`, `append`). `partial` merges into existing state, `full` replaces state, and `append` appends to arrays.
+- `outputSchema`: Defines the expected public result fields.
+- `behaviorPrompt`: Prompt used by AI mode.
 - `mutationSettings`: Execution mode config (`ai` or `direct`; `direct` uses a template).
 - `executionSettings`: Execution visibility and triggers (`admin`, `public`, `cron`) with optional `priceUsd` and `cron` config.
 
-For more details visit [events](/docs/concepts/events) page.
+For more details, see [Events](/docs/concepts/events).
 
 <Tabs defaultValue="curl">
   <TabsList>
@@ -281,9 +282,9 @@ For more details visit [events](/docs/concepts/events) page.
         "firstVersion": {
           "inputSchema": { "raceId": "string" },
           "readEntities": [{ "schemaId": <schema-id> }],
-          "entityChangeSettings": { "horse": "partial" },
+          "stateChanges": { "horse": "partial" },
           "outputSchema": { "winner": "string", "time": "string" },
-          "behaviorPrompt": "Determine the race winner based on horse speed ratings. Update the winners wins count."
+          "behaviorPrompt": "Determine the race winner based on horse speed ratings. Update the winner's wins count."
         }
       }'
     ```
@@ -302,9 +303,9 @@ For more details visit [events](/docs/concepts/events) page.
         firstVersion: {
           inputSchema: { raceId: "string" },
           readEntities: [{ schemaId: <schema-id> }],
-          entityChangeSettings: { horse: "partial" },
+          stateChanges: { horse: "partial" },
           outputSchema: { winner: "string", time: "string" },
-          behaviorPrompt: "Determine the race winner based on horse speed ratings. Update the winners wins count."
+          behaviorPrompt: "Determine the race winner based on horse speed ratings. Update the winner's wins count."
         }
       })
     });
@@ -327,9 +328,9 @@ For more details visit [events](/docs/concepts/events) page.
             "firstVersion": {
                 "inputSchema": { "raceId": "string" },
                 "readEntities": [{ "schemaId": <schema-id> }],
-                "entityChangeSettings": { "horse": "partial" },
+                "stateChanges": { "horse": "partial" },
                 "outputSchema": { "winner": "string", "time": "string" },
-                "behaviorPrompt": "Determine the race winner based on horse speed ratings. Update the winners wins count."
+                "behaviorPrompt": "Determine the race winner based on horse speed ratings. Update the winner's wins count."
             }
         }
     )
@@ -345,9 +346,9 @@ For more details visit [events](/docs/concepts/events) page.
 
 The Live layer is where your simulation actually runs. Deployments are isolated runtime instances of a world.
 
-### Create a Deployment
+### Step 4: Create a deployment
 
-A Deployment is a running instance of a world with its own isolated state.
+A deployment is a running instance of a world with its own isolated state.
 
 <Tabs defaultValue="curl">
   <TabsList>
@@ -422,9 +423,9 @@ The `targetChains` option determines where event data is stored on-chain:
 - `["near-testnet"]` - Push to NEAR testnet
 - `["solana-devnet", "near-testnet"]` - Push to both chains
 
-### Create Entity Instances
+### Step 5: Create entity instances
 
-Entity Instances are the actual data in your deployment.
+Entity instances are the actual data in your deployment.
 
 <Tabs defaultValue="curl">
   <TabsList>
@@ -492,9 +493,9 @@ Entity Instances are the actual data in your deployment.
   </TabsContent>
 </Tabs>
 
-### Execute an Event
+### Step 6: Execute an event
 
-This is where the magic happens! Executing an event triggers the AI engine.
+Executing an event triggers the AI engine and applies state changes to your deployment.
 
 <Tabs defaultValue="curl">
   <TabsList>
@@ -584,7 +585,7 @@ This is where the magic happens! Executing an event triggers the AI engine.
   ```
 </Callout>
 
-### View Updated State
+### Step 7: View updated state
 
 After executing an event, you can query the entity instances to see how the state has changed.
 

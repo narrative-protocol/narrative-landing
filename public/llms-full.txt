@@ -1,7 +1,7 @@
 # Narrative Protocol - LLMs Full Reference
 
 ## 1) Overview
-Narrative Protocol is a World State & Event Engine for defining worlds, versioning event behavior, executing events (AI or direct), and recording verifiable execution history.
+Narrative Protocol is a World State and Event Engine for defining worlds, versioning event behavior, executing events (AI or direct), and recording verifiable execution history.
 
 Base URL:
 `https://api.narrativeprotocol.com`
@@ -9,27 +9,34 @@ Base URL:
 Health:
 `GET /health`
 
-## 2) Auth
+## 2) Authentication
 
 ### API routes
 All `/api/*` routes require:
 `Authorization: Bearer <api-key>`
 
 Notes:
-- Debug auth and debug registration flow are removed.
-- Invalid/missing token returns `401`.
+- Debug auth flow is removed.
+- Missing/invalid token returns `401`.
 
 ### Public app route
-`/app/*` does not require API key, but uses wallet signature checks.
+`/app/*` routes do not require API key and instead use wallet signature validation.
 
 ## 3) Route Model
 
-The API now uses world-scoped nested routes for entity schemas, events, deployments, bindings, and instances.
-Direct legacy routes such as `/api/entity-schemas`, `/api/events`, `/api/deployments`, `/api/entity-instances`, and `/api/event-bindings` are removed.
+The API uses world-scoped nested routes for entity schemas, events, deployments, bindings, and instances.
+
+Removed legacy top-level routes:
+- `/api/entity-schemas`
+- `/api/events`
+- `/api/deployments`
+- `/api/entity-instances`
+- `/api/event-bindings`
 
 ## 4) Worlds
 
-- `GET /api/worlds`
+Endpoints:
+- `GET /api/worlds?page=1&limit=20`
 - `POST /api/worlds`
 - `GET /api/worlds/:id`
 - `PUT /api/worlds/:id`
@@ -47,10 +54,21 @@ Create world body:
 }
 ```
 
-## 5) Entity Schemas & Attributes
+Update world body (all optional):
+```json
+{
+  "name": "Horse Racing v2",
+  "description": "Updated description",
+  "domainTags": ["sports", "simulation", "strategy"],
+  "promptSeed": "Updated world guidance"
+}
+```
+
+## 5) Entity Schemas and Attributes
 
 ### Entity Schemas (world-scoped)
-- `GET /api/worlds/:worldId/entity-schemas`
+Endpoints:
+- `GET /api/worlds/:worldId/entity-schemas?page=1&limit=20`
 - `POST /api/worlds/:worldId/entity-schemas`
 
 Create schema body:
@@ -58,7 +76,7 @@ Create schema body:
 {
   "name": "horse",
   "description": "A racing horse",
-  "attributeDefinitions": [
+  "attributes": [
     {
       "name": "speed_rating",
       "type": "float",
@@ -70,67 +88,98 @@ Create schema body:
 ```
 
 ### Attributes (schema-scoped)
-- `GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes`
+Endpoints:
+- `GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes?page=1&limit=20`
 - `POST /api/worlds/:worldId/entity-schemas/:schemaId/attributes`
 - `GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name`
 - `PUT /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name`
 - `DELETE /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name`
 
-Notes:
-- Attribute identity is by `name` within an entity schema.
-- Unique constraint exists on `(entitySchemaId, name)`.
+Create attribute body:
+```json
+{
+  "name": "wins",
+  "type": "integer",
+  "constraints": { "min": 0 },
+  "defaultValue": 0
+}
+```
 
-## 6) Events & Event Versions
+Validation notes:
+- Attribute `type`: `integer | float | string | boolean | json`.
+- Unique constraint is effectively `(entitySchemaId, name)`.
+
+## 6) Events and Event Versions
 
 ### Events (world-scoped)
-- `GET /api/worlds/:worldId/events`
+Endpoints:
+- `GET /api/worlds/:worldId/events?page=1&limit=20`
 - `POST /api/worlds/:worldId/events`
 
+Create event body:
+```json
+{
+  "name": "race_result",
+  "description": "Resolves a race and updates horse stats",
+  "firstVersion": {
+    "inputSchema": { "raceId": "string" },
+    "outputSchema": { "winner": "string", "time": "string" },
+    "readEntities": [{ "schemaId": 53 }],
+    "stateChanges": { "horse": "partial" },
+    "behaviorPrompt": "Determine the race winner based on horse speed ratings.",
+    "mutationSettings": { "mode": "ai" },
+    "executionSettings": { "visibility": "admin" }
+  }
+}
+```
+
 ### Event versions (event-scoped)
-- `GET /api/worlds/:worldId/events/:eventId/event-versions`
+Endpoints:
+- `GET /api/worlds/:worldId/events/:eventId/event-versions?page=1&limit=20`
 - `POST /api/worlds/:worldId/events/:eventId/event-versions`
 - `POST /api/worlds/:worldId/events/:eventId/event-versions/:version/publish`
 
-### Event version fields (current)
+Create event version body:
 ```json
 {
-  "inputSchema": {},
-  "outputSchema": {},
-  "readEntities": [{ "schemaId": 1, "filter": ["eq:name:HORSE_1"] }],
-  "entityChangeSettings": { "horse": "partial" },
-  "behaviorPrompt": "...",
+  "inputSchema": { "raceId": "string", "weather": "string" },
+  "outputSchema": { "winner": "string", "time": "string", "weather": "string" },
+  "readEntities": [{ "schemaId": 53, "filter": ["eq:instanceId:HORSE_1"] }],
+  "stateChanges": { "horse": "partial" },
+  "behaviorPrompt": "Consider weather conditions.",
   "mutationSettings": {
-    "mode": "ai",
-    "template": {}
+    "mode": "direct",
+    "template": { "result": { "winner": "{{input.winner}}" } }
   },
   "executionSettings": {
-    "visibility": "admin",
-    "priceUsd": 0,
-    "cron": {
-      "schedule": "*/5 * * * *",
-      "input": {}
-    }
+    "visibility": "cron",
+    "cron": { "schedule": "*/5 * * * *", "input": { "tick": "{{counter}}" } }
   }
 }
 ```
 
 Field migration summary:
 - `reads` -> `readEntities`
-- `stateChangeSchema` -> `entityChangeSettings`
+- `stateChangeSchema` -> `stateChanges`
 - `resultSchema` -> `outputSchema`
 
 Validation notes:
 - `mutationSettings.mode = "direct"` requires `mutationSettings.template`.
-- Cron schedules in `executionSettings.cron.schedule` must be valid cron expressions.
+- `executionSettings.visibility` values: `admin | public | cron`.
+- If visibility is `cron`, `executionSettings.cron.schedule` must be valid cron.
 
 ## 7) Deployments
 
-### Deployments (world-scoped)
-- `GET /api/worlds/:worldId/deployments`
+Endpoints:
+- `GET /api/worlds/:worldId/deployments?page=1&limit=20`
 - `POST /api/worlds/:worldId/deployments`
-- `POST /api/worlds/:worldId/deployments/:deploymentId/lock`
 - `POST /api/worlds/:worldId/deployments/:deploymentId/execute`
+- `POST /api/worlds/:worldId/deployments/:deploymentId/lock`
 - `GET /api/worlds/:worldId/deployments/:deploymentId/history?page=1&limit=10`
+- `GET /api/worlds/:worldId/deployments/:deploymentId/event-bindings`
+- `POST /api/worlds/:worldId/deployments/:deploymentId/event-bindings`
+- `GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances?page=1&limit=20`
+- `POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
 
 Create deployment body:
 ```json
@@ -141,51 +190,71 @@ Create deployment body:
   "targetChains": ["near-testnet"],
   "aiModelId": "openai/gpt-oss-120b",
   "onchain": {
-    "stateChanges": ["wins"],
+    "stateChanges": ["wins", "speed_rating"],
     "result": ["winner"]
   },
   "isLLMPublic": false,
   "payToAddress": "6Q2...wallet",
   "firstBinding": {
-    "eventId": 1,
+    "eventId": 29,
     "eventVersion": 1
   },
-  "sourceDeploymentId": 123
+  "sourceDeploymentId": 12
 }
 ```
 
-### New deployment fields
-- `payToAddress` for paid public execution settlement.
+Notes:
+- `mode`: `upgradable | locked`.
+- `targetChains`: `solana-devnet | solana-mainnet | near-testnet | near-mainnet`.
+- `payToAddress` is the settlement receiver for paid public execution.
+
+### Execute event (admin)
+`POST /api/worlds/:worldId/deployments/:deploymentId/execute`
+
+Body:
+```json
+{
+  "eventId": 29,
+  "input": { "raceId": "RACE_001" }
+}
+```
+
+Response commonly includes:
+- `historyId`
+- `eventVersion`
+- `stateChanges`
+- `result`
+- `attestation`
+- `oracle` (`solana`, `near`)
 
 ## 8) Event Bindings
 
+Endpoints:
 - `GET /api/worlds/:worldId/deployments/:deploymentId/event-bindings`
 - `POST /api/worlds/:worldId/deployments/:deploymentId/event-bindings`
 
 Binding body:
 ```json
 {
-  "eventId": 1,
+  "eventId": 29,
   "eventVersion": 2
 }
 ```
 
-Notes:
-- Bound event must belong to same world.
+Rules:
+- Bound event must belong to the same world.
 - Only published event versions can be bound.
 
 ## 9) Entity Instances
 
+Endpoints:
 - `GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
 - `POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
-
-List supports optional query filter:
-- `entitySchemaId`
 
 Create instance body:
 ```json
 {
-  "entitySchemaId": 1,
+  "entitySchemaId": 53,
   "instanceId": "HORSE_1",
   "state": {
     "name": "Midnight Comet",
@@ -194,37 +263,16 @@ Create instance body:
 }
 ```
 
-## 10) Event Execution
+## 10) Public Execution (Wallet)
 
-### Admin execution (API key)
-`POST /api/worlds/:worldId/deployments/:deploymentId/execute`
-
-Body:
-```json
-{
-  "eventId": 1,
-  "input": {
-    "raceId": "RACE_001"
-  }
-}
-```
-
-Response includes:
-- `historyId`
-- `eventVersion`
-- `stateChanges`
-- `result`
-- `attestation`
-- `oracle` (`solana`, `near`)
-
-### Public execution (wallet)
+Endpoint:
 `POST /app/deployments/:address/execute`
 
 Body:
 ```json
 {
-  "eventId": 1,
-  "input": {},
+  "eventId": 29,
+  "input": { "raceId": "RACE_001" },
   "wallet": "<solana-wallet>",
   "signature": "<base58-signature>",
   "message": "narrativeprotocol:<deploymentAddress>:<eventId>:<timestamp>"
@@ -232,42 +280,41 @@ Body:
 ```
 
 Rules:
-- Deployment must be public.
+- Deployment must expose a publicly executable event version.
 - Event version must have `executionSettings.visibility = "public"`.
-- Message timestamp max skew: 5 minutes.
-- Rate limit: 30 requests/minute per wallet.
-- If priced (`priceUsd > 0`), include `X-Payment` (x402) or receive `402 Payment Required`.
+- If `executionSettings.priceUsd > 0`, include `X-Payment` (x402).
 
 ## 11) Cron Execution
 
 Event versions can run on cron when:
 - `executionSettings.visibility = "cron"`
-- Valid `executionSettings.cron.schedule` is set.
+- `executionSettings.cron.schedule` is a valid cron expression
 
-Cron executor runs periodically and resolves templated cron input before execution.
+Optional:
+- `executionSettings.cron.input` template is resolved at runtime.
 
 ## 12) AI Models
 
+Endpoint:
 - `GET /api/ai-models`
 
-Use model ID in deployment `aiModelId`.
+Use returned `modelId` when creating deployments via `aiModelId`.
 
-## 13) Errors
+## 13) Common Errors
 
-Common status codes:
-- `400` validation errors
+Status codes:
+- `400` validation error
 - `401` unauthorized
+- `402` payment required (priced public execution)
 - `403` forbidden
 - `404` not found
-- `409` conflicts
-- `402` payment required (public priced execution)
+- `409` conflict
 
 ## 14) Quick End-to-End
 
 1. `POST /api/worlds`
 2. `POST /api/worlds/:worldId/entity-schemas`
-3. `POST /api/worlds/:worldId/entity-schemas/:schemaId/attributes`
-4. `POST /api/worlds/:worldId/events`
-5. `POST /api/worlds/:worldId/deployments`
-6. `POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
-7. `POST /api/worlds/:worldId/deployments/:deploymentId/execute`
+3. `POST /api/worlds/:worldId/events`
+4. `POST /api/worlds/:worldId/deployments`
+5. `POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
+6. `POST /api/worlds/:worldId/deployments/:deploymentId/execute`

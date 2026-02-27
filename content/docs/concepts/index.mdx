@@ -16,6 +16,14 @@ The system uses a two-layer architecture:
 | Blueprint | Design-time definitions   | Worlds, Entity Schemas, Events, Event Versions         |
 | Live      | Runtime state & execution | Deployments, Entity Instances, Event Bindings, History |
 
+## Terminology
+
+- **Entity Schema**: A blueprint that defines fields and types.
+- **Entity Instance**: Runtime data that follows an entity schema.
+- **Event**: A named action that can be executed.
+- **Event Version**: An immutable implementation of an event after publishing.
+- **Deployment**: A running instance of a world with isolated state.
+
 ## Key Concepts
 
 ### [Architecture](/docs/concepts/architecture)
@@ -47,7 +55,7 @@ Event records are pushed to Solana and/or NEAR for on-chain immutability.
 ```
 World (Blueprint)
 ├── Entity Schemas (define structure)
-│   └── Attribute Definitions
+│   └── Attributes
 └── Events (define behavior)
     └── Event Versions (immutable after publish)
 

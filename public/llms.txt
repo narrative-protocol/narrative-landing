@@ -1,20 +1,23 @@
 # Narrative Protocol - LLMs.txt
 
 ## Overview
-Narrative Protocol is a World State & Event Engine for versioned world simulations, AI/direct event mutation, and on-chain attested execution.
+Narrative Protocol is a World State and Event Engine for defining versioned worlds, executing events (AI or direct), and recording verifiable execution history.
 
 ## Base URL
 `https://api.narrativeprotocol.com`
 
 ## Authentication
-- All `/api/*` endpoints require: `Authorization: Bearer <api-key>`
-- Debug token auth is removed.
-- Public execution uses `/app/*` and wallet signatures.
+- All `/api/*` endpoints require `Authorization: Bearer <api-key>`.
+- `/app/*` public execution routes use wallet signature validation (no API key).
+- Missing/invalid API key returns `401`.
 
 ## Core Routes
 
+### Health
+- `GET /health`
+
 ### Worlds
-- `GET /api/worlds`
+- `GET /api/worlds?page=1&limit=20`
 - `POST /api/worlds`
 - `GET /api/worlds/:id`
 - `PUT /api/worlds/:id`
@@ -22,53 +25,59 @@ Narrative Protocol is a World State & Event Engine for versioned world simulatio
 - `POST /api/worlds/:id/publish`
 - `POST /api/worlds/:id/unpublish`
 
-### Entity Schemas & Attributes (World-scoped)
-- `GET /api/worlds/:worldId/entity-schemas`
+### Entity Schemas and Attributes (World-scoped)
+- `GET /api/worlds/:worldId/entity-schemas?page=1&limit=20`
 - `POST /api/worlds/:worldId/entity-schemas`
-- `GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes`
+- `GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes?page=1&limit=20`
 - `POST /api/worlds/:worldId/entity-schemas/:schemaId/attributes`
 - `GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name`
 - `PUT /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name`
 - `DELETE /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name`
 
-### Events & Versions (World-scoped)
-- `GET /api/worlds/:worldId/events`
+### Events and Versions (World-scoped)
+- `GET /api/worlds/:worldId/events?page=1&limit=20`
 - `POST /api/worlds/:worldId/events`
-- `GET /api/worlds/:worldId/events/:eventId/event-versions`
+- `GET /api/worlds/:worldId/events/:eventId/event-versions?page=1&limit=20`
 - `POST /api/worlds/:worldId/events/:eventId/event-versions`
 - `POST /api/worlds/:worldId/events/:eventId/event-versions/:version/publish`
 
 ### Deployments (World-scoped)
-- `GET /api/worlds/:worldId/deployments`
+- `GET /api/worlds/:worldId/deployments?page=1&limit=20`
 - `POST /api/worlds/:worldId/deployments`
 - `POST /api/worlds/:worldId/deployments/:deploymentId/execute`
 - `POST /api/worlds/:worldId/deployments/:deploymentId/lock`
 - `GET /api/worlds/:worldId/deployments/:deploymentId/history?page=1&limit=10`
 - `GET /api/worlds/:worldId/deployments/:deploymentId/event-bindings`
 - `POST /api/worlds/:worldId/deployments/:deploymentId/event-bindings`
-- `GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
+- `GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances?page=1&limit=20`
 - `POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
 
 ### Public App Execution
 - `POST /app/deployments/:address/execute`
-- Requires `wallet`, `signature`, `message`
-- If priced (`executionSettings.priceUsd`), include `X-Payment` (x402)
+- Body includes `eventId`, optional `input`, plus `wallet`, `signature`, `message`.
+- If priced (`executionSettings.priceUsd > 0`), include `X-Payment` (x402).
 
 ### AI Models
 - `GET /api/ai-models`
 
-## Event Version Schema Changes
+## Event Version Fields (Current)
+- `inputSchema`
+- `outputSchema`
+- `readEntities`
+- `stateChanges`
+- `behaviorPrompt`
+- `mutationSettings` (`mode: ai | direct`, `template` required for `direct`)
+- `executionSettings` (`visibility: admin | public | cron`, optional `priceUsd`, optional `cron`)
+
+## Migration Summary
 - `reads` -> `readEntities`
-- `stateChangeSchema` -> `entityChangeSettings`
+- `stateChangeSchema` -> `stateChanges`
 - `resultSchema` -> `outputSchema`
-- Added `mutationSettings` (`ai` or `direct`)
-- Added `executionSettings` (`admin`, `public`, `cron` + optional `priceUsd`, `cron`)
 
 ## Quick Flow
 1. Create world: `POST /api/worlds`
-2. Create schema: `POST /api/worlds/:worldId/entity-schemas`
-3. Add attributes: `POST /api/worlds/:worldId/entity-schemas/:schemaId/attributes`
-4. Create event: `POST /api/worlds/:worldId/events`
-5. Create deployment: `POST /api/worlds/:worldId/deployments`
-6. Create instance: `POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
-7. Execute event: `POST /api/worlds/:worldId/deployments/:deploymentId/execute`
+2. Create entity schema: `POST /api/worlds/:worldId/entity-schemas`
+3. Create event: `POST /api/worlds/:worldId/events`
+4. Create deployment: `POST /api/worlds/:worldId/deployments`
+5. Create instance: `POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
+6. Execute event: `POST /api/worlds/:worldId/deployments/:deploymentId/execute`

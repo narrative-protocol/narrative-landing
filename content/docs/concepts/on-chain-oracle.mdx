@@ -207,7 +207,7 @@ Either field will be `null` if that chain family is not configured or not select
 To verify an event:
 
 1. **Fetch on-chain record** from the appropriate chain
-2. **Fetch off-chain data** from API: `GET /api/deployments/:id/history`
+2. **Fetch off-chain data** from API: `GET /api/worlds/:worldId/deployments/:deploymentId/history`
 3. **Compare state_changes and result** - on-chain contains full JSON (or filtered JSON if `onchain` config is set)
 4. **Compute hash** of input
 5. **Compare hash** - it must match on-chain value
@@ -217,7 +217,7 @@ To verify an event:
 
 ```javascript
 const onChainRecord = await program.account.deploymentRecord.fetch(pda);
-const offChainData = await fetch(`/api/deployments/${id}/history/${historyId}`);
+const offChainData = await fetch(`/api/worlds/${worldId}/deployments/${id}/history?page=1&limit=10`);
 
 const onChainStateChanges = JSON.parse(onChainRecord.stateChanges);
 assert.deepEqual(onChainStateChanges, offChainData.stateChanges);
@@ -230,7 +230,7 @@ assert(inputHash === onChainRecord.inputHash);
 
 ```javascript
 const onChainRecord = await contract.get_event({ event_history_id: historyId });
-const offChainData = await fetch(`/api/deployments/${id}/history/${historyId}`);
+const offChainData = await fetch(`/api/worlds/${worldId}/deployments/${id}/history?page=1&limit=10`);
 
 const onChainStateChanges = JSON.parse(onChainRecord.state_changes);
 assert.deepEqual(onChainStateChanges, offChainData.stateChanges);

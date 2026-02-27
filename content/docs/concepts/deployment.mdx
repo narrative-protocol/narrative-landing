@@ -12,13 +12,13 @@ A **Deployment** is a running instance of a world. It contains the actual runtim
 Deployments are created with a first event binding:
 
 ```json
-POST /api/deployments
+POST /api/worlds/:worldId/deployments
 {
-  "worldId": 1,
   "name": "Season 1",
   "description": "First season of the racing simulation",
   "targetChains": ["solana-devnet"],
   "aiModelId": "openai/gpt-oss-120b",
+  "payToAddress": "6Q2...wallet",
   "onchain": {
     "stateChanges": ["wins", "speed_rating"],
     "result": ["winner"]
@@ -34,12 +34,12 @@ POST /api/deployments
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `worldId` | integer | Yes | The world this deployment belongs to |
 | `name` | string | Yes | Human-readable name |
 | `description` | string | No | Optional description |
 | `targetChains` | string[] | No | On-chain oracle targets (see below) |
 | `aiModelId` | string | No | AI model to use (default: `openai/gpt-oss-120b`) |
 | `onchain` | object | No | Selective on-chain push config |
+| `payToAddress` | string | No | Receiver wallet for paid public execution |
 | `mode` | enum | No | `upgradable` (default) or `locked` |
 | `firstBinding` | object | Yes | Initial event binding |
 
@@ -63,6 +63,12 @@ You can specify multiple chains:
 ```
 
 When both Solana and NEAR chains are included, the stricter Solana size limit applies.
+
+### Public & Paid Execution
+
+Deployments can expose execution publicly via `/app/deployments/:address/execute` when the bound event version has `executionSettings.visibility = "public"`.
+
+If `executionSettings.priceUsd` is set, public callers must include a valid x402 `X-Payment` header and the deployment must define `payToAddress`.
 
 ### AI Model Selection
 
@@ -139,7 +145,7 @@ A frozen state where no modifications are allowed. **This transition is irrevers
 ### Locking a Deployment
 
 ```http
-POST /api/deployments/:id/lock
+POST /api/worlds/:worldId/deployments/:deploymentId/lock
 ```
 
 <Callout type="warning" title="Irreversible Action">
@@ -173,7 +179,6 @@ When creating a deployment with a `sourceDeploymentId`, the system:
 
 ```json title="Request Body"
 {
-  "worldId": 1,
   "name": "Season 2",
   "firstBinding": { "eventId": 1, "eventVersion": 2 },
   "sourceDeploymentId": 123

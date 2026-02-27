@@ -5,50 +5,29 @@ description: Manage entity data
 
 # Entity Instances API
 
-Create and manage entity instances within deployments.
+Entity instance routes are deployment-scoped under worlds.
 
 ## Endpoints
 
 ### List Entity Instances
 
 ```http
-GET /api/entity-instances?deploymentId=:deploymentId
+GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances
 ```
 
 ### Create Entity Instance
 
 ```http
-POST /api/entity-instances
+POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances
 ```
 
-### Get Entity Instance
-
-```http
-GET /api/entity-instances/:id
-```
-
-### Update Entity Instance
-
-```http
-PUT /api/entity-instances/:id
-```
-
-### Delete Entity Instance
-
-```http
-DELETE /api/entity-instances/:id
-```
-
-## Examples
-
-### Create Entity Instance
+## Example
 
 ```bash
-curl -X POST https://api.narrativeprotocol.com/api/entity-instances \
+curl -X POST https://api.narrativeprotocol.com/api/worlds/39/deployments/28/entity-instances \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
-    "deploymentId": 28,
     "entitySchemaId": 53,
     "instanceId": "HORSE_1",
     "state": {
@@ -56,23 +35,4 @@ curl -X POST https://api.narrativeprotocol.com/api/entity-instances \
       "speed_rating": 0.85
     }
   }'
-```
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": 107,
-    "deploymentId": 28,
-    "entitySchemaId": 53,
-    "instanceId": "HORSE_1",
-    "state": {
-      "name": "Midnight Comet",
-      "wins": 0,
-      "speed_rating": 0.85
-    },
-    "createdAt": "2026-02-18T04:20:39.855Z",
-    "updatedAt": "2026-02-18T04:20:39.855Z"
-  }
-}
 ```

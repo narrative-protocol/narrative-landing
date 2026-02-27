@@ -5,58 +5,67 @@ description: Create and manage events
 
 # Events API
 
-Create and manage events within worlds.
+Event routes are world-scoped.
 
 ## Endpoints
 
 ### List Events
 
 ```http
-GET /api/events?worldId=:worldId
+GET /api/worlds/:worldId/events
 ```
 
 ### Create Event
 
 ```http
-POST /api/events
+POST /api/worlds/:worldId/events
 ```
 
-### Get Event
+### List Event Versions
 
 ```http
-GET /api/events/:id
+GET /api/worlds/:worldId/events/:eventId/event-versions
 ```
 
 ### Create Event Version
 
 ```http
-POST /api/events/:eventId/versions
+POST /api/worlds/:worldId/events/:eventId/event-versions
 ```
 
 ### Publish Event Version
 
 ```http
-POST /api/events/:eventId/versions/:version/publish
+POST /api/worlds/:worldId/events/:eventId/event-versions/:version/publish
 ```
 
-## Examples
+## Event Version Fields
 
-### Create Event
+- `inputSchema`
+- `outputSchema`
+- `readEntities` (`[{ schemaId, filter? }]`)
+- `entityChangeSettings` (`{ [schemaName]: "partial" | "full" | "append" }`)
+- `behaviorPrompt`
+- `mutationSettings` (`{ mode: "ai" | "direct", template? }`)
+- `executionSettings` (`{ visibility: "admin" | "public" | "cron", priceUsd?, cron? }`)
+
+## Example
 
 ```bash
-curl -X POST https://api.narrativeprotocol.com/api/events \
+curl -X POST https://api.narrativeprotocol.com/api/worlds/39/events \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
-    "worldId": 39,
     "name": "race_result",
     "description": "Resolves a race and updates horse stats",
     "firstVersion": {
       "inputSchema": { "raceId": "string" },
-      "reads": [53],
-      "stateChangeSchema": { "horse": "partial" },
-      "resultSchema": { "winner": "string", "time": "string" },
-      "behaviorPrompt": "Determine the race winner based on horse speed ratings."
+      "readEntities": [{ "schemaId": 53 }],
+      "entityChangeSettings": { "horse": "partial" },
+      "outputSchema": { "winner": "string", "time": "string" },
+      "behaviorPrompt": "Determine the race winner based on horse speed ratings.",
+      "mutationSettings": { "mode": "ai" },
+      "executionSettings": { "visibility": "admin" }
     }
   }'
 ```

@@ -5,52 +5,84 @@ description: Create and manage deployments
 
 # Deployments API
 
-Create and manage deployments within worlds.
+Deployment routes are world-scoped.
 
 ## Endpoints
 
 ### List Deployments
 
 ```http
-GET /api/deployments?worldId=:worldId
+GET /api/worlds/:worldId/deployments
 ```
 
 ### Create Deployment
 
 ```http
-POST /api/deployments
-```
-
-### Get Deployment
-
-```http
-GET /api/deployments/:id
+POST /api/worlds/:worldId/deployments
 ```
 
 ### Execute Event
 
 ```http
-POST /api/deployments/:id/execute
+POST /api/worlds/:worldId/deployments/:deploymentId/execute
 ```
 
 ### Lock Deployment
 
 ```http
-POST /api/deployments/:id/lock
+POST /api/worlds/:worldId/deployments/:deploymentId/lock
 ```
+
+### List Event History
+
+```http
+GET /api/worlds/:worldId/deployments/:deploymentId/history?page=1&limit=10
+```
+
+### List Event Bindings
+
+```http
+GET /api/worlds/:worldId/deployments/:deploymentId/event-bindings
+```
+
+### Create Event Binding
+
+```http
+POST /api/worlds/:worldId/deployments/:deploymentId/event-bindings
+```
+
+### List Entity Instances
+
+```http
+GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances
+```
+
+### Create Entity Instance
+
+```http
+POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances
+```
+
+## Public Execution
+
+Public app execution is available at:
+
+```http
+POST /app/deployments/:address/execute
+```
+
+Requires wallet signature (`wallet`, `signature`, `message`) and optional x402 payment (`X-Payment`) when `executionSettings.priceUsd` is set.
 
 ## Examples
 
-### Create Deployment
-
 ```bash
-curl -X POST https://api.narrativeprotocol.com/api/deployments \
+curl -X POST https://api.narrativeprotocol.com/api/worlds/39/deployments \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
-    "worldId": 39,
     "name": "Season 1",
     "targetChains": ["near-testnet"],
+    "payToAddress": "6Q2...wallet",
     "firstBinding": {
       "eventId": 29,
       "eventVersion": 1
@@ -58,10 +90,8 @@ curl -X POST https://api.narrativeprotocol.com/api/deployments \
   }'
 ```
 
-### Execute Event
-
 ```bash
-curl -X POST https://api.narrativeprotocol.com/api/deployments/28/execute \
+curl -X POST https://api.narrativeprotocol.com/api/worlds/39/deployments/28/execute \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{

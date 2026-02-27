@@ -10,7 +10,7 @@ Events in Narrative Protocol are executed by an AI engine that computes state ch
 ## Execution Flow
 
 ```
-1. User calls POST /api/deployments/:id/execute
+1. User calls POST /api/worlds/:worldId/deployments/:deploymentId/execute
    │
    ▼
 2. System gathers context
@@ -67,9 +67,8 @@ GET /api/ai-models
 ### Setting a Model on Deployment
 
 ```json
-POST /api/deployments
+POST /api/worlds/:worldId/deployments
 {
-  "worldId": 1,
   "name": "Season 1",
   "aiModelId": "openai/gpt-oss-120b",
   "firstBinding": { "eventId": 1, "eventVersion": 1 }
@@ -79,7 +78,7 @@ POST /api/deployments
 ## Request Format
 
 ```http
-POST /api/deployments/:id/execute
+POST /api/worlds/:worldId/deployments/:deploymentId/execute
 ```
 
 ```json title="Request Body"
@@ -165,8 +164,10 @@ The AI engine receives structured context:
   "name": "race_result",
   "behaviorPrompt": "Determine the race winner based on horse stats and conditions.",
   "inputSchema": { "raceId": "string", "trackCondition": "string" },
-  "stateChangeSchema": { "horse": "partial" },
-  "resultSchema": { "winner": "string", "time": "string" }
+  "entityChangeSettings": { "horse": "partial" },
+  "outputSchema": { "winner": "string", "time": "string" },
+  "mutationSettings": { "mode": "ai" },
+  "executionSettings": { "visibility": "admin" }
 }
 ```
 
@@ -202,10 +203,10 @@ Event history records include LLM metadata for debugging and transparency:
 
 ## State Change Application
 
-After AI returns, the system applies changes based on `stateChangeSchema`:
+After AI returns, the system applies changes based on `entityChangeSettings`:
 
 ```json
-// stateChangeSchema
+// entityChangeSettings
 { "horse": "partial", "race_log": "append" }
 
 // AI returns

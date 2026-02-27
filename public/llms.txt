@@ -1,134 +1,74 @@
 # Narrative Protocol - LLMs.txt
 
 ## Overview
-Narrative Protocol is a World State & Event Engine that enables you to define, manage, and execute complex world simulations with versioned events, AI-driven execution, and on-chain verification.
-
-## Studio
-```
-https://studio.narrativeprotocol.com
-```
-Use the studio to register, add credits, and create API keys.
+Narrative Protocol is a World State & Event Engine for versioned world simulations, AI/direct event mutation, and on-chain attested execution.
 
 ## Base URL
-```
-https://api.narrativeprotocol.com
-```
+`https://api.narrativeprotocol.com`
 
 ## Authentication
-All `/api/*` endpoints require a Bearer token in the Authorization header:
-```
-Authorization: Bearer <token>
-```
+- All `/api/*` endpoints require: `Authorization: Bearer <api-key>`
+- Debug token auth is removed.
+- Public execution uses `/app/*` and wallet signatures.
 
-### Get Token (Debug)
-```
-POST /DEBUG_register
-Body: { "email": "dev@example.com" }
-Response: { "success": true, "data": { "token": "eyJhbGci..." } }
-```
-
-## Core Concepts
+## Core Routes
 
 ### Worlds
-Top-level container for simulations. Contains entity schemas and events.
-- `POST /api/worlds` - Create a world
-- `GET /api/worlds` - List worlds
-- `GET /api/worlds/:id` - Get world details
+- `GET /api/worlds`
+- `POST /api/worlds`
+- `GET /api/worlds/:id`
+- `PUT /api/worlds/:id`
+- `DELETE /api/worlds/:id`
+- `POST /api/worlds/:id/publish`
+- `POST /api/worlds/:id/unpublish`
 
-### Entity Schemas
-Defines structure for entities (e.g., horse, player, item).
-- `POST /api/entity-schemas` - Create schema
-- `GET /api/entity-schemas` - List schemas
-- `GET /api/entity-schemas/:id` - Get schema details
-- `POST /api/attribute-definitions` - Add attributes to schema
+### Entity Schemas & Attributes (World-scoped)
+- `GET /api/worlds/:worldId/entity-schemas`
+- `POST /api/worlds/:worldId/entity-schemas`
+- `GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes`
+- `POST /api/worlds/:worldId/entity-schemas/:schemaId/attributes`
+- `GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name`
+- `PUT /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name`
+- `DELETE /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name`
 
-### Events
-Actions that drive state changes. Have versioned behavior.
-- `POST /api/events` - Create event with first version
-- `GET /api/events` - List events
-- `GET /api/events/:id` - Get event with versions
-- `POST /api/events/:id/versions` - Create new version
+### Events & Versions (World-scoped)
+- `GET /api/worlds/:worldId/events`
+- `POST /api/worlds/:worldId/events`
+- `GET /api/worlds/:worldId/events/:eventId/event-versions`
+- `POST /api/worlds/:worldId/events/:eventId/event-versions`
+- `POST /api/worlds/:worldId/events/:eventId/event-versions/:version/publish`
 
-### Deployments
-Running instances of a world with isolated state.
-- `POST /api/worlds/:worldId/deployments` - Create deployment (nested, recommended)
-- `POST /api/deployments` - Create deployment (direct)
-- `GET /api/worlds/:worldId/deployments` - List deployments (nested, recommended)
-- `GET /api/deployments` - List deployments (direct)
-- `GET /api/deployments/:id` - Get deployment details
-- `POST /api/worlds/:worldId/deployments/:deploymentId/lock` - Lock deployment (nested)
-- `POST /api/deployments/:id/lock` - Lock deployment (direct)
-- `POST /api/worlds/:worldId/deployments/:deploymentId/execute` - Execute event (nested)
-- `POST /api/deployments/:id/execute` - Execute event (direct)
-- `DELETE /api/deployments/:id` - Delete deployment
+### Deployments (World-scoped)
+- `GET /api/worlds/:worldId/deployments`
+- `POST /api/worlds/:worldId/deployments`
+- `POST /api/worlds/:worldId/deployments/:deploymentId/execute`
+- `POST /api/worlds/:worldId/deployments/:deploymentId/lock`
+- `GET /api/worlds/:worldId/deployments/:deploymentId/history?page=1&limit=10`
+- `GET /api/worlds/:worldId/deployments/:deploymentId/event-bindings`
+- `POST /api/worlds/:worldId/deployments/:deploymentId/event-bindings`
+- `GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
+- `POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
 
-### Entity Instances
-Actual data in a deployment following a schema.
-- `POST /api/entity-instances` - Create instance
-- `GET /api/entity-instances` - List instances
-- `GET /api/entity-instances/:id` - Get instance
-- `PATCH /api/entity-instances/:id` - Update instance
-- `DELETE /api/entity-instances/:id` - Delete instance
-
-### Event Bindings
-Links between deployments and event versions.
-- `GET /api/worlds/:worldId/deployments/:deploymentId/event-bindings` - List bindings (nested)
-- `GET /api/event-bindings?deploymentId=<id>` - List bindings (direct)
-- `POST /api/worlds/:worldId/deployments/:deploymentId/event-bindings` - Create binding (nested)
-- `POST /api/event-bindings` - Create binding (direct)
-- `DELETE /api/event-bindings/:id` - Delete binding
-
-### Event History
-- `GET /api/worlds/:worldId/deployments/:deploymentId/history?page=1&limit=10` - List history (nested)
-- `GET /api/deployments/:id/history?page=1&limit=10` - List history (direct)
+### Public App Execution
+- `POST /app/deployments/:address/execute`
+- Requires `wallet`, `signature`, `message`
+- If priced (`executionSettings.priceUsd`), include `X-Payment` (x402)
 
 ### AI Models
-- `GET /api/ai-models` - List available AI models
+- `GET /api/ai-models`
 
-## Key Features
+## Event Version Schema Changes
+- `reads` -> `readEntities`
+- `stateChangeSchema` -> `entityChangeSettings`
+- `resultSchema` -> `outputSchema`
+- Added `mutationSettings` (`ai` or `direct`)
+- Added `executionSettings` (`admin`, `public`, `cron` + optional `priceUsd`, `cron`)
 
-### Deployment targetChains
-```json
-{ "targetChains": ["solana-devnet"] }
-```
-Options: `[]` (default), `["solana-devnet"]`, `["solana-mainnet"]`, `["near-testnet"]`, `["near-mainnet"]`, or multiple
-
-### On-chain Config
-```json
-{
-  "targetChains": ["solana-devnet"],
-  "onchain": {
-    "stateChanges": ["wins"],
-    "result": ["winner"]
-  }
-}
-```
-
-### AI Model Selection
-```json
-{ "aiModelId": "openai/gpt-oss-120b" }
-```
-
-### State Change Modes
-- `partial`: Merge changes into existing state (default)
-- `full`: Replace entire state
-- `append`: Append to arrays, merge objects
-
-## Environment
-
-### Mainnet
-- NEAR Smart Contract: `oracle-1.narrativeprotocol.near`
-
-### Testnet / Devnet
-- NEAR Smart Contract: `narrative-p.testnet`
-- Solana Program ID: `3L4tQCyJQDJTxGb2FHKkp2mSpnQPzUKguX5stbktxAaFWutu2cZS8Nnpk17eQ3bThgkNkErXceJ7wE7wTR8jpewz`
-
-## Quick Start Flow
-1. Register: `POST /DEBUG_register`
-2. Create World: `POST /api/worlds`
-3. Create Entity Schema: `POST /api/entity-schemas`
-4. Add Attributes: `POST /api/attribute-definitions`
-5. Create Event: `POST /api/events`
-6. Create Deployment: `POST /api/worlds/:worldId/deployments`
-7. Create Instances: `POST /api/entity-instances`
-8. Execute: `POST /api/worlds/:worldId/deployments/:deploymentId/execute`
+## Quick Flow
+1. Create world: `POST /api/worlds`
+2. Create schema: `POST /api/worlds/:worldId/entity-schemas`
+3. Add attributes: `POST /api/worlds/:worldId/entity-schemas/:schemaId/attributes`
+4. Create event: `POST /api/worlds/:worldId/events`
+5. Create deployment: `POST /api/worlds/:worldId/deployments`
+6. Create instance: `POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
+7. Execute event: `POST /api/worlds/:worldId/deployments/:deploymentId/execute`

@@ -1,246 +1,43 @@
-# Narrative Protocol - Complete Documentation
+# Narrative Protocol - LLMs Full Reference
 
-## Overview
-Narrative Protocol is a **World State & Event Engine** that enables you to define, manage, and execute complex world simulations with versioned events, AI-driven execution, and on-chain verification.
+## 1) Overview
+Narrative Protocol is a World State & Event Engine for defining worlds, versioning event behavior, executing events (AI or direct), and recording verifiable execution history.
 
-## Studio
-```
-https://studio.narrativeprotocol.com
-```
-Use the studio to register, add credits, and create API keys.
+Base URL:
+`https://api.narrativeprotocol.com`
 
-## Base URL
-```
-https://api.narrativeprotocol.com
-```
+Health:
+`GET /health`
 
----
+## 2) Auth
 
-## Introduction
+### API routes
+All `/api/*` routes require:
+`Authorization: Bearer <api-key>`
 
-Narrative Protocol uses a two-layer architecture that separates **design-time** definitions from **runtime** state.
+Notes:
+- Debug auth and debug registration flow are removed.
+- Invalid/missing token returns `401`.
 
-### Blueprint Layer (Design-Time)
-The Blueprint layer contains definitions that describe the structure and behavior of your world. These don't hold runtime data.
+### Public app route
+`/app/*` does not require API key, but uses wallet signature checks.
 
-- **Worlds**: Top-level containers that group related definitions together
-- **Entity Schemas**: Define the shape of entities (templates, not data containers)
-- **Events**: Define what can happen with versioned behavior
+## 3) Route Model
 
-### Live Layer (Runtime)
-The Live layer contains actual runtime state and execution records.
+The API now uses world-scoped nested routes for entity schemas, events, deployments, bindings, and instances.
+Direct legacy routes such as `/api/entity-schemas`, `/api/events`, `/api/deployments`, `/api/entity-instances`, and `/api/event-bindings` are removed.
 
-- **Deployments**: Running instances of a world with isolated state
-- **Entity Instances**: Actual data belonging to a deployment
-- **Event History**: Records of all event executions
+## 4) Worlds
 
----
+- `GET /api/worlds`
+- `POST /api/worlds`
+- `GET /api/worlds/:id`
+- `PUT /api/worlds/:id`
+- `DELETE /api/worlds/:id`
+- `POST /api/worlds/:id/publish`
+- `POST /api/worlds/:id/unpublish`
 
-## Core Concepts
-
-### Worlds
-Top-level container for simulations. Holds entity schemas and events. Can have multiple deployments.
-
-Fields:
-- `name`: Human-readable identifier
-- `description`: What this world simulates
-- `domainTags`: Categories for organization (array of strings)
-- `promptSeed`: Base context for AI-driven event resolution
-
-### Entity Schemas
-Defines the structure for entities in a world (e.g., horse, player, item). They are templates, not data containers.
-
-Attribute Types:
-- `string`: Text values
-- `integer`: Whole numbers
-- `float`: Floating-point numbers
-- `boolean`: True/false values
-- `json`: Complex nested data
-
-### Events
-Actions that drive state changes. Have versioned behavior that becomes immutable once published.
-
-Key configurations:
-- `inputSchema`: What input the event accepts (JSON schema)
-- `reads`: Array of entity schema IDs to read
-- `stateChangeSchema`: How entity state changes (key = schema name, value = "partial" | "full" | "append")
-- `resultSchema`: What the event returns
-- `behaviorPrompt`: Instructions for the AI
-
-### Deployments
-Running instances of a world with isolated state and on-chain oracle support.
-
-Fields:
-- `worldId`: The world this deployment belongs to
-- `name`: Human-readable name
-- `targetChains`: Array of chains for on-chain storage
-- `aiModelId`: AI model for execution (default: `openai/gpt-oss-120b`)
-- `onchain`: Selective on-chain push config
-- `mode`: `upgradable` (default) or `locked`
-- `firstBinding`: Initial event binding
-- `sourceDeploymentId`: For snapshotting
-
-### Entity Instances
-Actual data in a deployment following a schema. Multiple instances can share a schema.
-
-### Event Bindings
-Links between deployments and event versions. Determines which event version is used when executing.
-
----
-
-## Features
-
-### Event Versioning
-Events have versions that become immutable once published, ensuring reproducibility and auditability. Each version can have different behavior while maintaining historical records.
-
-### AI Event Execution
-Events are executed by an AI engine with configurable model selection (default: `openai/gpt-oss-120b`). Each deployment can use a different AI model.
-
-The AI engine:
-1. Receives the world definition (name, description, tags, seed prompt)
-2. Receives current entity states from the deployment
-3. Receives event version config (behavior prompt, schemas)
-4. Receives user-provided input
-5. Generates state changes and public result
-6. Applies state changes to entity instances
-7. Records everything in event history with attestation
-8. Pushes to on-chain oracle(s)
-
-### State Change Modes
-
-| Mode | Behavior |
-|------|----------|
-| `partial` | Merge changes into existing state (default) |
-| `full` | Replace entire state |
-| `append` | Append to arrays, merge objects |
-
-### Deployment Modes
-
-#### Upgradable Mode (Default)
-All operations permitted:
-- Execute events
-- Create/update entity instances
-- Add event bindings
-- Update deployment metadata
-- Transition to locked mode
-
-#### Locked Mode
-Irreversible. All modifications blocked:
-- Cannot execute events
-- Cannot modify instances
-- Cannot add bindings
-- Cannot delete deployment
-- Read-only access
-
-### Snapshotting
-Create new deployments by copying state from existing ones. Useful for:
-- Forking simulations
-- Creating test environments
-- Preserving state before major changes
-- Version migration
-
-What gets copied:
-- Entity instances (full state at time of snapshot)
-- Event bindings (except duplicates of firstBinding)
-
-What doesn't get copied:
-- Event history (new deployment starts fresh)
-- Deployment mode (always starts as upgradable)
-
-### Cryptographic Attestation
-Every AI response includes a cryptographic attestation for independent verification:
-- `signature`: ECDSA signature (65 bytes hex)
-- `signing_address`: Ethereum-style address (20 bytes hex)
-- `signing_algo`: Algorithm used ("ecdsa")
-- `text`: Hash of signed content
-
-### Multi-Chain On-chain Oracle
-Event execution records can be pushed to Solana and/or NEAR networks for immutable on-chain storage. Deployments specify target chains as an array (e.g., `["solana-devnet", "near-testnet"]`).
-
-Note: Solana program is currently only deployed on devnet. NEAR smart contract is currently deployed on mainnet and testnet.
-
-### Selective On-Chain Push
-Configure which state change and result fields get pushed to the blockchain. When using Solana chains, be mindful of the 1232-byte per-field limit.
-
----
-
-## Environment & Endpoints
-
-### Studio
-```
-https://studio.narrativeprotocol.com
-```
-
-### API Endpoint
-```
-https://api.narrativeprotocol.com
-```
-
-### Mainnet Contracts
-
-#### NEAR Smart Contract
-```
-oracle-1.narrativeprotocol.near
-```
-
-### Testnet / Devnet Contracts
-
-#### NEAR Smart Contract
-```
-narrative-p.testnet
-```
-
-#### Solana Program ID
-```
-3L4tQCyJQDJTxGb2FHKkp2mSpnQPzUKguX5stbktxAaFWutu2cZS8Nnpk17eQ3bThgkNkErXceJ7wE7wTR8jpewz
-```
-
----
-
-## API Reference
-
-### Authentication
-
-All `/api/*` endpoints require authentication via Bearer token.
-
-#### Authorization Header
-```
-Authorization: Bearer <token>
-```
-
-#### Register (Get Token) - Debug
-```
-POST /DEBUG_register
-```
-
-Request:
-```json
-{
-  "email": "dev@example.com"
-}
-```
-
-Response:
-```json
-{
-  "success": true,
-  "data": {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "userId": 1
-  }
-}
-```
-
----
-
-### Worlds
-
-#### Create World
-```
-POST /api/worlds
-```
-
-Request:
+Create world body:
 ```json
 {
   "name": "Horse Racing",
@@ -250,733 +47,227 @@ Request:
 }
 ```
 
-Response:
+## 5) Entity Schemas & Attributes
+
+### Entity Schemas (world-scoped)
+- `GET /api/worlds/:worldId/entity-schemas`
+- `POST /api/worlds/:worldId/entity-schemas`
+
+Create schema body:
 ```json
 {
-  "success": true,
-  "data": {
-    "id": 1,
-    "name": "Horse Racing",
-    "description": "A horse racing simulation world",
-    "domainTags": ["sports", "simulation"],
-    "promptSeed": "This world simulates realistic horse racing events.",
-    "createdAt": "2024-01-01T00:00:00Z"
-  }
-}
-```
-
-#### List Worlds
-```
-GET /api/worlds
-```
-
-#### Get World
-```
-GET /api/worlds/:id
-```
-
-#### Update World
-```
-PATCH /api/worlds/:id
-```
-
-#### Delete World
-```
-DELETE /api/worlds/:id
-```
-
----
-
-### Entity Schemas
-
-#### Create Entity Schema
-```
-POST /api/entity-schemas
-```
-
-Request:
-```json
-{
-  "worldId": 1,
   "name": "horse",
-  "description": "A racing horse"
-}
-```
-
-#### List Entity Schemas
-```
-GET /api/entity-schemas?worldId=1
-```
-
-#### Get Entity Schema
-```
-GET /api/entity-schemas/:id
-```
-
-#### Update Entity Schema
-```
-PATCH /api/entity-schemas/:id
-```
-
-#### Delete Entity Schema
-```
-DELETE /api/entity-schemas/:id
-```
-
----
-
-### Attribute Definitions
-
-#### Create Attribute Definition
-```
-POST /api/attribute-definitions
-```
-
-Request:
-```json
-{
-  "entitySchemaId": 1,
-  "name": "speed_rating",
-  "type": "float",
-  "constraints": { "min": 0, "max": 1 },
-  "defaultValue": 0.5
-}
-```
-
-#### List Attribute Definitions
-```
-GET /api/attribute-definitions?entitySchemaId=1
-```
-
-#### Delete Attribute Definition
-```
-DELETE /api/attribute-definitions/:id
-```
-
----
-
-### Events
-
-#### Create Event (with first version)
-```
-POST /api/events
-```
-
-Request:
-```json
-{
-  "worldId": 1,
-  "name": "race_result",
-  "description": "Resolves a race and updates horse stats",
-  "firstVersion": {
-    "inputSchema": { "raceId": "string" },
-    "reads": [1],
-    "stateChangeSchema": { "horse": "partial" },
-    "resultSchema": { "winner": "string", "time": "string" },
-    "behaviorPrompt": "Determine the race winner based on horse speed ratings. Update the winners wins count."
-  }
-}
-```
-
-#### List Events
-```
-GET /api/events?worldId=1
-```
-
-#### Get Event (with versions)
-```
-GET /api/events/:id
-```
-
-Response includes `versions` array with all event versions.
-
-#### Create New Event Version
-```
-POST /api/events/:id/versions
-```
-
-Request:
-```json
-{
-  "inputSchema": { "raceId": "string", "weather": "string" },
-  "reads": [1],
-  "stateChangeSchema": { "horse": "partial" },
-  "resultSchema": { "winner": "string", "time": "string", "weather": "string" },
-  "behaviorPrompt": "Updated behavior prompt..."
-}
-```
-
-#### Delete Event
-```
-DELETE /api/events/:id
-```
-
----
-
-### Deployments
-
-There are two ways to access deployments:
-1. **Nested routes** (recommended): `/api/worlds/:worldId/deployments`
-2. **Direct routes**: `/api/deployments` (for backwards compatibility)
-
-#### List Deployments
-
-Nested route (recommended):
-```
-GET /api/worlds/:worldId/deployments
-```
-
-Direct route:
-```
-GET /api/deployments?worldId=<world-id>
-```
-
-#### Create Deployment
-
-Nested route (recommended):
-```
-POST /api/worlds/:worldId/deployments
-```
-
-Request:
-```json
-{
-  "name": "Season 1",
-  "targetChains": ["solana-devnet"],
-  "aiModelId": "openai/gpt-oss-120b",
-  "onchain": {
-    "stateChanges": ["wins"],
-    "result": ["winner"]
-  },
-  "firstBinding": {
-    "eventId": 1,
-    "eventVersion": 1
-  },
-  "sourceDeploymentId": 2
-}
-```
-
-Direct route:
-```
-POST /api/deployments
-```
-
-Request (direct route requires `worldId`):
-```json
-{
-  "worldId": 1,
-  "name": "Season 1",
-  "targetChains": ["solana-devnet"],
-  "aiModelId": "openai/gpt-oss-120b",
-  "onchain": {
-    "stateChanges": ["wins"],
-    "result": ["winner"]
-  },
-  "firstBinding": {
-    "eventId": 1,
-    "eventVersion": 1
-  }
-}
-```
-
-Fields:
-- `worldId`: Parent world ID (not needed for nested route)
-- `name`: Deployment name (required)
-- `targetChains`: Array of chains - `[]`, `["solana-devnet"]`, `["solana-mainnet"]`, `["near-testnet"]`, `["near-mainnet"]`, or multiple (default: `[]`)
-- `aiModelId`: AI model for execution (default: `openai/gpt-oss-120b`)
-- `onchain.stateChanges`: Keys from stateChanges to push on-chain
-- `onchain.result`: Keys from result to push on-chain
-- `firstBinding`: Initial event binding (required)
-- `firstBinding.eventId`: Event ID to bind
-- `firstBinding.eventVersion`: Relative event version number to bind
-- `sourceDeploymentId`: Copy state from this deployment (snapshotting)
-
-Response:
-```json
-{
-  "success": true,
-  "data": {
-    "id": 123456,
-    "worldId": 1,
-    "name": "Season 1",
-    "mode": "upgradable",
-    "targetChains": ["solana-devnet"],
-    "aiModelId": "openai/gpt-oss-120b",
-    "onchain": {
-      "stateChanges": ["wins"],
-      "result": ["winner"]
-    },
-    "lockedAt": null,
-    "eventBindings": [
-      {
-        "id": 123457,
-        "deploymentId": 123456,
-        "eventId": 1,
-        "eventVersion": 1
-      }
-    ]
-  }
-}
-```
-
-#### Get Deployment
-```
-GET /api/deployments/:id
-```
-
-Returns deployment with entity instances and bindings.
-
-#### Update Deployment
-```
-PATCH /api/deployments/:id
-```
-
-#### Lock Deployment
-
-Nested route (recommended):
-```
-POST /api/worlds/:worldId/deployments/:deploymentId/lock
-```
-
-Direct route:
-```
-POST /api/deployments/:id/lock
-```
-
-Makes deployment read-only permanently.
-
-Response:
-```json
-{
-  "success": true,
-  "data": {
-    "id": 123456,
-    "mode": "locked",
-    "lockedAt": "2024-01-01T00:00:00Z"
-  },
-  "message": "Deployment locked successfully"
-}
-```
-
-#### Delete Deployment
-```
-DELETE /api/deployments/:id
-```
-
-Deletes a deployment and all its event bindings.
-
-Constraints:
-- Cannot delete locked deployments (400 Bad Request)
-- Cannot delete if entity instances exist (409 Conflict)
-- Cannot delete if event history exists (409 Conflict)
-
----
-
-### Entity Instances
-
-#### Create Entity Instance
-```
-POST /api/entity-instances
-```
-
-Request:
-```json
-{
-  "deploymentId": 1,
-  "entitySchemaId": 1,
-  "instanceId": "HORSE_1",
-  "state": {
-    "name": "Midnight Comet",
-    "speed_rating": 0.85,
-    "wins": 0
-  }
-}
-```
-
-#### List Entity Instances
-```
-GET /api/entity-instances?deploymentId=1
-```
-
-#### Get Entity Instance
-```
-GET /api/entity-instances/:id
-```
-
-#### Update Entity Instance
-```
-PATCH /api/entity-instances/:id
-```
-
-Request:
-```json
-{
-  "state": {
-    "wins": 1
-  }
-}
-```
-
-#### Delete Entity Instance
-```
-DELETE /api/entity-instances/:id
-```
-
----
-
-### Event Execution
-
-#### Execute Event
-
-Nested route (recommended):
-```
-POST /api/worlds/:worldId/deployments/:deploymentId/execute
-```
-
-Direct route:
-```
-POST /api/deployments/:id/execute
-```
-
-Request:
-```json
-{
-  "eventId": 1,
-  "input": { "raceId": "RACE_001" }
-}
-```
-
-Response:
-```json
-{
-  "success": true,
-  "data": {
-    "historyId": 123458,
-    "eventVersion": 1,
-    "stateChanges": {
-      "horse:HORSE_1": {
-        "wins": 5,
-        "lastRace": "2024-06-15"
-      }
-    },
-    "result": {
-      "winner": "HORSE_1",
-      "time": "1:45.32"
-    },
-    "attestation": {
-      "signature": "0x77057beca063e348d93069e9912d5e31...",
-      "signing_address": "0x34B7BcB4b2b61FCF9fA14715ba8708AC0dBC8Be5",
-      "signing_algo": "ecdsa",
-      "text": "eda20c62e5fe44e2aa8820c962efef0306f2d0c94805f9105add72ff705a8358:..."
-    },
-    "oracle": {
-      "solana": {
-        "signature": "5xYzABC123def456...",
-        "eventRecordPda": "7abcDEF789ghi012..."
-      },
-      "near": null
-    }
-  }
-}
-```
-
-Response Fields:
-- `historyId`: Unique ID of this execution record
-- `eventVersion`: Relative version number of the event version that was executed
-- `stateChanges`: Changes applied to entity instances (key: `schemaName:instanceId`)
-- `result`: Public output from AI (matches `resultSchema`)
-- `attestation`: Cryptographic attestation from NEAR AI
-- `oracle`: On-chain records (based on deployment's `targetChains`)
-- `oracle.solana`: Solana record (`null` if no Solana chain configured)
-- `oracle.solana.signature`: Solana transaction signature
-- `oracle.solana.eventRecordPda`: PDA of the on-chain deployment record
-- `oracle.near`: NEAR record (`null` if no NEAR chain configured)
-- `oracle.near.txHash`: NEAR transaction hash
-
-#### State Change Modes
-
-The `stateChangeSchema` in the event version determines how changes are applied:
-
-| Mode | Behavior |
-|------|----------|
-| `partial` | Merge changes into existing state (default) |
-| `full` | Replace entire state |
-| `append` | Append to arrays, merge objects |
-
----
-
-### Event History
-
-#### List Event History
-
-Nested route (recommended):
-```
-GET /api/worlds/:worldId/deployments/:deploymentId/history?page=1&limit=10
-```
-
-Direct route:
-```
-GET /api/deployments/:id/history?page=1&limit=10
-```
-
-Response:
-```json
-{
-  "success": true,
-  "data": [
+  "description": "A racing horse",
+  "attributeDefinitions": [
     {
-      "id": 123459,
-      "deploymentId": 123456,
-      "input": { "raceId": "RACE_001" },
-      "stateChanges": { ... },
-      "result": { ... },
-      "attestation": { ... },
-      "executedAt": "2024-06-15T10:30:00Z",
-      "eventVersion": {
-        "version": 1,
-        "event": { "id": 123456, "name": "race_result" }
-      }
-    }
-  ],
-  "pagination": {
-    "page": 1,
-    "limit": 10,
-    "total": 42,
-    "totalPages": 5
-  }
-}
-```
-
-#### Get Event History
-```
-GET /api/deployments/:id/history/:historyId
-```
-
----
-
-### Event Bindings
-
-#### List Bindings
-
-Nested route (recommended):
-```
-GET /api/worlds/:worldId/deployments/:deploymentId/event-bindings
-```
-
-Direct route:
-```
-GET /api/event-bindings?deploymentId=<deployment-id>
-```
-
-#### Create Binding
-
-Nested route (recommended):
-```
-POST /api/worlds/:worldId/deployments/:deploymentId/event-bindings
-```
-
-Request:
-```json
-{
-  "eventId": 1,
-  "eventVersion": 2
-}
-```
-
-Direct route:
-```
-POST /api/event-bindings
-```
-
-Request:
-```json
-{
-  "deploymentId": 1,
-  "eventId": 1,
-  "eventVersion": 2
-}
-```
-
-#### Delete Binding
-```
-DELETE /api/event-bindings/:id
-```
-
----
-
-### AI Models
-
-#### List AI Models
-```
-GET /api/ai-models
-```
-
-Response:
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "modelId": "openai/gpt-oss-120b",
-      "modelDisplayName": "GPT OSS 120B",
-      "modelDescription": "A high-performance open-source model",
-      "contextLength": 131000,
-      "attestationSupported": true,
-      "verifiable": true,
-      "isDefault": true,
-      "syncedAt": "2024-06-15T10:00:00Z"
+      "name": "speed_rating",
+      "type": "float",
+      "constraints": { "min": 0, "max": 1 },
+      "defaultValue": 0.5
     }
   ]
 }
 ```
 
----
+### Attributes (schema-scoped)
+- `GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes`
+- `POST /api/worlds/:worldId/entity-schemas/:schemaId/attributes`
+- `GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name`
+- `PUT /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name`
+- `DELETE /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name`
 
-## On-chain Oracle Details
+Notes:
+- Attribute identity is by `name` within an entity schema.
+- Unique constraint exists on `(entitySchemaId, name)`.
 
-Note: Solana program is currently only deployed on devnet. NEAR smart contract is currently deployed on mainnet and testnet.
+## 6) Events & Event Versions
 
-### Target Chains
+### Events (world-scoped)
+- `GET /api/worlds/:worldId/events`
+- `POST /api/worlds/:worldId/events`
 
-| Value | Description | Max Data Size |
-|-------|-------------|---------------|
-| `[]` | No on-chain storage (default) | N/A |
-| `["solana-devnet"]` | Solana devnet | 1232 bytes/field |
-| `["solana-mainnet"]` | Solana mainnet | 1232 bytes/field |
-| `["near-testnet"]` | NEAR testnet | 2048 bytes/field |
-| `["near-mainnet"]` | NEAR mainnet | 2048 bytes/field |
+### Event versions (event-scoped)
+- `GET /api/worlds/:worldId/events/:eventId/event-versions`
+- `POST /api/worlds/:worldId/events/:eventId/event-versions`
+- `POST /api/worlds/:worldId/events/:eventId/event-versions/:version/publish`
 
-### Selective On-chain Push
-Control which fields get pushed on-chain:
-
+### Event version fields (current)
 ```json
 {
+  "inputSchema": {},
+  "outputSchema": {},
+  "readEntities": [{ "schemaId": 1, "filter": ["eq:name:HORSE_1"] }],
+  "entityChangeSettings": { "horse": "partial" },
+  "behaviorPrompt": "...",
+  "mutationSettings": {
+    "mode": "ai",
+    "template": {}
+  },
+  "executionSettings": {
+    "visibility": "admin",
+    "priceUsd": 0,
+    "cron": {
+      "schedule": "*/5 * * * *",
+      "input": {}
+    }
+  }
+}
+```
+
+Field migration summary:
+- `reads` -> `readEntities`
+- `stateChangeSchema` -> `entityChangeSettings`
+- `resultSchema` -> `outputSchema`
+
+Validation notes:
+- `mutationSettings.mode = "direct"` requires `mutationSettings.template`.
+- Cron schedules in `executionSettings.cron.schedule` must be valid cron expressions.
+
+## 7) Deployments
+
+### Deployments (world-scoped)
+- `GET /api/worlds/:worldId/deployments`
+- `POST /api/worlds/:worldId/deployments`
+- `POST /api/worlds/:worldId/deployments/:deploymentId/lock`
+- `POST /api/worlds/:worldId/deployments/:deploymentId/execute`
+- `GET /api/worlds/:worldId/deployments/:deploymentId/history?page=1&limit=10`
+
+Create deployment body:
+```json
+{
+  "name": "Season 1",
+  "description": "Runtime deployment",
+  "mode": "upgradable",
+  "targetChains": ["near-testnet"],
+  "aiModelId": "openai/gpt-oss-120b",
   "onchain": {
     "stateChanges": ["wins"],
     "result": ["winner"]
-  }
+  },
+  "isLLMPublic": false,
+  "payToAddress": "6Q2...wallet",
+  "firstBinding": {
+    "eventId": 1,
+    "eventVersion": 1
+  },
+  "sourceDeploymentId": 123
 }
 ```
 
-When `onchain` is set, only the specified keys from `stateChanges` and `result` are included. When omitted or null, all data is pushed.
+### New deployment fields
+- `payToAddress` for paid public execution settlement.
 
-### Solana
-- Program ID: `8KAY24esApxCjPs48qSHAmFMH8EpTp59XntNLouyRdmQ`
-- PDA: `["deployment", deployment_id]`
+## 8) Event Bindings
 
-On-chain record fields:
-- `deployment_id`: Deployment identifier
-- `event_version_id`: Event version of the latest event
-- `event_history_id`: History ID of the latest event
-- `event_count`: Total events pushed for this deployment
-- `input_hash`: SHA-256 of latest input JSON
-- `state_changes`: Latest state changes JSON
-- `result`: Latest result JSON
-- `attestation`: Attestation from the latest event
-- `executed_at`: When latest event was executed
-- `pushed_at`: When latest record was pushed
+- `GET /api/worlds/:worldId/deployments/:deploymentId/event-bindings`
+- `POST /api/worlds/:worldId/deployments/:deploymentId/event-bindings`
 
-### NEAR
-- Mainnet Contract: `oracle-1.narrativeprotocol.near`
-- Testnet Contract: `narrative-p.testnet`
-
-Contract methods:
-- `initialize`: Set up contract authority
-- `push_event`: Push new event record
-- `update_authority`: Transfer authority
-- `get_deployment_event`: Get event by deployment ID and event ID
-- `get_deployment_event_count`: Get total event count
-
----
-
-## LLM Metadata
-
-Event history records include LLM metadata for debugging and transparency:
-
-- `llmModel`: The model used (e.g., `openai/gpt-oss-120b`)
-- `plainTextRequest`: The full prompt sent to the LLM
-- `plainTextResponse`: The raw response from the LLM
-
----
-
-## Error Responses
-
-Standard error format:
+Binding body:
 ```json
 {
-  "success": false,
-  "error": {
-    "code": "ERROR_CODE",
-    "message": "Human readable message"
+  "eventId": 1,
+  "eventVersion": 2
+}
+```
+
+Notes:
+- Bound event must belong to same world.
+- Only published event versions can be bound.
+
+## 9) Entity Instances
+
+- `GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
+- `POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
+
+List supports optional query filter:
+- `entitySchemaId`
+
+Create instance body:
+```json
+{
+  "entitySchemaId": 1,
+  "instanceId": "HORSE_1",
+  "state": {
+    "name": "Midnight Comet",
+    "speed_rating": 0.85
   }
 }
 ```
 
+## 10) Event Execution
+
+### Admin execution (API key)
+`POST /api/worlds/:worldId/deployments/:deploymentId/execute`
+
+Body:
+```json
+{
+  "eventId": 1,
+  "input": {
+    "raceId": "RACE_001"
+  }
+}
+```
+
+Response includes:
+- `historyId`
+- `eventVersion`
+- `stateChanges`
+- `result`
+- `attestation`
+- `oracle` (`solana`, `near`)
+
+### Public execution (wallet)
+`POST /app/deployments/:address/execute`
+
+Body:
+```json
+{
+  "eventId": 1,
+  "input": {},
+  "wallet": "<solana-wallet>",
+  "signature": "<base58-signature>",
+  "message": "narrativeprotocol:<deploymentAddress>:<eventId>:<timestamp>"
+}
+```
+
+Rules:
+- Deployment must be public.
+- Event version must have `executionSettings.visibility = "public"`.
+- Message timestamp max skew: 5 minutes.
+- Rate limit: 30 requests/minute per wallet.
+- If priced (`priceUsd > 0`), include `X-Payment` (x402) or receive `402 Payment Required`.
+
+## 11) Cron Execution
+
+Event versions can run on cron when:
+- `executionSettings.visibility = "cron"`
+- Valid `executionSettings.cron.schedule` is set.
+
+Cron executor runs periodically and resolves templated cron input before execution.
+
+## 12) AI Models
+
+- `GET /api/ai-models`
+
+Use model ID in deployment `aiModelId`.
+
+## 13) Errors
+
 Common status codes:
-- `200 OK` - Success
-- `201 Created` - Resource created
-- `400 Bad Request` - Invalid input
-- `401 Unauthorized` - Missing/invalid auth
-- `403 Forbidden` - No permission
-- `404 Not Found` - Resource doesn't exist
-- `409 Conflict` - Resource conflict (e.g., deleting deployment with instances)
-- `500 Internal Server Error` - Server error
+- `400` validation errors
+- `401` unauthorized
+- `403` forbidden
+- `404` not found
+- `409` conflicts
+- `402` payment required (public priced execution)
 
----
+## 14) Quick End-to-End
 
-## Quick Start
-
-1. **Register**
-```bash
-curl -X POST https://api.narrativeprotocol.com/DEBUG_register \
-  -H "Content-Type: application/json" \
-  -d '{"email": "dev@example.com"}'
-```
-
-2. **Create World**
-```bash
-curl -X POST https://api.narrativeprotocol.com/api/worlds \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{"name": "Horse Racing"}'
-```
-
-3. **Create Entity Schema**
-```bash
-curl -X POST https://api.narrativeprotocol.com/api/entity-schemas \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{"worldId": 1, "name": "horse"}'
-```
-
-4. **Create Event**
-```bash
-curl -X POST https://api.narrativeprotocol.com/api/events \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{"worldId": 1, "name": "race_result", "firstVersion": {...}}'
-```
-
-5. **Create Deployment**
-```bash
-curl -X POST https://api.narrativeprotocol.com/api/worlds/1/deployments \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{"name": "Season 1", "firstBinding": {"eventId": 1, "eventVersion": 1}}'
-```
-
-6. **Create Entity Instances**
-```bash
-curl -X POST https://api.narrativeprotocol.com/api/entity-instances \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{"deploymentId": 1, "entitySchemaId": 1, "instanceId": "HORSE_1", "state": {...}}'
-```
-
-7. **Execute Event**
-```bash
-curl -X POST https://api.narrativeprotocol.com/api/worlds/1/deployments/1/execute \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{"eventId": 1, "input": {"raceId": "RACE_001"}}'
-```
+1. `POST /api/worlds`
+2. `POST /api/worlds/:worldId/entity-schemas`
+3. `POST /api/worlds/:worldId/entity-schemas/:schemaId/attributes`
+4. `POST /api/worlds/:worldId/events`
+5. `POST /api/worlds/:worldId/deployments`
+6. `POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
+7. `POST /api/worlds/:worldId/deployments/:deploymentId/execute`

@@ -33,19 +33,18 @@ Each event belongs to a world and has:
 Events are always created with their first version:
 
 ```http title="Request"
-POST /api/events
+POST /api/worlds/:worldId/events
 ```
 
 ```json title="Request Body"
 {
-  "worldId": 1,
   "name": "race_result",
   "description": "Resolves a race and updates horse statistics",
   "firstVersion": {
     "inputSchema": { "raceId": "string" },
-    "reads": [1, 2],
-    "stateChangeSchema": { "horse": "partial" },
-    "resultSchema": { "winner": "string", "time": "string" },
+    "readEntities": [{ "schemaId": 1 }, { "schemaId": 2 }],
+    "entityChangeSettings": { "horse": "partial" },
+    "outputSchema": { "winner": "string", "time": "string" },
     "behaviorPrompt": "Determine the race winner based on horse stats."
   }
 }
@@ -85,14 +84,14 @@ Version 2 (published) ─── immutable, can be bound
 New versions start as drafts. You can modify:
 
 - `inputSchema` - What data the event accepts
-- `reads` - Which entity schemas to read
-- `stateChangeSchema` - How state changes (partial/full/append)
-- `resultSchema` - What gets returned publicly
+- `readEntities` - Which entity schemas to read
+- `entityChangeSettings` - How state changes (partial/full/append)
+- `outputSchema` - What gets returned publicly
 - `behaviorPrompt` - AI resolution instructions
 
 ### Published State
 
-Once published via `POST /api/events/:eventId/versions/:version/publish`:
+Once published via `POST /api/worlds/:worldId/events/:eventId/event-versions/:version/publish`:
 
 - Version becomes **immutable**
 - Can be bound to deployments
@@ -107,14 +106,16 @@ Once published via `POST /api/events/:eventId/versions/:version/publish`:
 | Field | Type | Description |
 |-------|------|-------------|
 | `inputSchema` | object | Expected input fields and types |
-| `reads` | integer[] | Entity schema IDs the AI can read |
-| `stateChangeSchema` | object | Per-schema change mode |
-| `resultSchema` | object | Public output structure |
+| `readEntities` | object[] | Entity schema read config (`schemaId`, optional `filter`) |
+| `entityChangeSettings` | object | Per-schema change mode |
+| `outputSchema` | object | Public output structure |
 | `behaviorPrompt` | string | Instructions for AI resolution |
+| `mutationSettings` | object | Execution mode: `ai` or `direct` (templated) |
+| `executionSettings` | object | Visibility: `admin`, `public`, or `cron` (+ price/cron config) |
 
 ### State Change Modes
 
-The `stateChangeSchema` maps entity schema names to change modes:
+The `entityChangeSettings` maps entity schema names to change modes:
 
 ```json title="State Change Schema"
 {
@@ -143,14 +144,14 @@ Event: "race_result"
 ## Creating a New Version
 
 ```http title="Request"
-POST /api/events/:eventId/versions
+POST /api/worlds/:worldId/events/:eventId/event-versions
 ```
 
 ```json title="Request Body"
 {
   "inputSchema": { "raceId": "string", "weather": "string" },
-  "reads": [1, 2],
-  "stateChangeSchema": { "horse": "partial" },
+  "readEntities": [{ "schemaId": 1 }, { "schemaId": 2 }],
+  "entityChangeSettings": { "horse": "partial" },
   "behaviorPrompt": "Consider weather conditions when determining the winner."
 }
 ```
@@ -168,11 +169,9 @@ Version numbers auto-increment based on existing versions.
 
 ## API Reference
 
-- `POST /api/events` - Create event with first version
-- `POST /api/events/:eventId/versions` - Create additional versions
-- `PUT /api/events/:eventId/versions/:version` - Update draft version
-- `POST /api/events/:eventId/versions/:version/publish` - Publish (make immutable)
-- `DELETE /api/events/:eventId/versions/:version` - Delete (drafts only)
+- `POST /api/worlds/:worldId/events` - Create event with first version
+- `POST /api/worlds/:worldId/events/:eventId/event-versions` - Create additional versions
+- `POST /api/worlds/:worldId/events/:eventId/event-versions/:version/publish` - Publish (make immutable)
 
 ## Related Concepts
 

@@ -46,11 +46,10 @@ curl https://api.narrativeprotocol.com/api/ai-models \
 Set the AI model when creating a deployment:
 
 ```bash
-curl -X POST https://api.narrativeprotocol.com/api/deployments \
+curl -X POST https://api.narrativeprotocol.com/api/worlds/39/deployments \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
-    "worldId": 39,
     "name": "Season 1",
     "aiModelId": "openai/gpt-oss-120b",
     "firstBinding": {

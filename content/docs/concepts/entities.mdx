@@ -23,12 +23,11 @@ Entity Schema: "horse"
 ## Creating Instances
 
 ```http title="Request"
-POST /api/entity-instances
+POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances
 ```
 
 ```json title="Request Body"
 {
-  "deploymentId": 1,
   "entitySchemaId": 1,
   "instanceId": "HORSE_1",
   "state": {
@@ -70,20 +69,6 @@ Attributes not provided in `state` use schema defaults:
 
 ## Updating State
 
-### Direct Update
-
-```http title="Request"
-PUT /api/entity-instances/:id
-```
-
-```json title="Request Body"
-{
-  "state": { "wins": 4, "lastRace": "2024-06-15" }
-}
-```
-
-Direct updates **merge** with existing state (partial update).
-
 ### Via Event Execution
 
 Events update state through AI-computed changes:
@@ -100,7 +85,7 @@ The key format is `"schemaName:instanceId"`.
 
 ## State Change Modes
 
-When events execute, the `stateChangeSchema` determines how changes apply:
+When events execute, the `entityChangeSettings` determines how changes apply:
 
 | Mode | Behavior | Use Case |
 |------|----------|----------|
@@ -137,26 +122,19 @@ When events execute, the `stateChangeSchema` determines how changes apply:
 ### List by Deployment
 
 ```http
-GET /api/entity-instances?deploymentId=1
+GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances
 ```
 
 ### List by Schema
 
 ```http
-GET /api/entity-instances?deploymentId=1&entitySchemaId=1
-```
-
-### Get Single Instance
-
-```http
-GET /api/entity-instances/:id
+GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances?entitySchemaId=1
 ```
 
 ## Constraints
 
 <Callout type="info" title="Important Limitations">
 - Cannot modify instances in locked deployments
-- Cannot delete instances if deployment has event history
 - Instance IDs must be unique within deployment + schema
 </Callout>
 

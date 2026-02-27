@@ -5,44 +5,50 @@ description: Define entity structures
 
 # Entity Schemas API
 
-Create and manage entity schemas within worlds.
+Entity schema routes are world-scoped.
 
 ## Endpoints
 
 ### List Entity Schemas
 
 ```http
-GET /api/entity-schemas?worldId=:worldId
+GET /api/worlds/:worldId/entity-schemas
 ```
 
 ### Create Entity Schema
 
 ```http
-POST /api/entity-schemas
+POST /api/worlds/:worldId/entity-schemas
 ```
 
-### Get Entity Schema
+### List Attributes for a Schema
 
 ```http
-GET /api/entity-schemas/:id
+GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes
 ```
 
-### Update Entity Schema
+### Create Attribute
 
 ```http
-PUT /api/entity-schemas/:id
+POST /api/worlds/:worldId/entity-schemas/:schemaId/attributes
 ```
 
-### Delete Entity Schema
+### Get Attribute by Name
 
 ```http
-DELETE /api/entity-schemas/:id
+GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name
 ```
 
-### Create Attribute Definition
+### Update Attribute by Name
 
 ```http
-POST /api/attribute-definitions
+PUT /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name
+```
+
+### Delete Attribute by Name
+
+```http
+DELETE /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name
 ```
 
 ## Examples
@@ -50,39 +56,22 @@ POST /api/attribute-definitions
 ### Create Entity Schema
 
 ```bash
-curl -X POST https://api.narrativeprotocol.com/api/entity-schemas \
+curl -X POST https://api.narrativeprotocol.com/api/worlds/39/entity-schemas \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
-    "worldId": 39,
     "name": "horse",
     "description": "A racing horse"
   }'
 ```
 
-```json
-{
-  "success": true,
-  "data": {
-    "id": 53,
-    "worldId": 39,
-    "name": "horse",
-    "description": "A racing horse",
-    "createdAt": "2026-02-18T04:13:49.117Z",
-    "updatedAt": "2026-02-18T04:13:49.117Z",
-    "attributeDefinitions": []
-  }
-}
-```
-
-### Add Attribute Definition
+### Add Attribute
 
 ```bash
-curl -X POST https://api.narrativeprotocol.com/api/attribute-definitions \
+curl -X POST https://api.narrativeprotocol.com/api/worlds/39/entity-schemas/53/attributes \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
-    "entitySchemaId": 53,
     "name": "speed_rating",
     "type": "float",
     "constraints": { "min": 0, "max": 1 },

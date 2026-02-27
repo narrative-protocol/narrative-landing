@@ -14,8 +14,8 @@
   "deployments": {
     "title": "Deployments"
   },
-  "instances": {
-    "title": "Instances"
+  "entity-instances": {
+    "title": "Entity Instances"
   },
   "ai-models": {
     "title": "AI Models"
@@ -25,7 +25,7 @@
     "entity",
     "events",
     "deployments",
-    "instances",
+    "entity-instances",
     "ai-models"
   ]
 }

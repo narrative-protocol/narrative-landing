@@ -7,5 +7,6 @@
   },
   "environment": {
     "title": "Environment"
-  }
+  },
+  "pages": ["index", "quickstart", "environment", "concepts", "api-reference"]
 }

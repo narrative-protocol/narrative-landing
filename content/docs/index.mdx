@@ -1,67 +1,53 @@
 ---
 title: Introduction
-description: Welcome to Narrative Protocol documentation
+description: Get ready to build your worlds
 ---
 
 # Narrative Protocol
 
-Narrative Protocol is a **World State & Event Engine** that enables you to define, manage, and execute complex world simulations with versioned events, AI-driven execution, and on-chain verification.
+Narrative Protocol is a **World State & Event Engine** that enables you to define and execute complex world simulations.
 
 <Callout type="info" title="Machine-Readable Documentation">
-  The documentation is also available for machine readers at [](/llms.txt) (concise) and [](/llms-full.txt) (complete).
+  The documentation is also available for machine readers at
+  [/llms.txt](/llms.txt) (concise) and [/llms-full.txt](/llms-full.txt)
+  (complete).
 </Callout>
 
 ## Key Concepts
 
-### Blueprint vs Live
+### Layers
 
-The system separates **design-time** (World/Blueprint) from **runtime** (Deployment/Live):
+The system separates the **design** layer (Blueprint) and **runtime** layer (Live):
 
-- **World (Blueprint)**: Define your entity schemas and events with versioned behavior
-- **Deployment (Live)**: Create instances, execute events via AI, and track history
+- **Blueprint**: Define your world, entity schemas, and events
+- **Live**: Create deployments, instances, and execute events
 
 ### Core Components
 
-| Component | Layer | Description |
-|-----------|-------|-------------|
-| Worlds | Blueprint | Container for all definitions (title, tags, prompt seed) |
-| Entity Schemas | Blueprint | Define the shape of entities (e.g., Horse, Track, Jockey) |
-| Events | Blueprint | Define what can happen (with versioned behavior) |
-| Deployments | Live | Running instance of a world with its own state |
-| Entity Instances | Live | Actual entities (e.g., HORSE_1, HORSE_2) |
+| Component      | Layer     | Description                                                      |
+| -------------- | --------- | ---------------------------------------------------------------- |
+| Worlds         | Blueprint | Container for all definitions (title, tags, prompt seed)         |
+| Entity Schemas | Blueprint | Define the shape of entities (e.g., Horse, Track, Jockey)        |
+| Events         | Blueprint | Define what can happen (with versioned behavior)                 |
+| Deployments    | Live      | Running instance of a world with its own state                   |
+| Instances      | Live      | Actual entities based on entity schemas (e.g., HORSE_1, HORSE_2) |
 
-## Features
-
-### Event Versioning
-
-Events have versions that become immutable once published, ensuring reproducibility and auditability.
+## Feature Highlights
 
 ### AI Event Execution
 
-Events are executed by an AI engine with configurable model selection (default: `openai/gpt-oss-120b`). Each deployment can use a different AI model.
-
-### Deployment Modes
-
-Deployments can be `upgradable` (default) or `locked` (irreversible freeze for archival).
+Events can mutate the world by using an AI engine with configurable model selection. Each deployment can use a different AI model. Every AI response includes a cryptographic attestation for verification.
 
 ### Snapshotting
 
-Create new deployments by copying state from existing ones - useful for forking simulations or creating test environments.
-
-### Cryptographic Attestation
-
-Every AI response includes a cryptographic attestation for independent verification.
+Create new deployments by copying state from existing ones, useful for forking simulations or creating test environments.
 
 ### Multi-Chain On-chain Oracle
 
-Event execution records can be pushed to Solana and/or NEAR networks for immutable on-chain storage. Deployments specify target chains as an array (e.g., `["solana-devnet", "near-testnet"]`).
-
-### Selective On-Chain Push
-
-Configure which state change and result fields get pushed to the blockchain.
+Event execution records can be pushed to Solana and/or NEAR networks. This is useful for onchain games or archival records.
 
 <Callout type="tip" title="Quick Links">
-- [Quickstart Guide](/docs/quickstart) - Get running in 5 minutes
-- [Core Concepts](/docs/concepts) - Understand the architecture
-- [API Reference](/docs/api-reference/authentication) - Complete API documentation
+  - [Quickstart Guide](/docs/quickstart) - Get running in 5 minutes - [Core
+  Concepts](/docs/concepts) - Understand the architecture - [API
+  Reference](/docs/api-reference/authentication) - Complete API documentation
 </Callout>

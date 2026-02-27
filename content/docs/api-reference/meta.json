@@ -1,15 +1,12 @@
 {
   "index": {
-    "title": "Overview"
-  },
-  "authentication": {
-    "title": "Authentication"
+    "title": "API Reference"
   },
   "worlds": {
     "title": "Worlds"
   },
-  "entity-schemas": {
-    "title": "Entity Schemas"
+  "entity": {
+    "title": "Entity"
   },
   "events": {
     "title": "Events"
@@ -17,10 +14,18 @@
   "deployments": {
     "title": "Deployments"
   },
-  "entity-instances": {
-    "title": "Entity Instances"
+  "instances": {
+    "title": "Instances"
   },
   "ai-models": {
     "title": "AI Models"
-  }
+  },
+  "pages": [
+    "worlds",
+    "entity",
+    "events",
+    "deployments",
+    "instances",
+    "ai-models"
+  ]
 }

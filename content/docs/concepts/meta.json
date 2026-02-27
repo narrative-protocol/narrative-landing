@@ -1,6 +1,6 @@
 {
   "index": {
-    "title": "Overview"
+    "title": "Concepts"
   },
   "architecture": {
     "title": "Architecture"
@@ -19,5 +19,13 @@
   },
   "on-chain-oracle": {
     "title": "On-chain Oracle"
-  }
+  },
+  "pages": [
+    "architecture",
+    "entities",
+    "events",
+    "deployments",
+    "ai-engine",
+    "on-chain-oracle"
+  ]
 }

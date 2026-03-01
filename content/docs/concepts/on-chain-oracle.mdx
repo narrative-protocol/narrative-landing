@@ -37,7 +37,7 @@ An empty array `[]` (default) means no on-chain storage.
   "worldId": 1,
   "name": "Season 1",
   "targetChains": ["solana-devnet", "near-testnet"],
-  "firstBinding": { "eventId": 1, "eventVersion": 1 }
+  "bindings": [{ "eventId": 1, "eventVersion": 1 }]
 }
 ```
 
@@ -45,15 +45,19 @@ When both Solana and NEAR chains are included, the stricter Solana 1232-byte lim
 
 ## Selective On-Chain Push
 
-Deployments can configure which fields get pushed on-chain via the `onchain` config:
+Bindings can configure which fields get pushed on-chain via the `onchain` config:
 
 ```json
 {
   "targetChains": ["solana-devnet"],
-  "onchain": {
-    "stateChanges": ["wins", "speed_rating"],
-    "result": ["winner"]
-  }
+  "bindings": [{
+    "eventId": 1,
+    "eventVersion": 1,
+    "onchain": {
+      "stateChanges": ["wins", "speed_rating"],
+      "result": ["winner"]
+    }
+  }]
 }
 ```
 

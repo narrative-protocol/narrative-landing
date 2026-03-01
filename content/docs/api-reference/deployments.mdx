@@ -28,16 +28,16 @@ POST /api/worlds/:worldId/deployments
   "mode": "upgradable",
   "targetChains": ["near-testnet"],
   "aiModelId": "openai/gpt-oss-120b",
-  "onchain": {
-    "stateChanges": ["wins", "speed_rating"],
-    "result": ["winner"]
-  },
   "isLLMPublic": false,
   "payToAddress": "6Q2...wallet",
-  "firstBinding": {
+  "bindings": [{
     "eventId": 29,
-    "eventVersion": 1
-  },
+    "eventVersion": 1,
+    "onchain": {
+      "stateChanges": ["wins", "speed_rating"],
+      "result": ["winner"]
+    }
+  }],
   "sourceDeploymentId": 12
 }
 ```
@@ -49,14 +49,14 @@ POST /api/worlds/:worldId/deployments
 | `mode` | `enum` | No | `upgradable | locked` (default `upgradable`). |
 | `targetChains` | `enum[]` | No | `solana-devnet | solana-mainnet | near-testnet | near-mainnet`. |
 | `aiModelId` | `string` | No | Selected model ID. |
-| `onchain` | `object` | No | Field filter for on-chain push. |
-| `onchain.stateChanges` | `string[]` | No | Allowed state-change keys. |
-| `onchain.result` | `string[]` | No | Allowed result keys. |
 | `isLLMPublic` | `boolean` | No | Whether LLM prompt/response data is public. |
 | `payToAddress` | `string` | No | Payment receiver Solana address for paid public execution. |
-| `firstBinding` | `object` | Yes | Initial bound event version. |
-| `firstBinding.eventId` | `number` | Yes | Event ID. |
-| `firstBinding.eventVersion` | `number` | Yes | Relative version number. |
+| `bindings` | `object[]` | Yes | Initial event bindings (array). |
+| `bindings[].eventId` | `number` | Yes | Event ID. |
+| `bindings[].eventVersion` | `number` | Yes | Relative version number. |
+| `bindings[].onchain` | `object` | No | Field filter for on-chain push (per binding). |
+| `bindings[].onchain.stateChanges` | `string[]` | No | Allowed state-change keys. |
+| `bindings[].onchain.result` | `string[]` | No | Allowed result keys. |
 | `sourceDeploymentId` | `number` | No | Clone entity state and bindings from source deployment. |
 
 ### Execute Event

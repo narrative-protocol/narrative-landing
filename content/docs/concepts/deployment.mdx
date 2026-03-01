@@ -20,14 +20,14 @@ POST /api/worlds/:worldId/deployments
   "targetChains": ["solana-devnet"],
   "aiModelId": "openai/gpt-oss-120b",
   "payToAddress": "6Q2...wallet",
-  "onchain": {
-    "stateChanges": ["wins", "speed_rating"],
-    "result": ["winner"]
-  },
-  "firstBinding": {
+  "bindings": [{
     "eventId": 1,
-    "eventVersion": 1
-  }
+    "eventVersion": 1,
+    "onchain": {
+      "stateChanges": ["wins", "speed_rating"],
+      "result": ["winner"]
+    }
+  }]
 }
 ```
 
@@ -42,10 +42,9 @@ Use this table when creating a deployment payload.
 | `targetChains` | string[] | No       | On-chain oracle targets (see below)                  |
 | `aiModelId`    | string   | No       | AI model to use (default: `openai/gpt-oss-120b`)     |
 | `isLLMPublic`  | boolean  | No       | Whether LLM prompt/response data is publicly visible |
-| `onchain`      | object   | No       | Selective on-chain push config                       |
 | `payToAddress` | string   | No       | Receiver wallet (solana) for paid public execution   |
 | `mode`         | enum     | No       | `upgradable` (default) or `locked`                   |
-| `firstBinding` | object   | Yes      | Initial event binding                                |
+| `bindings`     | object[] | Yes      | Initial event bindings (array)                      |
 
 ### Target Chains
 
@@ -82,14 +81,18 @@ Each deployment can specify which AI model to use for event execution via `aiMod
 
 ### Selective On-Chain Push
 
-The `onchain` config controls which fields from `stateChanges` and `result` get pushed to the blockchain:
+The `onchain` config controls which fields from `stateChanges` and `result` get pushed to the blockchain. This is now configured per-binding:
 
 ```json
 {
-  "onchain": {
-    "stateChanges": ["wins", "speed_rating"],
-    "result": ["winner"]
-  }
+  "bindings": [{
+    "eventId": 1,
+    "eventVersion": 1,
+    "onchain": {
+      "stateChanges": ["wins", "speed_rating"],
+      "result": ["winner"]
+    }
+  }]
 }
 ```
 
@@ -183,26 +186,26 @@ When creating a deployment with a `sourceDeploymentId`, the system:
 
 1. Creates the new deployment
 2. Copies all entity instances from the source
-3. Copies event bindings (except duplicates of `firstBinding`)
+3. Copies event bindings (except duplicates)
 4. New deployment starts as `upgradable`
 
 ```json title="Request Body"
 {
   "name": "Season 2",
-  "firstBinding": { "eventId": 1, "eventVersion": 2 },
+  "bindings": [{ "eventId": 1, "eventVersion": 2 }],
   "sourceDeploymentId": 123
 }
 ```
 
 ### What Gets Copied
 
-| Component        | Copied | Notes                               |
-| ---------------- | ------ | ----------------------------------- |
-| Entity instances | Yes    | Full state at time of snapshot      |
-| Event bindings   | Yes    | Except if duplicate of firstBinding |
-| Event history    | No     | New deployment starts fresh         |
-| Deployment mode  | No     | Always starts as upgradable         |
-| Deployment name  | No     | Must provide new name               |
+| Component        | Copied | Notes                    |
+| ---------------- | ------ | ------------------------ |
+| Entity instances | Yes    | Full state at time of snapshot |
+| Event bindings   | Yes    | Except duplicates       |
+| Event history    | No     | New deployment starts fresh |
+| Deployment mode  | No     | Always starts as upgradable |
+| Deployment name  | No     | Must provide new name   |
 
 ### Use Cases
 

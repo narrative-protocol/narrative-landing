@@ -215,6 +215,20 @@ Notes:
 
 `executionSettings` controls who can run an event version and when it can run.
 
+### Concurrent Execution Lock
+
+Events use a mutex (mutual exclusion) lock to prevent race conditions when multiple executions target the same entity data. An event cannot execute concurrently if:
+
+1. **Same event** - The identical event is already executing on the deployment
+2. **Shared entity schema** - Any entity schema is both read by the new event and modified by a running event (via `readEntities` or `stateChanges`)
+
+```typescript
+// Lock prevents concurrent execution if:
+eventA.readEntities ∩ eventB.stateChanges ≠ ∅
+```
+
+This ensures data consistency when events modify overlapping entities. If a conflicting execution is in progress, the new execution request will fail.
+
 ### Visibility Modes
 
 | Value | Meaning |

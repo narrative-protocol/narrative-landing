@@ -56,6 +56,36 @@ POST /api/worlds/:worldAddress/events
 | `firstVersion.executionSettings.cron.schedule` | `string`   | Conditionally | Required for cron visibility; must be valid cron. |
 | `firstVersion.executionSettings.cron.input`    | `object`   | No            | Cron input template.                              |
 
+### Get Event
+
+```http
+GET /api/worlds/:worldAddress/events/:eventName
+```
+
+### Update Event
+
+```http
+PUT /api/worlds/:worldAddress/events/:eventName
+```
+
+```json title="Request Body"
+{
+  "name": "race_result",
+  "description": "Updated event description"
+}
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | `string` | No | Event name. |
+| `description` | `string` | No | Event description. |
+
+### Delete Event
+
+```http
+DELETE /api/worlds/:worldAddress/events/:eventName
+```
+
 ### List Event Versions
 
 ```http
@@ -187,4 +217,58 @@ Loads all instances of schema (useful for listing queries)
 
 ```http
 POST /api/worlds/:worldAddress/events/:eventName/event-versions/:version/publish
+```
+
+### Get Event Version
+
+```http
+GET /api/worlds/:worldAddress/events/:eventName/event-versions/:version
+```
+
+### Update Event Version
+
+```http
+PUT /api/worlds/:worldAddress/events/:eventName/event-versions/:version
+```
+
+```json title="Request Body"
+{
+  "inputSchema": { "raceId": "string", "weather": "string" },
+  "outputSchema": { "winner": "string", "time": "string" },
+  "readEntities": [{ "schema": "horse", "filter": ["raceId"] }],
+  "stateChangeSchema": { "horse": "partial" },
+  "behaviorPrompt": "Updated behavior prompt.",
+  "mutationSettings": {
+    "mode": "ai",
+    "behaviorPrompt": "New prompt"
+  },
+  "executionSettings": {
+    "visibility": "admin"
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `inputSchema` | `object` | No | Execution input contract. |
+| `outputSchema` | `object` | No | Public result contract. |
+| `readEntities` | `object[]` | No | Read access config. |
+| `readEntities[].schema` | `string` | Yes | Entity schema name to read. |
+| `readEntities[].filter` | `string[]` | No | Filter expressions. |
+| `stateChangeSchema` | `object` | No | Per-schema mode map (`partial`, `full`, `append`). |
+| `behaviorPrompt` | `string` | No | Prompt for AI mode. |
+| `mutationSettings` | `object` | No | Mutation configuration. Set to `null` to remove. |
+| `mutationSettings.mode` | `enum` | No | `ai` or `direct`. |
+| `mutationSettings.template` | `object` | Conditionally | Required when mode is `direct`. |
+| `mutationSettings.behaviorPrompt` | `string` | No | Prompt for AI mode. |
+| `executionSettings` | `object` | No | Execution settings. Set to `null` to remove. |
+| `executionSettings.visibility` | `enum` | No | `admin`, `public`, or `cron`. |
+| `executionSettings.priceUsd` | `number` | No | Price for public execution. |
+| `executionSettings.cron.schedule` | `string` | Conditionally | Required for cron visibility. |
+| `executionSettings.cron.input` | `object` | No | Cron input template. |
+
+### Delete Event Version
+
+```http
+DELETE /api/worlds/:worldAddress/events/:eventName/event-versions/:version
 ```

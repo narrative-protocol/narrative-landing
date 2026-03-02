@@ -29,15 +29,17 @@ POST /api/worlds/:worldAddress/deployments
   "aiModelId": "openai/gpt-oss-120b",
   "isLLMPublic": false,
   "payToAddress": "6Q2...wallet",
-  "bindings": [{
-    "event": "race_result",
-    "eventVersion": 1,
-    "targetChains": ["near-testnet"],
-    "onchain": {
-      "stateChanges": ["wins", "speed_rating"],
-      "result": ["winner"]
+  "bindings": [
+    {
+      "event": "race_result",
+      "eventVersion": 1,
+      "targetChains": ["near-testnet"],
+      "onchain": {
+        "stateChanges": ["wins", "speed_rating"],
+        "result": ["winner"]
+      }
     }
-  }],
+  ],
   "sourceDeployment": "0x123...abc"
 }
 ```
@@ -46,18 +48,54 @@ POST /api/worlds/:worldAddress/deployments
 |---|---|---|---|
 | `name` | `string` | Yes | Deployment name. |
 | `description` | `string` | No | Description. |
-| `mode` | `enum` | No | `upgradable | locked` (default `upgradable`). |
+| `mode` | `enum` | No | `upgradable` or `locked` (default `upgradable`). |
 | `aiModelId` | `string` | No | Selected model ID. |
 | `isLLMPublic` | `boolean` | No | Whether LLM prompt/response data is public. |
 | `payToAddress` | `string` | No | Payment receiver Solana address for paid public execution. |
 | `bindings` | `object[]` | Yes | Initial event bindings (array). |
 | `bindings[].event` | `string` | Yes | Event name. |
 | `bindings[].eventVersion` | `number` | Yes | Relative version number. |
-| `bindings[].targetChains` | `enum[]` | No | `solana-devnet | solana-mainnet | near-testnet | near-mainnet` - Chain networks for on-chain push (per binding). |
+| `bindings[].targetChains` | `enum[]` | No | Chain networks for on-chain push (per binding). |
 | `bindings[].onchain` | `object` | No | Field filter for on-chain push (per binding). |
 | `bindings[].onchain.stateChanges` | `string[]` | No | Allowed state-change keys. |
 | `bindings[].onchain.result` | `string[]` | No | Allowed result keys. |
 | `sourceDeployment` | `string` | No | Clone entity state and bindings from source deployment (address). |
+
+### Get Deployment
+
+```http
+GET /api/worlds/:worldAddress/deployments/:address
+```
+
+### Update Deployment
+
+```http
+PUT /api/worlds/:worldAddress/deployments/:address
+```
+
+```json title="Request Body"
+{
+  "name": "Season 1 Updated",
+  "description": "Updated description",
+  "aiModelId": "openai/gpt-oss-120b",
+  "isLLMPublic": true,
+  "payToAddress": "6Q2...wallet"
+}
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | `string` | No | Deployment name. |
+| `description` | `string` | No | Description. |
+| `aiModelId` | `string` | No | Selected model ID. Set to `null` to remove. |
+| `isLLMPublic` | `boolean` | No | Whether LLM prompt/response data is public. |
+| `payToAddress` | `string` | No | Payment receiver Solana address. Set to `null` to remove. |
+
+### Delete Deployment
+
+```http
+DELETE /api/worlds/:worldAddress/deployments/:address
+```
 
 ### Execute Event
 
@@ -72,10 +110,10 @@ POST /api/worlds/:worldAddress/deployments/:address/execute
 }
 ```
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `event` | `string` | Yes | Event name to execute. |
-| `input` | `object` | No | Event input payload. |
+| Field   | Type     | Required | Description            |
+| ------- | -------- | -------- | ---------------------- |
+| `event` | `string` | Yes      | Event name to execute. |
+| `input` | `object` | No       | Event input payload.   |
 
 ### Lock Deployment
 
@@ -95,6 +133,16 @@ GET /api/worlds/:worldAddress/deployments/:address/history?page=1&limit=10
 GET /api/worlds/:worldAddress/deployments/:address/event-bindings
 ```
 
+### Get Event Binding
+
+```http
+GET /api/worlds/:worldAddress/deployments/:address/event-bindings?event=race_result
+```
+
+Query parameters:
+
+- `event` - Event name (required)
+
 ### Create Event Binding
 
 ```http
@@ -108,10 +156,47 @@ POST /api/worlds/:worldAddress/deployments/:address/event-bindings
 }
 ```
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `event` | `string` | Yes | Event name to bind. |
-| `eventVersion` | `number` | Yes | Relative version number to bind. |
+| Field          | Type     | Required | Description                      |
+| -------------- | -------- | -------- | -------------------------------- |
+| `event`        | `string` | Yes      | Event name to bind.              |
+| `eventVersion` | `number` | Yes      | Relative version number to bind. |
+
+### Update Event Binding
+
+```http
+PUT /api/worlds/:worldAddress/deployments/:address/event-bindings
+```
+
+```json title="Request Body"
+{
+  "event": "race_result",
+  "eventVersion": 3,
+  "targetChains": ["solana-devnet"],
+  "onchain": {
+    "stateChanges": ["wins"],
+    "result": ["winner"]
+  }
+}
+```
+
+| Field                  | Type       | Required | Description                       |
+| ---------------------- | ---------- | -------- | --------------------------------- |
+| `event`                | `string`   | Yes      | Event name to update.             |
+| `eventVersion`         | `number`   | No       | New version number to bind.       |
+| `targetChains`         | `enum[]`   | No       | Chain networks for on-chain push. |
+| `onchain`              | `object`   | No       | Field filter for on-chain push.   |
+| `onchain.stateChanges` | `string[]` | No       | Allowed state-change keys.        |
+| `onchain.result`       | `string[]` | No       | Allowed result keys.              |
+
+### Delete Event Binding
+
+```http
+DELETE /api/worlds/:worldAddress/deployments/:address/event-bindings?event=race_result
+```
+
+Query parameters:
+
+- `event` - Event name to unbind (required)
 
 ### List Entity Instances
 
@@ -136,11 +221,11 @@ POST /api/worlds/:worldAddress/deployments/:address/entity-instances
 }
 ```
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `entitySchema` | `string` | Yes | Entity schema name. |
-| `instanceId` | `string` | Yes | Unique per deployment+schema. |
-| `state` | `object` | No | Initial state. Defaults to `{}`. |
+| Field          | Type     | Required | Description                      |
+| -------------- | -------- | -------- | -------------------------------- |
+| `entitySchema` | `string` | Yes      | Entity schema name.              |
+| `instanceId`   | `string` | Yes      | Unique per deployment+schema.    |
+| `state`        | `object` | No       | Initial state. Defaults to `{}`. |
 
 ## Public Execution
 
@@ -160,13 +245,13 @@ POST /app/deployments/:address/execute
 }
 ```
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `event` | `string` | Yes | Event name to execute. |
-| `input` | `object` | No | Event input payload. |
-| `wallet` | `string` | Yes | Signer wallet (base58 public key). |
-| `signature` | `string` | Yes | Signature over `message`. |
-| `message` | `string` | Yes | `narrativeprotocol:{deploymentAddress}:{eventName}:{timestamp}`. |
+| Field       | Type     | Required | Description                                                      |
+| ----------- | -------- | -------- | ---------------------------------------------------------------- |
+| `event`     | `string` | Yes      | Event name to execute.                                           |
+| `input`     | `object` | No       | Event input payload.                                             |
+| `wallet`    | `string` | Yes      | Signer wallet (base58 public key).                               |
+| `signature` | `string` | Yes      | Signature over `message`.                                        |
+| `message`   | `string` | Yes      | `narrativeprotocol:{deploymentAddress}:{eventName}:{timestamp}`. |
 
 Rules:
 

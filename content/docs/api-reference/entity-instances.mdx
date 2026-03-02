@@ -41,6 +41,38 @@ POST /api/worlds/:worldAddress/deployments/:address/entity-instances
 | `instanceId` | `string` | Yes | Instance key unique in deployment+schema. |
 | `state` | `object` | No | Initial state. Defaults to `{}`. |
 
+### Get Entity Instance
+
+```http
+GET /api/worlds/:worldAddress/deployments/:address/entity-instances/:instanceId
+```
+
+### Update Entity Instance
+
+```http
+PUT /api/worlds/:worldAddress/deployments/:address/entity-instances/:instanceId
+```
+
+```json title="Request Body"
+{
+  "state": {
+    "name": "Midnight Comet",
+    "speed_rating": 0.9,
+    "wins": 5
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `state` | `object` | Yes | Updated state object (replaces existing state). |
+
+### Delete Entity Instance
+
+```http
+DELETE /api/worlds/:worldAddress/deployments/:address/entity-instances/:instanceId
+```
+
 ## Example
 
 ```bash

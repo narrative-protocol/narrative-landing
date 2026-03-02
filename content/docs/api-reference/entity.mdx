@@ -120,3 +120,33 @@ PUT /api/worlds/:worldAddress/entity-schemas/:schemaName/attributes/:name
 ```http
 DELETE /api/worlds/:worldAddress/entity-schemas/:schemaName/attributes/:name
 ```
+
+### Get Entity Schema
+
+```http
+GET /api/worlds/:worldAddress/entity-schemas/:schemaName
+```
+
+### Update Entity Schema
+
+```http
+PUT /api/worlds/:worldAddress/entity-schemas/:schemaName
+```
+
+```json title="Request Body"
+{
+  "name": "horse",
+  "description": "A racing horse updated"
+}
+```
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `name` | `string` | No | Schema name. |
+| `description` | `string` | No | Schema description. |
+
+### Delete Entity Schema
+
+```http
+DELETE /api/worlds/:worldAddress/entity-schemas/:schemaName
+```

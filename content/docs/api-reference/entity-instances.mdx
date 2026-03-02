@@ -12,18 +12,21 @@ Entity instance routes are deployment-scoped under worlds.
 ### List Entity Instances
 
 ```http
-GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances
+GET /api/worlds/:worldId/deployments/:address/entity-instances?entitySchema=horse&page=1&limit=20
 ```
+
+Query parameters:
+- `entitySchema` - Filter by entity schema name (optional)
 
 ### Create Entity Instance
 
 ```http
-POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances
+POST /api/worlds/:worldId/deployments/:address/entity-instances
 ```
 
 ```json title="Request Body"
 {
-  "entitySchemaId": 53,
+  "entitySchema": "horse",
   "instanceId": "HORSE_1",
   "state": {
     "name": "Midnight Comet",
@@ -34,18 +37,18 @@ POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `entitySchemaId` | `number` | Yes | Entity schema ID. |
+| `entitySchema` | `string` | Yes | Entity schema name. |
 | `instanceId` | `string` | Yes | Instance key unique in deployment+schema. |
 | `state` | `object` | No | Initial state. Defaults to `{}`. |
 
 ## Example
 
 ```bash
-curl -X POST https://api.narrativeprotocol.com/api/worlds/39/deployments/28/entity-instances \
+curl -X POST https://api.narrativeprotocol.com/api/worlds/0x123.../deployments/0xabc.../entity-instances \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
   -d '{
-    "entitySchemaId": 53,
+    "entitySchema": "horse",
     "instanceId": "HORSE_1",
     "state": {
       "name": "Midnight Comet",

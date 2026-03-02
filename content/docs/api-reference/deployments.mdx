@@ -31,14 +31,14 @@ POST /api/worlds/:worldId/deployments
   "isLLMPublic": false,
   "payToAddress": "6Q2...wallet",
   "bindings": [{
-    "eventId": 29,
+    "event": "race_result",
     "eventVersion": 1,
     "onchain": {
       "stateChanges": ["wins", "speed_rating"],
       "result": ["winner"]
     }
   }],
-  "sourceDeploymentId": 12
+  "sourceDeployment": "0x123...abc"
 }
 ```
 
@@ -52,82 +52,82 @@ POST /api/worlds/:worldId/deployments
 | `isLLMPublic` | `boolean` | No | Whether LLM prompt/response data is public. |
 | `payToAddress` | `string` | No | Payment receiver Solana address for paid public execution. |
 | `bindings` | `object[]` | Yes | Initial event bindings (array). |
-| `bindings[].eventId` | `number` | Yes | Event ID. |
+| `bindings[].event` | `string` | Yes | Event name. |
 | `bindings[].eventVersion` | `number` | Yes | Relative version number. |
 | `bindings[].onchain` | `object` | No | Field filter for on-chain push (per binding). |
 | `bindings[].onchain.stateChanges` | `string[]` | No | Allowed state-change keys. |
 | `bindings[].onchain.result` | `string[]` | No | Allowed result keys. |
-| `sourceDeploymentId` | `number` | No | Clone entity state and bindings from source deployment. |
+| `sourceDeployment` | `string` | No | Clone entity state and bindings from source deployment (address). |
 
 ### Execute Event
 
 ```http
-POST /api/worlds/:worldId/deployments/:deploymentId/execute
+POST /api/worlds/:worldId/deployments/:address/execute
 ```
 
 ```json title="Request Body"
 {
-  "eventId": 29,
+  "event": "race_result",
   "input": { "raceId": "RACE_001" }
 }
 ```
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `eventId` | `number` | Yes | Bound event to execute. |
+| `event` | `string` | Yes | Event name to execute. |
 | `input` | `object` | No | Event input payload. |
 
 ### Lock Deployment
 
 ```http
-POST /api/worlds/:worldId/deployments/:deploymentId/lock
+POST /api/worlds/:worldId/deployments/:address/lock
 ```
 
 ### List Event History
 
 ```http
-GET /api/worlds/:worldId/deployments/:deploymentId/history?page=1&limit=10
+GET /api/worlds/:worldId/deployments/:address/history?page=1&limit=10
 ```
 
 ### List Event Bindings
 
 ```http
-GET /api/worlds/:worldId/deployments/:deploymentId/event-bindings
+GET /api/worlds/:worldId/deployments/:address/event-bindings
 ```
 
 ### Create Event Binding
 
 ```http
-POST /api/worlds/:worldId/deployments/:deploymentId/event-bindings
+POST /api/worlds/:worldId/deployments/:address/event-bindings
 ```
 
 ```json title="Request Body"
 {
-  "eventId": 29,
+  "event": "race_result",
   "eventVersion": 2
 }
 ```
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `eventId` | `number` | Yes | Event to bind. |
+| `event` | `string` | Yes | Event name to bind. |
 | `eventVersion` | `number` | Yes | Relative version number to bind. |
 
 ### List Entity Instances
 
 ```http
-GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances?page=1&limit=20
+GET /api/worlds/:worldId/deployments/:address/entity-instances?page=1&limit=20
 ```
 
 ### Create Entity Instance
 
 ```http
-POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances
+POST /api/worlds/:worldId/deployments/:address/entity-instances
 ```
 
 ```json title="Request Body"
 {
-  "entitySchemaId": 53,
+  "entitySchema": "horse",
   "instanceId": "HORSE_1",
   "state": {
     "name": "Midnight Comet",
@@ -138,7 +138,7 @@ POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `entitySchemaId` | `number` | Yes | Entity schema for the instance. |
+| `entitySchema` | `string` | Yes | Entity schema name. |
 | `instanceId` | `string` | Yes | Unique per deployment+schema. |
 | `state` | `object` | No | Initial state. Defaults to `{}`. |
 
@@ -152,21 +152,21 @@ POST /app/deployments/:address/execute
 
 ```json title="Request Body"
 {
-  "eventId": 29,
+  "event": "race_result",
   "input": { "raceId": "RACE_001" },
   "wallet": "<solana-wallet>",
   "signature": "<base58-signature>",
-  "message": "narrativeprotocol:<deploymentAddress>:<eventId>:<timestamp>"
+  "message": "narrativeprotocol:<deploymentAddress>:<eventName>:<timestamp>"
 }
 ```
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `eventId` | `number` | Yes | Bound event to execute. |
+| `event` | `string` | Yes | Event name to execute. |
 | `input` | `object` | No | Event input payload. |
 | `wallet` | `string` | Yes | Signer wallet (base58 public key). |
 | `signature` | `string` | Yes | Signature over `message`. |
-| `message` | `string` | Yes | `narrativeprotocol:{deploymentAddress}:{eventId}:{timestamp}`. |
+| `message` | `string` | Yes | `narrativeprotocol:{deploymentAddress}:{eventName}:{timestamp}`. |
 
 Rules:
 

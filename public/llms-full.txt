@@ -38,11 +38,13 @@ Removed legacy top-level routes:
 Endpoints:
 - `GET /api/worlds?page=1&limit=20`
 - `POST /api/worlds`
-- `GET /api/worlds/:id`
-- `PUT /api/worlds/:id`
-- `DELETE /api/worlds/:id`
-- `POST /api/worlds/:id/publish`
-- `POST /api/worlds/:id/unpublish`
+- `GET /api/worlds/:idOrAddress`
+- `PUT /api/worlds/:idOrAddress`
+- `DELETE /api/worlds/:idOrAddress`
+- `POST /api/worlds/:idOrAddress/publish`
+- `POST /api/worlds/:idOrAddress/unpublish`
+
+> Note: World paths support both numeric ID and hex address.
 
 Create world body:
 ```json
@@ -89,11 +91,11 @@ Create schema body:
 
 ### Attributes (schema-scoped)
 Endpoints:
-- `GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes?page=1&limit=20`
-- `POST /api/worlds/:worldId/entity-schemas/:schemaId/attributes`
-- `GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name`
-- `PUT /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name`
-- `DELETE /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name`
+- `GET /api/worlds/:worldId/entity-schemas/:schemaName/attributes?page=1&limit=20`
+- `POST /api/worlds/:worldId/entity-schemas/:schemaName/attributes`
+- `GET /api/worlds/:worldId/entity-schemas/:schemaName/attributes/:name`
+- `PUT /api/worlds/:worldId/entity-schemas/:schemaName/attributes/:name`
+- `DELETE /api/worlds/:worldId/entity-schemas/:schemaName/attributes/:name`
 
 Create attribute body:
 ```json
@@ -135,9 +137,9 @@ Create event body:
 
 ### Event versions (event-scoped)
 Endpoints:
-- `GET /api/worlds/:worldId/events/:eventId/event-versions?page=1&limit=20`
-- `POST /api/worlds/:worldId/events/:eventId/event-versions`
-- `POST /api/worlds/:worldId/events/:eventId/event-versions/:version/publish`
+- `GET /api/worlds/:worldId/events/:eventName/event-versions?page=1&limit=20`
+- `POST /api/worlds/:worldId/events/:eventName/event-versions`
+- `POST /api/worlds/:worldId/events/:eventName/event-versions/:version/publish`
 
 Create event version body:
 ```json
@@ -187,13 +189,13 @@ This ensures data consistency when events modify overlapping entities. If a conf
 Endpoints:
 - `GET /api/worlds/:worldId/deployments?page=1&limit=20`
 - `POST /api/worlds/:worldId/deployments`
-- `POST /api/worlds/:worldId/deployments/:deploymentId/execute`
-- `POST /api/worlds/:worldId/deployments/:deploymentId/lock`
-- `GET /api/worlds/:worldId/deployments/:deploymentId/history?page=1&limit=10`
-- `GET /api/worlds/:worldId/deployments/:deploymentId/event-bindings`
-- `POST /api/worlds/:worldId/deployments/:deploymentId/event-bindings`
-- `GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances?page=1&limit=20`
-- `POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
+- `POST /api/worlds/:worldId/deployments/:address/execute`
+- `POST /api/worlds/:worldId/deployments/:address/lock`
+- `GET /api/worlds/:worldId/deployments/:address/history?page=1&limit=10`
+- `GET /api/worlds/:worldId/deployments/:address/event-bindings`
+- `POST /api/worlds/:worldId/deployments/:address/event-bindings`
+- `GET /api/worlds/:worldId/deployments/:address/entity-instances?entitySchema=horse&page=1&limit=20`
+- `POST /api/worlds/:worldId/deployments/:address/entity-instances`
 
 Create deployment body:
 ```json
@@ -206,14 +208,14 @@ Create deployment body:
   "isLLMPublic": false,
   "payToAddress": "6Q2...wallet",
   "bindings": [{
-    "eventId": 29,
+    "event": "race_result",
     "eventVersion": 1,
     "onchain": {
       "stateChanges": ["wins", "speed_rating"],
       "result": ["winner"]
     }
   }],
-  "sourceDeploymentId": 12
+  "sourceDeployment": "0x123...abc"
 }
 ```
 
@@ -223,12 +225,12 @@ Notes:
 - `payToAddress` is the settlement receiver for paid public execution.
 
 ### Execute event (admin)
-`POST /api/worlds/:worldId/deployments/:deploymentId/execute`
+`POST /api/worlds/:worldId/deployments/:address/execute`
 
 Body:
 ```json
 {
-  "eventId": 29,
+  "event": "race_result",
   "input": { "raceId": "RACE_001" }
 }
 ```
@@ -244,13 +246,13 @@ Response commonly includes:
 ## 8) Event Bindings
 
 Endpoints:
-- `GET /api/worlds/:worldId/deployments/:deploymentId/event-bindings`
-- `POST /api/worlds/:worldId/deployments/:deploymentId/event-bindings`
+- `GET /api/worlds/:worldId/deployments/:address/event-bindings`
+- `POST /api/worlds/:worldId/deployments/:address/event-bindings`
 
 Binding body:
 ```json
 {
-  "eventId": 29,
+  "event": "race_result",
   "eventVersion": 2,
   "onchain": {
     "stateChanges": ["wins", "speed_rating"],
@@ -267,13 +269,13 @@ Rules:
 ## 9) Entity Instances
 
 Endpoints:
-- `GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
-- `POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
+- `GET /api/worlds/:worldId/deployments/:address/entity-instances?entitySchema=horse`
+- `POST /api/worlds/:worldId/deployments/:address/entity-instances`
 
 Create instance body:
 ```json
 {
-  "entitySchemaId": 53,
+  "entitySchema": "horse",
   "instanceId": "HORSE_1",
   "state": {
     "name": "Midnight Comet",
@@ -290,11 +292,11 @@ Endpoint:
 Body:
 ```json
 {
-  "eventId": 29,
+  "event": "race_result",
   "input": { "raceId": "RACE_001" },
   "wallet": "<solana-wallet>",
   "signature": "<base58-signature>",
-  "message": "narrativeprotocol:<deploymentAddress>:<eventId>:<timestamp>"
+  "message": "narrativeprotocol:<deploymentAddress>:<eventName>:<timestamp>"
 }
 ```
 
@@ -335,5 +337,5 @@ Status codes:
 2. `POST /api/worlds/:worldId/entity-schemas`
 3. `POST /api/worlds/:worldId/events`
 4. `POST /api/worlds/:worldId/deployments`
-5. `POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
-6. `POST /api/worlds/:worldId/deployments/:deploymentId/execute`
+5. `POST /api/worlds/:worldId/deployments/:address/entity-instances`
+6. `POST /api/worlds/:worldId/deployments/:address/execute`

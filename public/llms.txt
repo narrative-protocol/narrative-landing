@@ -19,42 +19,44 @@ Narrative Protocol is a World State and Event Engine for defining versioned worl
 ### Worlds
 - `GET /api/worlds?page=1&limit=20`
 - `POST /api/worlds`
-- `GET /api/worlds/:id`
-- `PUT /api/worlds/:id`
-- `DELETE /api/worlds/:id`
-- `POST /api/worlds/:id/publish`
-- `POST /api/worlds/:id/unpublish`
+- `GET /api/worlds/:idOrAddress`
+- `PUT /api/worlds/:idOrAddress`
+- `DELETE /api/worlds/:idOrAddress`
+- `POST /api/worlds/:idOrAddress/publish`
+- `POST /api/worlds/:idOrAddress/unpublish`
+
+> Note: World paths support both numeric ID and hex address.
 
 ### Entity Schemas and Attributes (World-scoped)
 - `GET /api/worlds/:worldId/entity-schemas?page=1&limit=20`
 - `POST /api/worlds/:worldId/entity-schemas`
-- `GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes?page=1&limit=20`
-- `POST /api/worlds/:worldId/entity-schemas/:schemaId/attributes`
-- `GET /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name`
-- `PUT /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name`
-- `DELETE /api/worlds/:worldId/entity-schemas/:schemaId/attributes/:name`
+- `GET /api/worlds/:worldId/entity-schemas/:schemaName/attributes?page=1&limit=20`
+- `POST /api/worlds/:worldId/entity-schemas/:schemaName/attributes`
+- `GET /api/worlds/:worldId/entity-schemas/:schemaName/attributes/:name`
+- `PUT /api/worlds/:worldId/entity-schemas/:schemaName/attributes/:name`
+- `DELETE /api/worlds/:worldId/entity-schemas/:schemaName/attributes/:name`
 
 ### Events and Versions (World-scoped)
 - `GET /api/worlds/:worldId/events?page=1&limit=20`
 - `POST /api/worlds/:worldId/events`
-- `GET /api/worlds/:worldId/events/:eventId/event-versions?page=1&limit=20`
-- `POST /api/worlds/:worldId/events/:eventId/event-versions`
-- `POST /api/worlds/:worldId/events/:eventId/event-versions/:version/publish`
+- `GET /api/worlds/:worldId/events/:eventName/event-versions?page=1&limit=20`
+- `POST /api/worlds/:worldId/events/:eventName/event-versions`
+- `POST /api/worlds/:worldId/events/:eventName/event-versions/:version/publish`
 
 ### Deployments (World-scoped)
 - `GET /api/worlds/:worldId/deployments?page=1&limit=20`
 - `POST /api/worlds/:worldId/deployments`
-- `POST /api/worlds/:worldId/deployments/:deploymentId/execute`
-- `POST /api/worlds/:worldId/deployments/:deploymentId/lock`
-- `GET /api/worlds/:worldId/deployments/:deploymentId/history?page=1&limit=10`
-- `GET /api/worlds/:worldId/deployments/:deploymentId/event-bindings`
-- `POST /api/worlds/:worldId/deployments/:deploymentId/event-bindings`
-- `GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances?page=1&limit=20`
-- `POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
+- `POST /api/worlds/:worldId/deployments/:address/execute`
+- `POST /api/worlds/:worldId/deployments/:address/lock`
+- `GET /api/worlds/:worldId/deployments/:address/history?page=1&limit=10`
+- `GET /api/worlds/:worldId/deployments/:address/event-bindings`
+- `POST /api/worlds/:worldId/deployments/:address/event-bindings`
+- `GET /api/worlds/:worldId/deployments/:address/entity-instances?entitySchema=horse&page=1&limit=20`
+- `POST /api/worlds/:worldId/deployments/:address/entity-instances`
 
 ### Public App Execution
 - `POST /app/deployments/:address/execute`
-- Body includes `eventId`, optional `input`, plus `wallet`, `signature`, `message`.
+- Body includes `event` (name), optional `input`, plus `wallet`, `signature`, `message`.
 - If priced (`executionSettings.priceUsd > 0`), include `X-Payment` (x402).
 
 ### AI Models
@@ -88,14 +90,14 @@ Events use a mutex lock - an event cannot execute if another event is already ru
   "isLLMPublic": false,
   "payToAddress": "6Q2...wallet",
   "bindings": [{
-    "eventId": 29,
+    "event": "race_result",
     "eventVersion": 1,
     "onchain": {
       "stateChanges": ["wins", "speed_rating"],
       "result": ["winner"]
     }
   }],
-  "sourceDeploymentId": 12
+  "sourceDeployment": "0x123...abc"
 }
 ```
 

@@ -59,13 +59,13 @@ POST /api/worlds/:worldId/events
 ### List Event Versions
 
 ```http
-GET /api/worlds/:worldId/events/:eventId/event-versions?page=1&limit=20
+GET /api/worlds/:worldId/events/:eventName/event-versions?page=1&limit=20
 ```
 
 ### Create Event Version
 
 ```http
-POST /api/worlds/:worldId/events/:eventId/event-versions
+POST /api/worlds/:worldId/events/:eventName/event-versions
 ```
 
 ```json title="Request Body"
@@ -102,5 +102,5 @@ POST /api/worlds/:worldId/events/:eventId/event-versions
 ### Publish Event Version
 
 ```http
-POST /api/worlds/:worldId/events/:eventId/event-versions/:version/publish
+POST /api/worlds/:worldId/events/:eventName/event-versions/:version/publish
 ```

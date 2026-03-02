@@ -73,6 +73,31 @@ Narrative Protocol is a World State and Event Engine for defining versioned worl
 - `reads` -> `readEntities`
 - `stateChangeSchema` -> `stateChanges`
 - `resultSchema` -> `outputSchema`
+- `firstBinding` -> `bindings` (array, per-binding onchain config)
+
+## Concurrent Execution Lock
+Events use a mutex lock - an event cannot execute if another event is already running that reads or modifies the same entity schemas.
+
+## Deployment Body
+```json
+{
+  "name": "Season 1",
+  "mode": "upgradable",
+  "targetChains": ["near-testnet"],
+  "aiModelId": "openai/gpt-oss-120b",
+  "isLLMPublic": false,
+  "payToAddress": "6Q2...wallet",
+  "bindings": [{
+    "eventId": 29,
+    "eventVersion": 1,
+    "onchain": {
+      "stateChanges": ["wins", "speed_rating"],
+      "result": ["winner"]
+    }
+  }],
+  "sourceDeploymentId": 12
+}
+```
 
 ## Quick Flow
 1. Create world: `POST /api/worlds`

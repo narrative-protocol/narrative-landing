@@ -162,11 +162,25 @@ Field migration summary:
 - `reads` -> `readEntities`
 - `stateChangeSchema` -> `stateChanges`
 - `resultSchema` -> `outputSchema`
+- `firstBinding` -> `bindings` (array, per-binding onchain config)
 
 Validation notes:
 - `mutationSettings.mode = "direct"` requires `mutationSettings.template`.
 - `executionSettings.visibility` values: `admin | public | cron`.
 - If visibility is `cron`, `executionSettings.cron.schedule` must be valid cron.
+
+### Concurrent Execution Lock
+
+Events use a mutex (mutual exclusion) lock to prevent race conditions when multiple executions target the same entity data. An event cannot execute concurrently if:
+
+1. **Same event** - The identical event is already executing on the deployment
+2. **Shared entity schema** - Any entity schema is both read by the new event and modified by a running event (via `readEntities` or `stateChanges`)
+
+```
+eventA.readEntities ∩ eventB.stateChanges ≠ ∅
+```
+
+This ensures data consistency when events modify overlapping entities. If a conflicting execution is in progress, the new execution request will fail with a 409 conflict error.
 
 ## 7) Deployments
 
@@ -189,16 +203,16 @@ Create deployment body:
   "mode": "upgradable",
   "targetChains": ["near-testnet"],
   "aiModelId": "openai/gpt-oss-120b",
-  "onchain": {
-    "stateChanges": ["wins", "speed_rating"],
-    "result": ["winner"]
-  },
   "isLLMPublic": false,
   "payToAddress": "6Q2...wallet",
-  "firstBinding": {
+  "bindings": [{
     "eventId": 29,
-    "eventVersion": 1
-  },
+    "eventVersion": 1,
+    "onchain": {
+      "stateChanges": ["wins", "speed_rating"],
+      "result": ["winner"]
+    }
+  }],
   "sourceDeploymentId": 12
 }
 ```
@@ -237,13 +251,18 @@ Binding body:
 ```json
 {
   "eventId": 29,
-  "eventVersion": 2
+  "eventVersion": 2,
+  "onchain": {
+    "stateChanges": ["wins", "speed_rating"],
+    "result": ["winner"]
+  }
 }
 ```
 
 Rules:
 - Bound event must belong to the same world.
 - Only published event versions can be bound.
+- `onchain` config is optional and controls which fields get pushed to blockchain.
 
 ## 9) Entity Instances
 

@@ -131,7 +131,7 @@ Attribute `constraints` fields:
   </TabsList>
   <TabsContent value="curl">
     ```bash
-    curl -X POST https://api.narrativeprotocol.com/api/worlds/<world-id>/entity-schemas \
+    curl -X POST https://api.narrativeprotocol.com/api/worlds/<world-address>/entity-schemas \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer <your-token>" \
       -d '{
@@ -156,7 +156,7 @@ Attribute `constraints` fields:
   </TabsContent>
   <TabsContent value="javascript">
     ```javascript
-    const response = await fetch(`https://api.narrativeprotocol.com/api/worlds/<world-id>/entity-schemas`, {
+    const response = await fetch(`https://api.narrativeprotocol.com/api/worlds/<world-address>/entity-schemas`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -189,7 +189,7 @@ Attribute `constraints` fields:
     import requests
 
     response = requests.post(
-        "https://api.narrativeprotocol.com/api/worlds/<world-id>/entity-schemas",
+        "https://api.narrativeprotocol.com/api/worlds/<world-address>/entity-schemas",
         headers={
             "Content-Type": "application/json",
             "Authorization": "Bearer <your-token>"
@@ -273,7 +273,7 @@ For more details, see [Events](/docs/concepts/events).
   </TabsList>
   <TabsContent value="curl">
     ```bash
-    curl -X POST https://api.narrativeprotocol.com/api/worlds/<world-id>/events \
+    curl -X POST https://api.narrativeprotocol.com/api/worlds/<world-address>/events \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer <your-token>" \
       -d '{
@@ -281,7 +281,7 @@ For more details, see [Events](/docs/concepts/events).
         "description": "Resolves a race and updates horse stats",
         "firstVersion": {
           "inputSchema": { "raceId": "string" },
-          "readEntities": [{ "schemaId": <schema-id> }],
+          "readEntities": [{ "schema": "horse" }],
           "stateChanges": { "horse": "partial" },
           "outputSchema": { "winner": "string", "time": "string" },
           "behaviorPrompt": "Determine the race winner based on horse speed ratings. Update the winner's wins count."
@@ -291,7 +291,7 @@ For more details, see [Events](/docs/concepts/events).
   </TabsContent>
   <TabsContent value="javascript">
     ```javascript
-    const response = await fetch(`https://api.narrativeprotocol.com/api/worlds/<world-id>/events`, {
+    const response = await fetch(`https://api.narrativeprotocol.com/api/worlds/<world-address>/events`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -302,7 +302,7 @@ For more details, see [Events](/docs/concepts/events).
         description: "Resolves a race and updates horse stats",
         firstVersion: {
           inputSchema: { raceId: "string" },
-          readEntities: [{ schemaId: <schema-id> }],
+          readEntities: [{ schema: "horse" }],
           stateChanges: { horse: "partial" },
           outputSchema: { winner: "string", time: "string" },
           behaviorPrompt: "Determine the race winner based on horse speed ratings. Update the winner's wins count."
@@ -317,7 +317,7 @@ For more details, see [Events](/docs/concepts/events).
     import requests
 
     response = requests.post(
-        "https://api.narrativeprotocol.com/api/worlds/<world-id>/events",
+        "https://api.narrativeprotocol.com/api/worlds/<world-address>/events",
         headers={
             "Content-Type": "application/json",
             "Authorization": "Bearer <your-token>"
@@ -327,7 +327,7 @@ For more details, see [Events](/docs/concepts/events).
             "description": "Resolves a race and updates horse stats",
             "firstVersion": {
                 "inputSchema": { "raceId": "string" },
-                "readEntities": [{ "schemaId": <schema-id> }],
+                "readEntities": [{ "schema": "horse" }],
                 "stateChanges": { "horse": "partial" },
                 "outputSchema": { "winner": "string", "time": "string" },
                 "behaviorPrompt": "Determine the race winner based on horse speed ratings. Update the winner's wins count."
@@ -358,22 +358,22 @@ A deployment is a running instance of a world with its own isolated state.
   </TabsList>
   <TabsContent value="curl">
     ```bash
-    curl -X POST https://api.narrativeprotocol.com/api/worlds/<world-id>/deployments \
+    curl -X POST https://api.narrativeprotocol.com/api/worlds/<world-address>/deployments \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer <your-token>" \
       -d '{
         "name": "Season 1",
-        "targetChains": ["near-testnet"],
         "bindings": [{
-          "eventId": <event-id>,
-          "eventVersion": <event-version>
+          "event": <event-name>,
+          "eventVersion": <event-version>,
+          "targetChains": ["near-testnet"]
         }]
       }'
     ```
   </TabsContent>
   <TabsContent value="javascript">
     ```javascript
-    const response = await fetch(`https://api.narrativeprotocol.com/api/worlds/<world-id>/deployments`, {
+    const response = await fetch(`https://api.narrativeprotocol.com/api/worlds/<world-address>/deployments`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -381,10 +381,10 @@ A deployment is a running instance of a world with its own isolated state.
       },
       body: JSON.stringify({
         name: "Season 1",
-        targetChains: ["near-testnet"],
         bindings: [{
-          eventId: <event-id>,
-          eventVersion: <event-version>
+          event: <event-name>,
+          eventVersion: <event-version>,
+          targetChains: ["near-testnet"]
         }]
       })
     });
@@ -396,17 +396,17 @@ A deployment is a running instance of a world with its own isolated state.
     import requests
 
     response = requests.post(
-        "https://api.narrativeprotocol.com/api/worlds/<world-id>/deployments",
+        "https://api.narrativeprotocol.com/api/worlds/<world-address>/deployments",
         headers={
             "Content-Type": "application/json",
             "Authorization": "Bearer <your-token>"
         },
         json={
             "name": "Season 1",
-            "targetChains": ["near-testnet"],
             "bindings": [{
-                "eventId": <event-id>,
-                "eventVersion": <event-version>
+                "event": <event-name>,
+                "eventVersion": <event-version>,
+                "targetChains": ["near-testnet"]
             }]
         }
     )
@@ -416,7 +416,7 @@ A deployment is a running instance of a world with its own isolated state.
   </TabsContent>
 </Tabs>
 
-The `targetChains` option determines where event data is stored on-chain:
+The `targetChains` option on each binding determines where event data for that event is stored on-chain:
 
 - `[]` - No on-chain storage (default)
 - `["solana-devnet"]` - Push to Solana devnet
@@ -435,11 +435,11 @@ Entity instances are the actual data in your deployment.
   </TabsList>
   <TabsContent value="curl">
     ```bash
-    curl -X POST https://api.narrativeprotocol.com/api/worlds/<world-id>/deployments/<deployment-id>/entity-instances \
+    curl -X POST https://api.narrativeprotocol.com/api/worlds/<world-address>/deployments/<deployment-address>/entity-instances \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer <your-token>" \
       -d '{
-        "entitySchemaId": <schema-id>,
+        "entitySchema": "horse",
         "instanceId": "HORSE_1",
         "state": {
           "name": "Midnight Comet",
@@ -450,14 +450,14 @@ Entity instances are the actual data in your deployment.
   </TabsContent>
   <TabsContent value="javascript">
     ```javascript
-    const response = await fetch(`https://api.narrativeprotocol.com/api/worlds/<world-id>/deployments/<deployment-id>/entity-instances`, {
+    const response = await fetch(`https://api.narrativeprotocol.com/api/worlds/<world-address>/deployments/<deployment-address>/entity-instances`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": "Bearer <your-token>"
       },
       body: JSON.stringify({
-        entitySchemaId: <schema-id>,
+        entitySchema: "horse",
         instanceId: "HORSE_1",
         state: {
           name: "Midnight Comet",
@@ -473,13 +473,13 @@ Entity instances are the actual data in your deployment.
     import requests
 
     response = requests.post(
-        "https://api.narrativeprotocol.com/api/worlds/<world-id>/deployments/<deployment-id>/entity-instances",
+        "https://api.narrativeprotocol.com/api/worlds/<world-address>/deployments/<deployment-address>/entity-instances",
         headers={
             "Content-Type": "application/json",
             "Authorization": "Bearer <your-token>"
         },
         json={
-            "entitySchemaId": <schema-id>,
+            "entitySchema": "horse",
             "instanceId": "HORSE_1",
             "state": {
                 "name": "Midnight Comet",
@@ -505,25 +505,25 @@ Executing an event triggers the AI engine and applies state changes to your depl
   </TabsList>
   <TabsContent value="curl">
     ```bash
-    curl -X POST https://api.narrativeprotocol.com/api/worlds/<world-id>/deployments/<deployment-id>/execute \
+    curl -X POST https://api.narrativeprotocol.com/api/worlds/<world-address>/deployments/<deployment-address>/execute \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer <your-token>" \
       -d '{
-        "eventId": <event-id>,
+        "event": <event-name>,
         "input": { "raceId": "RACE_001" }
       }'
     ```
   </TabsContent>
   <TabsContent value="javascript">
     ```javascript
-    const response = await fetch(`https://api.narrativeprotocol.com/api/worlds/<world-id>/deployments/<deployment-id>/execute`, {
+    const response = await fetch(`https://api.narrativeprotocol.com/api/worlds/<world-address>/deployments/<deployment-address>/execute`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": "Bearer <your-token>"
       },
       body: JSON.stringify({
-        eventId: <event-id>,
+        event: <event-name>,
         input: { raceId: "RACE_001" }
       })
     });
@@ -535,13 +535,13 @@ Executing an event triggers the AI engine and applies state changes to your depl
     import requests
 
     response = requests.post(
-        f"https://api.narrativeprotocol.com/api/worlds/<world-id>/deployments/<deployment-id>/execute",
+        f"https://api.narrativeprotocol.com/api/worlds/<world-address>/deployments/<deployment-address>/execute",
         headers={
             "Content-Type": "application/json",
             "Authorization": "Bearer <your-token>"
         },
         json={
-            "eventId": <event-id>,
+            "event": <event-name>,
             "input": { "raceId": "RACE_001" }
         }
     )
@@ -597,13 +597,13 @@ After executing an event, you can query the entity instances to see how the stat
   </TabsList>
   <TabsContent value="curl">
     ```bash
-    curl https://api.narrativeprotocol.com/api/worlds/<world-id>/deployments/<deployment-id>/entity-instances \
+    curl https://api.narrativeprotocol.com/api/worlds/<world-address>/deployments/<deployment-address>/entity-instances \
       -H "Authorization: Bearer <your-token>"
     ```
   </TabsContent>
   <TabsContent value="javascript">
     ```javascript
-    const response = await fetch(`https://api.narrativeprotocol.com/api/worlds/<world-id>/deployments/<deployment-id>/entity-instances`, {
+    const response = await fetch(`https://api.narrativeprotocol.com/api/worlds/<world-address>/deployments/<deployment-address>/entity-instances`, {
       headers: {
         "Authorization": "Bearer <your-token>"
       }
@@ -616,7 +616,7 @@ After executing an event, you can query the entity instances to see how the stat
     import requests
 
     response = requests.get(
-        f"https://api.narrativeprotocol.com/api/worlds/<world-id>/deployments/<deployment-id>/entity-instances",
+        f"https://api.narrativeprotocol.com/api/worlds/<world-address>/deployments/<deployment-address>/entity-instances",
         headers={
             "Authorization": "Bearer <your-token>"
         }

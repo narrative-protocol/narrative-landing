@@ -70,8 +70,8 @@ Update world body (all optional):
 
 ### Entity Schemas (world-scoped)
 Endpoints:
-- `GET /api/worlds/:worldId/entity-schemas?page=1&limit=20`
-- `POST /api/worlds/:worldId/entity-schemas`
+- `GET /api/worlds/:worldAddress/entity-schemas?page=1&limit=20`
+- `POST /api/worlds/:worldAddress/entity-schemas`
 
 Create schema body:
 ```json
@@ -91,11 +91,11 @@ Create schema body:
 
 ### Attributes (schema-scoped)
 Endpoints:
-- `GET /api/worlds/:worldId/entity-schemas/:schemaName/attributes?page=1&limit=20`
-- `POST /api/worlds/:worldId/entity-schemas/:schemaName/attributes`
-- `GET /api/worlds/:worldId/entity-schemas/:schemaName/attributes/:name`
-- `PUT /api/worlds/:worldId/entity-schemas/:schemaName/attributes/:name`
-- `DELETE /api/worlds/:worldId/entity-schemas/:schemaName/attributes/:name`
+- `GET /api/worlds/:worldAddress/entity-schemas/:schemaName/attributes?page=1&limit=20`
+- `POST /api/worlds/:worldAddress/entity-schemas/:schemaName/attributes`
+- `GET /api/worlds/:worldAddress/entity-schemas/:schemaName/attributes/:name`
+- `PUT /api/worlds/:worldAddress/entity-schemas/:schemaName/attributes/:name`
+- `DELETE /api/worlds/:worldAddress/entity-schemas/:schemaName/attributes/:name`
 
 Create attribute body:
 ```json
@@ -109,14 +109,14 @@ Create attribute body:
 
 Validation notes:
 - Attribute `type`: `integer | float | string | boolean | json`.
-- Unique constraint is effectively `(entitySchemaId, name)`.
+- Entity schema name is unique
 
 ## 6) Events and Event Versions
 
 ### Events (world-scoped)
 Endpoints:
-- `GET /api/worlds/:worldId/events?page=1&limit=20`
-- `POST /api/worlds/:worldId/events`
+- `GET /api/worlds/:worldAddress/events?page=1&limit=20`
+- `POST /api/worlds/:worldAddress/events`
 
 Create event body:
 ```json
@@ -126,7 +126,7 @@ Create event body:
   "firstVersion": {
     "inputSchema": { "raceId": "string" },
     "outputSchema": { "winner": "string", "time": "string" },
-    "readEntities": [{ "schemaId": 53 }],
+    "readEntities": [{ "schema": "horse" }],
     "stateChanges": { "horse": "partial" },
     "behaviorPrompt": "Determine the race winner based on horse speed ratings.",
     "mutationSettings": { "mode": "ai" },
@@ -137,16 +137,16 @@ Create event body:
 
 ### Event versions (event-scoped)
 Endpoints:
-- `GET /api/worlds/:worldId/events/:eventName/event-versions?page=1&limit=20`
-- `POST /api/worlds/:worldId/events/:eventName/event-versions`
-- `POST /api/worlds/:worldId/events/:eventName/event-versions/:version/publish`
+- `GET /api/worlds/:worldAddress/events/:eventName/event-versions?page=1&limit=20`
+- `POST /api/worlds/:worldAddress/events/:eventName/event-versions`
+- `POST /api/worlds/:worldAddress/events/:eventName/event-versions/:version/publish`
 
 Create event version body:
 ```json
 {
   "inputSchema": { "raceId": "string", "weather": "string" },
   "outputSchema": { "winner": "string", "time": "string", "weather": "string" },
-  "readEntities": [{ "schemaId": 53, "filter": ["eq:instanceId:HORSE_1"] }],
+  "readEntities": [{ "schema": "horse", "filter": ["eq:instanceId:HORSE_1"] }],
   "stateChanges": { "horse": "partial" },
   "behaviorPrompt": "Consider weather conditions.",
   "mutationSettings": {
@@ -187,15 +187,15 @@ This ensures data consistency when events modify overlapping entities. If a conf
 ## 7) Deployments
 
 Endpoints:
-- `GET /api/worlds/:worldId/deployments?page=1&limit=20`
-- `POST /api/worlds/:worldId/deployments`
-- `POST /api/worlds/:worldId/deployments/:address/execute`
-- `POST /api/worlds/:worldId/deployments/:address/lock`
-- `GET /api/worlds/:worldId/deployments/:address/history?page=1&limit=10`
-- `GET /api/worlds/:worldId/deployments/:address/event-bindings`
-- `POST /api/worlds/:worldId/deployments/:address/event-bindings`
-- `GET /api/worlds/:worldId/deployments/:address/entity-instances?entitySchema=horse&page=1&limit=20`
-- `POST /api/worlds/:worldId/deployments/:address/entity-instances`
+- `GET /api/worlds/:worldAddress/deployments?page=1&limit=20`
+- `POST /api/worlds/:worldAddress/deployments`
+- `POST /api/worlds/:worldAddress/deployments/:address/execute`
+- `POST /api/worlds/:worldAddress/deployments/:address/lock`
+- `GET /api/worlds/:worldAddress/deployments/:address/history?page=1&limit=10`
+- `GET /api/worlds/:worldAddress/deployments/:address/event-bindings`
+- `POST /api/worlds/:worldAddress/deployments/:address/event-bindings`
+- `GET /api/worlds/:worldAddress/deployments/:address/entity-instances?entitySchema=horse&page=1&limit=20`
+- `POST /api/worlds/:worldAddress/deployments/:address/entity-instances`
 
 Create deployment body:
 ```json
@@ -203,13 +203,13 @@ Create deployment body:
   "name": "Season 1",
   "description": "Runtime deployment",
   "mode": "upgradable",
-  "targetChains": ["near-testnet"],
   "aiModelId": "openai/gpt-oss-120b",
   "isLLMPublic": false,
   "payToAddress": "6Q2...wallet",
   "bindings": [{
     "event": "race_result",
     "eventVersion": 1,
+    "targetChains": ["near-testnet"],
     "onchain": {
       "stateChanges": ["wins", "speed_rating"],
       "result": ["winner"]
@@ -221,11 +221,11 @@ Create deployment body:
 
 Notes:
 - `mode`: `upgradable | locked`.
-- `targetChains`: `solana-devnet | solana-mainnet | near-testnet | near-mainnet`.
+- `targetChains` (per binding): `solana-devnet | solana-mainnet | near-testnet | near-mainnet`.
 - `payToAddress` is the settlement receiver for paid public execution.
 
 ### Execute event (admin)
-`POST /api/worlds/:worldId/deployments/:address/execute`
+`POST /api/worlds/:worldAddress/deployments/:address/execute`
 
 Body:
 ```json
@@ -246,14 +246,15 @@ Response commonly includes:
 ## 8) Event Bindings
 
 Endpoints:
-- `GET /api/worlds/:worldId/deployments/:address/event-bindings`
-- `POST /api/worlds/:worldId/deployments/:address/event-bindings`
+- `GET /api/worlds/:worldAddress/deployments/:address/event-bindings`
+- `POST /api/worlds/:worldAddress/deployments/:address/event-bindings`
 
 Binding body:
 ```json
 {
   "event": "race_result",
   "eventVersion": 2,
+  "targetChains": ["near-testnet"],
   "onchain": {
     "stateChanges": ["wins", "speed_rating"],
     "result": ["winner"]
@@ -264,13 +265,14 @@ Binding body:
 Rules:
 - Bound event must belong to the same world.
 - Only published event versions can be bound.
+- `targetChains` is optional and specifies which chains to push on-chain.
 - `onchain` config is optional and controls which fields get pushed to blockchain.
 
 ## 9) Entity Instances
 
 Endpoints:
-- `GET /api/worlds/:worldId/deployments/:address/entity-instances?entitySchema=horse`
-- `POST /api/worlds/:worldId/deployments/:address/entity-instances`
+- `GET /api/worlds/:worldAddress/deployments/:address/entity-instances?entitySchema=horse`
+- `POST /api/worlds/:worldAddress/deployments/:address/entity-instances`
 
 Create instance body:
 ```json
@@ -334,8 +336,8 @@ Status codes:
 ## 14) Quick End-to-End
 
 1. `POST /api/worlds`
-2. `POST /api/worlds/:worldId/entity-schemas`
-3. `POST /api/worlds/:worldId/events`
-4. `POST /api/worlds/:worldId/deployments`
-5. `POST /api/worlds/:worldId/deployments/:address/entity-instances`
-6. `POST /api/worlds/:worldId/deployments/:address/execute`
+2. `POST /api/worlds/:worldAddress/entity-schemas`
+3. `POST /api/worlds/:worldAddress/events`
+4. `POST /api/worlds/:worldAddress/deployments`
+5. `POST /api/worlds/:worldAddress/deployments/:address/entity-instances`
+6. `POST /api/worlds/:worldAddress/deployments/:address/execute`

@@ -7,8 +7,6 @@ description: Create and manage worlds
 
 Create and manage worlds in Narrative Protocol.
 
-> All world-scoped routes (`:worldId`) support both numeric ID and hex address.
-
 ## Endpoints
 
 ### List Worlds
@@ -32,12 +30,12 @@ POST /api/worlds
 }
 ```
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `name` | `string` | Yes | World name, 1-255 chars. |
-| `description` | `string` | No | Human-readable description. |
-| `domainTags` | `string[]` | No | Domain/category tags. Defaults to `[]`. |
-| `promptSeed` | `string` | No | Base context used for event execution prompts. |
+| Field         | Type       | Required | Description                                    |
+| ------------- | ---------- | -------- | ---------------------------------------------- |
+| `name`        | `string`   | Yes      | World name, 1-255 chars.                       |
+| `description` | `string`   | No       | Human-readable description.                    |
+| `domainTags`  | `string[]` | No       | Domain/category tags. Defaults to `[]`.        |
+| `promptSeed`  | `string`   | No       | Base context used for event execution prompts. |
 
 ### Get World
 
@@ -62,12 +60,12 @@ PUT /api/worlds/:idOrAddress
 }
 ```
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `name` | `string` | No | Same as create; updates world name. |
-| `description` | `string` | No | Same as create; updates description. |
-| `domainTags` | `string[]` | No | Same as create; updates domain tags. |
-| `promptSeed` | `string` | No | Same as create; updates prompt seed. |
+| Field         | Type       | Required | Description                          |
+| ------------- | ---------- | -------- | ------------------------------------ |
+| `name`        | `string`   | No       | Same as create; updates world name.  |
+| `description` | `string`   | No       | Same as create; updates description. |
+| `domainTags`  | `string[]` | No       | Same as create; updates domain tags. |
+| `promptSeed`  | `string`   | No       | Same as create; updates prompt seed. |
 
 ### Publish World
 

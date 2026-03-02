@@ -19,9 +19,9 @@ This enables independent verification of event executions.
 
 ## Target Chain Selection
 
-Use this section when deciding which chains a deployment should write to.
+Use this section when deciding which chains event executions should write to.
 
-When creating a deployment, specify which chain network(s) to use via the `targetChains` array:
+When creating a deployment, specify which chain network(s) to use via the `targetChains` array on each binding:
 
 | Value            | Description            | Max Data Size        |
 | ---------------- | ---------------------- | -------------------- |
@@ -36,8 +36,11 @@ An empty array `[]` (default) means no on-chain storage.
 {
   "worldId": 1,
   "name": "Season 1",
-  "targetChains": ["solana-devnet", "near-testnet"],
-  "bindings": [{ "eventId": 1, "eventVersion": 1 }]
+  "bindings": [{
+    "event": "race_result",
+    "eventVersion": 1,
+    "targetChains": ["solana-devnet", "near-testnet"]
+  }]
 }
 ```
 
@@ -49,10 +52,10 @@ Bindings can configure which fields get pushed on-chain via the `onchain` config
 
 ```json
 {
-  "targetChains": ["solana-devnet"],
   "bindings": [{
-    "eventId": 1,
+    "event": "race_result",
     "eventVersion": 1,
+    "targetChains": ["solana-devnet"],
     "onchain": {
       "stateChanges": ["wins", "speed_rating"],
       "result": ["winner"]
@@ -213,7 +216,7 @@ Either field will be `null` if that chain family is not configured or not select
 To verify an event:
 
 1. **Fetch on-chain record** from the appropriate chain
-2. **Fetch off-chain data** from API: `GET /api/worlds/:worldId/deployments/:deploymentId/history`
+2. **Fetch off-chain data** from API: `GET /api/worlds/:worldAddress/deployments/:deploymentAddress/history`
 3. **Compare state_changes and result** - on-chain contains full JSON (or filtered JSON if `onchain` config is set)
 4. **Compute hash** of input
 5. **Compare hash** - it must match on-chain value

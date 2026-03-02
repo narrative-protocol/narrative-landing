@@ -12,13 +12,13 @@ Entity schema routes are world-scoped.
 ### List Entity Schemas
 
 ```http
-GET /api/worlds/:worldId/entity-schemas?page=1&limit=20
+GET /api/worlds/:worldAddress/entity-schemas?page=1&limit=20
 ```
 
 ### Create Entity Schema
 
 ```http
-POST /api/worlds/:worldId/entity-schemas
+POST /api/worlds/:worldAddress/entity-schemas
 ```
 
 ```json title="Request Body"
@@ -54,13 +54,13 @@ POST /api/worlds/:worldId/entity-schemas
 ### List Attributes for a Schema
 
 ```http
-GET /api/worlds/:worldId/entity-schemas/:schemaName/attributes?page=1&limit=20
+GET /api/worlds/:worldAddress/entity-schemas/:schemaName/attributes?page=1&limit=20
 ```
 
 ### Create Attribute
 
 ```http
-POST /api/worlds/:worldId/entity-schemas/:schemaName/attributes
+POST /api/worlds/:worldAddress/entity-schemas/:schemaName/attributes
 ```
 
 ```json title="Request Body"
@@ -87,13 +87,13 @@ POST /api/worlds/:worldId/entity-schemas/:schemaName/attributes
 ### Get Attribute by Name
 
 ```http
-GET /api/worlds/:worldId/entity-schemas/:schemaName/attributes/:name
+GET /api/worlds/:worldAddress/entity-schemas/:schemaName/attributes/:name
 ```
 
 ### Update Attribute by Name
 
 ```http
-PUT /api/worlds/:worldId/entity-schemas/:schemaName/attributes/:name
+PUT /api/worlds/:worldAddress/entity-schemas/:schemaName/attributes/:name
 ```
 
 ```json title="Request Body"
@@ -118,5 +118,5 @@ PUT /api/worlds/:worldId/entity-schemas/:schemaName/attributes/:name
 ### Delete Attribute by Name
 
 ```http
-DELETE /api/worlds/:worldId/entity-schemas/:schemaName/attributes/:name
+DELETE /api/worlds/:worldAddress/entity-schemas/:schemaName/attributes/:name
 ```

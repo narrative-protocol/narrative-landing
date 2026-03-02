@@ -12,13 +12,13 @@ Deployment routes are world-scoped.
 ### List Deployments
 
 ```http
-GET /api/worlds/:worldId/deployments?page=1&limit=20
+GET /api/worlds/:worldAddress/deployments?page=1&limit=20
 ```
 
 ### Create Deployment
 
 ```http
-POST /api/worlds/:worldId/deployments
+POST /api/worlds/:worldAddress/deployments
 ```
 
 ```json title="Request Body"
@@ -26,13 +26,13 @@ POST /api/worlds/:worldId/deployments
   "name": "Season 1",
   "description": "Runtime deployment",
   "mode": "upgradable",
-  "targetChains": ["near-testnet"],
   "aiModelId": "openai/gpt-oss-120b",
   "isLLMPublic": false,
   "payToAddress": "6Q2...wallet",
   "bindings": [{
     "event": "race_result",
     "eventVersion": 1,
+    "targetChains": ["near-testnet"],
     "onchain": {
       "stateChanges": ["wins", "speed_rating"],
       "result": ["winner"]
@@ -47,13 +47,13 @@ POST /api/worlds/:worldId/deployments
 | `name` | `string` | Yes | Deployment name. |
 | `description` | `string` | No | Description. |
 | `mode` | `enum` | No | `upgradable | locked` (default `upgradable`). |
-| `targetChains` | `enum[]` | No | `solana-devnet | solana-mainnet | near-testnet | near-mainnet`. |
 | `aiModelId` | `string` | No | Selected model ID. |
 | `isLLMPublic` | `boolean` | No | Whether LLM prompt/response data is public. |
 | `payToAddress` | `string` | No | Payment receiver Solana address for paid public execution. |
 | `bindings` | `object[]` | Yes | Initial event bindings (array). |
 | `bindings[].event` | `string` | Yes | Event name. |
 | `bindings[].eventVersion` | `number` | Yes | Relative version number. |
+| `bindings[].targetChains` | `enum[]` | No | `solana-devnet | solana-mainnet | near-testnet | near-mainnet` - Chain networks for on-chain push (per binding). |
 | `bindings[].onchain` | `object` | No | Field filter for on-chain push (per binding). |
 | `bindings[].onchain.stateChanges` | `string[]` | No | Allowed state-change keys. |
 | `bindings[].onchain.result` | `string[]` | No | Allowed result keys. |
@@ -62,7 +62,7 @@ POST /api/worlds/:worldId/deployments
 ### Execute Event
 
 ```http
-POST /api/worlds/:worldId/deployments/:address/execute
+POST /api/worlds/:worldAddress/deployments/:address/execute
 ```
 
 ```json title="Request Body"
@@ -80,25 +80,25 @@ POST /api/worlds/:worldId/deployments/:address/execute
 ### Lock Deployment
 
 ```http
-POST /api/worlds/:worldId/deployments/:address/lock
+POST /api/worlds/:worldAddress/deployments/:address/lock
 ```
 
 ### List Event History
 
 ```http
-GET /api/worlds/:worldId/deployments/:address/history?page=1&limit=10
+GET /api/worlds/:worldAddress/deployments/:address/history?page=1&limit=10
 ```
 
 ### List Event Bindings
 
 ```http
-GET /api/worlds/:worldId/deployments/:address/event-bindings
+GET /api/worlds/:worldAddress/deployments/:address/event-bindings
 ```
 
 ### Create Event Binding
 
 ```http
-POST /api/worlds/:worldId/deployments/:address/event-bindings
+POST /api/worlds/:worldAddress/deployments/:address/event-bindings
 ```
 
 ```json title="Request Body"
@@ -116,13 +116,13 @@ POST /api/worlds/:worldId/deployments/:address/event-bindings
 ### List Entity Instances
 
 ```http
-GET /api/worlds/:worldId/deployments/:address/entity-instances?page=1&limit=20
+GET /api/worlds/:worldAddress/deployments/:address/entity-instances?page=1&limit=20
 ```
 
 ### Create Entity Instance
 
 ```http
-POST /api/worlds/:worldId/deployments/:address/entity-instances
+POST /api/worlds/:worldAddress/deployments/:address/entity-instances
 ```
 
 ```json title="Request Body"

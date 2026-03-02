@@ -23,12 +23,12 @@ Entity Schema: "horse"
 ## Creating Instances
 
 ```http title="Request"
-POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances
+POST /api/worlds/:worldAddress/deployments/:deploymentAddress/entity-instances
 ```
 
 ```json title="Request Body"
 {
-  "entitySchemaId": 1,
+  "entitySchema": "horse",
   "instanceId": "HORSE_1",
   "state": {
     "name": "Midnight Comet",
@@ -87,11 +87,11 @@ The key format is `"schemaName:instanceId"`.
 
 When events execute, the `stateChanges` determines how changes apply:
 
-| Mode | Behavior | Use Case |
-|------|----------|----------|
-| `partial` | Merge changes into existing state | Most updates |
-| `full` | Replace entire state | Complete resets |
-| `append` | Append to arrays, merge objects | Logs, history |
+| Mode      | Behavior                          | Use Case        |
+| --------- | --------------------------------- | --------------- |
+| `partial` | Merge changes into existing state | Most updates    |
+| `full`    | Replace entire state              | Complete resets |
+| `append`  | Append to arrays, merge objects   | Logs, history   |
 
 ### Partial Example
 
@@ -122,20 +122,20 @@ When events execute, the `stateChanges` determines how changes apply:
 ### List by Deployment
 
 ```http
-GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances
+GET /api/worlds/:worldAddress/deployments/:deploymentAddress/entity-instances
 ```
 
 ### List by Schema
 
 ```http
-GET /api/worlds/:worldId/deployments/:deploymentId/entity-instances?entitySchemaId=1
+GET /api/worlds/:worldAddress/deployments/:deploymentAddress/entity-instances?entitySchema="schemaName"
 ```
 
 ## Constraints
 
 <Callout type="info" title="Important Limitations">
-- Cannot modify instances in locked deployments
-- Instance IDs must be unique within deployment + schema
+  - Cannot modify instances in locked deployments - Instance IDs must be unique
+  within deployment + schema
 </Callout>
 
 ## Related Concepts

@@ -12,17 +12,17 @@ A **Deployment** is a running instance of a world. It contains the actual runtim
 Deployments are created with a first event binding:
 
 ```json
-POST /api/worlds/:worldId/deployments
+POST /api/worlds/:worldAddress/deployments
 {
   "name": "Season 1",
   "description": "First season of the racing simulation",
   "isLLMPublic": false,
-  "targetChains": ["solana-devnet"],
   "aiModelId": "openai/gpt-oss-120b",
   "payToAddress": "6Q2...wallet",
   "bindings": [{
-    "eventId": 1,
+    "event": "race_result",
     "eventVersion": 1,
+    "targetChains": ["solana-devnet"],
     "onchain": {
       "stateChanges": ["wins", "speed_rating"],
       "result": ["winner"]
@@ -39,16 +39,19 @@ Use this table when creating a deployment payload.
 | -------------- | -------- | -------- | ---------------------------------------------------- |
 | `name`         | string   | Yes      | Human-readable name                                  |
 | `description`  | string   | No       | Optional description                                 |
-| `targetChains` | string[] | No       | On-chain oracle targets (see below)                  |
 | `aiModelId`    | string   | No       | AI model to use (default: `openai/gpt-oss-120b`)     |
 | `isLLMPublic`  | boolean  | No       | Whether LLM prompt/response data is publicly visible |
 | `payToAddress` | string   | No       | Receiver wallet (solana) for paid public execution   |
 | `mode`         | enum     | No       | `upgradable` (default) or `locked`                   |
 | `bindings`     | object[] | Yes      | Initial event bindings (array)                      |
+| `bindings[].event` | string   | Yes      | Event name to bind                                 |
+| `bindings[].eventVersion` | number | Yes   | Event version number to bind                       |
+| `bindings[].targetChains` | string[] | No    | On-chain oracle targets (see below) per binding     |
+| `bindings[].onchain` | object | No         | Field filter for on-chain push (per binding)        |
 
 ### Target Chains
 
-Use `targetChains` to choose where execution records are pushed.
+Use `targetChains` on each binding to choose where execution records for that event are pushed.
 
 The `targetChains` field is an array of network-specific chain identifiers. An empty array (default) means no on-chain storage.
 
@@ -59,11 +62,15 @@ The `targetChains` field is an array of network-specific chain identifiers. An e
 | `near-testnet`   | Push to NEAR testnet   | 2048 bytes per field |
 | `near-mainnet`   | Push to NEAR mainnet   | 2048 bytes per field |
 
-You can specify multiple chains:
+You can specify multiple chains per binding:
 
 ```json
 {
-  "targetChains": ["solana-devnet", "near-testnet"]
+  "bindings": [{
+    "event": "race_result",
+    "eventVersion": 1,
+    "targetChains": ["solana-devnet", "near-testnet"]
+  }]
 }
 ```
 
@@ -86,7 +93,7 @@ The `onchain` config controls which fields from `stateChanges` and `result` get 
 ```json
 {
   "bindings": [{
-    "eventId": 1,
+    "event": "race_result",
     "eventVersion": 1,
     "onchain": {
       "stateChanges": ["wins", "speed_rating"],
@@ -156,7 +163,7 @@ A frozen state where no modifications are allowed. **This transition is irrevers
 ### Locking a Deployment
 
 ```http
-POST /api/worlds/:worldId/deployments/:deploymentId/lock
+POST /api/worlds/:worldAddress/deployments/:deploymentAddress/lock
 ```
 
 <Callout type="warning" title="Irreversible Action">
@@ -192,8 +199,8 @@ When creating a deployment with a `sourceDeploymentId`, the system:
 ```json title="Request Body"
 {
   "name": "Season 2",
-  "bindings": [{ "eventId": 1, "eventVersion": 2 }],
-  "sourceDeploymentId": 123
+  "bindings": [{ "event": "race_result", "eventVersion": 2 }],
+  "sourceDeployment": "0x123...abc"
 }
 ```
 

@@ -33,7 +33,7 @@ Each event belongs to a world and has:
 Events are always created with their first version:
 
 ```http title="Request"
-POST /api/worlds/:worldId/events
+POST /api/worlds/:worldAddress/events
 ```
 
 ```json title="Request Body"
@@ -42,7 +42,7 @@ POST /api/worlds/:worldId/events
   "description": "Resolves a race and updates horse statistics",
   "firstVersion": {
     "inputSchema": { "raceId": "string" },
-    "readEntities": [{ "schemaId": 1 }, { "schemaId": 2 }],
+    "readEntities": [{ "schema": "horse" }, { "schema": "jockey" }],
     "stateChanges": { "horse": "partial" },
     "outputSchema": { "winner": "string", "time": "string" },
     "behaviorPrompt": "Determine the race winner based on horse stats.",
@@ -93,7 +93,7 @@ New versions start as drafts. You can modify:
 
 ### Published State
 
-Once published via `POST /api/worlds/:worldId/events/:eventId/event-versions/:version/publish`:
+Once published via `POST /api/worlds/:worldAddress/events/:eventName/event-versions/:version/publish`:
 
 - Version becomes **immutable**
 - Can be bound to deployments
@@ -108,7 +108,7 @@ Once published via `POST /api/worlds/:worldId/events/:eventId/event-versions/:ve
 | Field | Type | Description |
 |-------|------|-------------|
 | `inputSchema` | object | Expected input fields and types |
-| `readEntities` | object[] | Entity schema read config (`schemaId`, optional `filter`) |
+| `readEntities` | object[] | Entity schema read config (`schema`, optional `filter`) |
 | `stateChanges` | object | Per-schema change mode |
 | `outputSchema` | object | Public output structure |
 | `behaviorPrompt` | string | Instructions for AI resolution |
@@ -154,7 +154,7 @@ Example (`direct` mutation):
 {
   "inputSchema": { "winner": "string" },
   "outputSchema": { "winner": "string" },
-  "readEntities": [{ "schemaId": 1 }],
+  "readEntities": [{ "schema": "horse" }],
   "stateChanges": { "horse": "partial" },
   "mutationSettings": {
     "mode": "direct",
@@ -233,7 +233,7 @@ This ensures data consistency when events modify overlapping entities. If a conf
 
 | Value | Meaning |
 |---|---|
-| `admin` | API-key authenticated execution via `/api/worlds/:worldId/deployments/:deploymentId/execute` |
+| `admin` | API-key authenticated execution via `/api/worlds/:worldAddress/deployments/:deploymentAddress/execute` |
 | `public` | Wallet-signed execution via `/app/deployments/:address/execute` |
 | `cron` | Scheduled execution by the background cron executor |
 
@@ -337,13 +337,13 @@ Event: "race_result"
 ## Creating a New Version
 
 ```http title="Request"
-POST /api/worlds/:worldId/events/:eventId/event-versions
+POST /api/worlds/:worldAddress/events/:eventName/event-versions
 ```
 
 ```json title="Request Body"
 {
   "inputSchema": { "raceId": "string", "weather": "string" },
-  "readEntities": [{ "schemaId": 1 }, { "schemaId": 2 }],
+  "readEntities": [{ "schema": "horse" }, { "schema": "jockey" }],
   "stateChanges": { "horse": "partial" },
   "behaviorPrompt": "Consider weather conditions when determining the winner."
 }
@@ -362,9 +362,9 @@ Version numbers auto-increment based on existing versions.
 
 ## API Reference
 
-- `POST /api/worlds/:worldId/events` - Create event with first version
-- `POST /api/worlds/:worldId/events/:eventId/event-versions` - Create additional versions
-- `POST /api/worlds/:worldId/events/:eventId/event-versions/:version/publish` - Publish (make immutable)
+- `POST /api/worlds/:worldAddress/events` - Create event with first version
+- `POST /api/worlds/:worldAddress/events/:eventName/event-versions` - Create additional versions
+- `POST /api/worlds/:worldAddress/events/:eventName/event-versions/:version/publish` - Publish (make immutable)
 
 ## Related Concepts
 

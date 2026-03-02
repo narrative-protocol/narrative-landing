@@ -48,13 +48,13 @@ Define the shape of entities. They are templates, not data containers.
 
 **Attribute Types:**
 
-| Type | Description |
-|------|-------------|
-| `string` | Text values |
-| `integer` | Whole numbers |
-| `float` | Floating-point numbers |
-| `boolean` | True/false values |
-| `json` | Complex nested data |
+| Type      | Description            |
+| --------- | ---------------------- |
+| `string`  | Text values            |
+| `integer` | Whole numbers          |
+| `float`   | Floating-point numbers |
+| `boolean` | True/false values      |
+| `json`    | Complex nested data    |
 
 ### Events
 
@@ -82,10 +82,10 @@ Running instances of a world with their own isolated state.
 
 ```json title="Deployment"
 {
-  "worldId": 1,
+  "worldAddress": "0xd36f777a077ff3825653f6d521f1437b4da69699",
   "name": "Season 1",
   "mode": "upgradable",
-  "bindings": [{ "eventId": 1, "eventVersion": 1 }]
+  "bindings": [{ "event": "race_result", "eventVersion": 1 }]
 }
 ```
 
@@ -95,8 +95,8 @@ Actual data belonging to a deployment. Multiple instances can share a schema.
 
 ```json title="Entity Instance"
 {
-  "deploymentId": 1,
-  "entitySchemaId": 1,
+  "deploymentAddress": "0x123...abc",
+  "entitySchema": "horse",
   "instanceId": "HORSE_1",
   "state": { "name": "Midnight Comet", "speed_rating": 0.85 }
 }

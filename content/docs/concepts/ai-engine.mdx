@@ -10,7 +10,7 @@ Events in Narrative Protocol are executed by an AI engine that computes state ch
 ## Execution Flow
 
 ```
-1. User calls POST /api/worlds/:worldId/deployments/:deploymentId/execute
+1. User calls POST /api/worlds/:worldAddress/deployments/:deploymentAddress/execute
    │
    ▼
 2. System gathers context
@@ -67,23 +67,23 @@ GET /api/ai-models
 ### Setting a Model on Deployment
 
 ```json
-POST /api/worlds/:worldId/deployments
+POST /api/worlds/:worldAddress/deployments
 {
   "name": "Season 1",
   "aiModelId": "openai/gpt-oss-120b",
-  "bindings": [{ "eventId": 1, "eventVersion": 1 }]
+  "bindings": [{ "event": "race_result", "eventVersion": 1 }]
 }
 ```
 
 ## Request Format
 
 ```http
-POST /api/worlds/:worldId/deployments/:deploymentId/execute
+POST /api/worlds/:worldAddress/deployments/:deploymentAddress/execute
 ```
 
 ```json title="Request Body"
 {
-  "eventId": 1,
+  "event": "race_result",
   "input": {
     "raceId": "RACE_2024_001",
     "trackCondition": "wet"

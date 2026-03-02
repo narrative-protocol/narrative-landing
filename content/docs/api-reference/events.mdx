@@ -12,13 +12,13 @@ Event routes are world-scoped.
 ### List Events
 
 ```http
-GET /api/worlds/:worldId/events?page=1&limit=20
+GET /api/worlds/:worldAddress/events?page=1&limit=20
 ```
 
 ### Create Event
 
 ```http
-POST /api/worlds/:worldId/events
+POST /api/worlds/:worldAddress/events
 ```
 
 ```json title="Request Body"
@@ -28,7 +28,7 @@ POST /api/worlds/:worldId/events
   "firstVersion": {
     "inputSchema": { "raceId": "string" },
     "outputSchema": { "winner": "string", "time": "string" },
-    "readEntities": [{ "schemaId": 53 }],
+    "readEntities": [{ "schema": "horse" }],
     "stateChanges": { "horse": "partial" },
     "behaviorPrompt": "Determine the race winner based on horse speed ratings.",
     "mutationSettings": { "mode": "ai" },
@@ -45,7 +45,7 @@ POST /api/worlds/:worldId/events
 | `firstVersion.inputSchema` | `object` | No | Execution input contract. |
 | `firstVersion.outputSchema` | `object` | No | Public result contract. |
 | `firstVersion.readEntities` | `object[]` | No | Read access config. |
-| `firstVersion.readEntities[].schemaId` | `number` | Yes | Entity schema ID to read. |
+| `firstVersion.readEntities[].schema` | `string` | Yes | Entity schema name to read. |
 | `firstVersion.readEntities[].filter` | `string[]` | No | Filter expressions. |
 | `firstVersion.stateChanges` | `object` | No | Per-schema mode map. |
 | `firstVersion.behaviorPrompt` | `string` | No | Prompt for AI mode. |
@@ -59,20 +59,20 @@ POST /api/worlds/:worldId/events
 ### List Event Versions
 
 ```http
-GET /api/worlds/:worldId/events/:eventName/event-versions?page=1&limit=20
+GET /api/worlds/:worldAddress/events/:eventName/event-versions?page=1&limit=20
 ```
 
 ### Create Event Version
 
 ```http
-POST /api/worlds/:worldId/events/:eventName/event-versions
+POST /api/worlds/:worldAddress/events/:eventName/event-versions
 ```
 
 ```json title="Request Body"
 {
   "inputSchema": { "raceId": "string", "weather": "string" },
   "outputSchema": { "winner": "string", "time": "string", "weather": "string" },
-  "readEntities": [{ "schemaId": 53, "filter": ["eq:instanceId:HORSE_1"] }],
+  "readEntities": [{ "schema": "horse", "filter": ["eq:instanceId:HORSE_1"] }],
   "stateChanges": { "horse": "partial" },
   "behaviorPrompt": "Consider weather conditions.",
   "mutationSettings": { "mode": "direct", "template": { "result": { "winner": "{{input.winner}}" } } },
@@ -88,7 +88,7 @@ POST /api/worlds/:worldId/events/:eventName/event-versions
 | `inputSchema` | `object` | No | Execution input contract. |
 | `outputSchema` | `object` | No | Public result contract. |
 | `readEntities` | `object[]` | No | Read access config. |
-| `readEntities[].schemaId` | `number` | Yes | Entity schema ID to read. |
+| `readEntities[].schema` | `string` | Yes | Entity schema name to read. |
 | `readEntities[].filter` | `string[]` | No | Filter expressions. |
 | `stateChanges` | `object` | No | Per-schema mode map (`partial|full|append`). |
 | `behaviorPrompt` | `string` | No | Prompt for AI mode. |
@@ -102,5 +102,5 @@ POST /api/worlds/:worldId/events/:eventName/event-versions
 ### Publish Event Version
 
 ```http
-POST /api/worlds/:worldId/events/:eventName/event-versions/:version/publish
+POST /api/worlds/:worldAddress/events/:eventName/event-versions/:version/publish
 ```

@@ -12,7 +12,7 @@ Entity instance routes are deployment-scoped under worlds.
 ### List Entity Instances
 
 ```http
-GET /api/worlds/:worldId/deployments/:address/entity-instances?entitySchema=horse&page=1&limit=20
+GET /api/worlds/:worldAddress/deployments/:address/entity-instances?entitySchema=horse&page=1&limit=20
 ```
 
 Query parameters:
@@ -21,7 +21,7 @@ Query parameters:
 ### Create Entity Instance
 
 ```http
-POST /api/worlds/:worldId/deployments/:address/entity-instances
+POST /api/worlds/:worldAddress/deployments/:address/entity-instances
 ```
 
 ```json title="Request Body"

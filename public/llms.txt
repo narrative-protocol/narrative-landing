@@ -28,31 +28,31 @@ Narrative Protocol is a World State and Event Engine for defining versioned worl
 > Note: World paths support both numeric ID and hex address.
 
 ### Entity Schemas and Attributes (World-scoped)
-- `GET /api/worlds/:worldId/entity-schemas?page=1&limit=20`
-- `POST /api/worlds/:worldId/entity-schemas`
-- `GET /api/worlds/:worldId/entity-schemas/:schemaName/attributes?page=1&limit=20`
-- `POST /api/worlds/:worldId/entity-schemas/:schemaName/attributes`
-- `GET /api/worlds/:worldId/entity-schemas/:schemaName/attributes/:name`
-- `PUT /api/worlds/:worldId/entity-schemas/:schemaName/attributes/:name`
-- `DELETE /api/worlds/:worldId/entity-schemas/:schemaName/attributes/:name`
+- `GET /api/worlds/:worldAddress/entity-schemas?page=1&limit=20`
+- `POST /api/worlds/:worldAddress/entity-schemas`
+- `GET /api/worlds/:worldAddress/entity-schemas/:schemaName/attributes?page=1&limit=20`
+- `POST /api/worlds/:worldAddress/entity-schemas/:schemaName/attributes`
+- `GET /api/worlds/:worldAddress/entity-schemas/:schemaName/attributes/:name`
+- `PUT /api/worlds/:worldAddress/entity-schemas/:schemaName/attributes/:name`
+- `DELETE /api/worlds/:worldAddress/entity-schemas/:schemaName/attributes/:name`
 
 ### Events and Versions (World-scoped)
-- `GET /api/worlds/:worldId/events?page=1&limit=20`
-- `POST /api/worlds/:worldId/events`
-- `GET /api/worlds/:worldId/events/:eventName/event-versions?page=1&limit=20`
-- `POST /api/worlds/:worldId/events/:eventName/event-versions`
-- `POST /api/worlds/:worldId/events/:eventName/event-versions/:version/publish`
+- `GET /api/worlds/:worldAddress/events?page=1&limit=20`
+- `POST /api/worlds/:worldAddress/events`
+- `GET /api/worlds/:worldAddress/events/:eventName/event-versions?page=1&limit=20`
+- `POST /api/worlds/:worldAddress/events/:eventName/event-versions`
+- `POST /api/worlds/:worldAddress/events/:eventName/event-versions/:version/publish`
 
 ### Deployments (World-scoped)
-- `GET /api/worlds/:worldId/deployments?page=1&limit=20`
-- `POST /api/worlds/:worldId/deployments`
-- `POST /api/worlds/:worldId/deployments/:address/execute`
-- `POST /api/worlds/:worldId/deployments/:address/lock`
-- `GET /api/worlds/:worldId/deployments/:address/history?page=1&limit=10`
-- `GET /api/worlds/:worldId/deployments/:address/event-bindings`
-- `POST /api/worlds/:worldId/deployments/:address/event-bindings`
-- `GET /api/worlds/:worldId/deployments/:address/entity-instances?entitySchema=horse&page=1&limit=20`
-- `POST /api/worlds/:worldId/deployments/:address/entity-instances`
+- `GET /api/worlds/:worldAddress/deployments?page=1&limit=20`
+- `POST /api/worlds/:worldAddress/deployments`
+- `POST /api/worlds/:worldAddress/deployments/:address/execute`
+- `POST /api/worlds/:worldAddress/deployments/:address/lock`
+- `GET /api/worlds/:worldAddress/deployments/:address/history?page=1&limit=10`
+- `GET /api/worlds/:worldAddress/deployments/:address/event-bindings`
+- `POST /api/worlds/:worldAddress/deployments/:address/event-bindings`
+- `GET /api/worlds/:worldAddress/deployments/:address/entity-instances?entitySchema=horse&page=1&limit=20`
+- `POST /api/worlds/:worldAddress/deployments/:address/entity-instances`
 
 ### Public App Execution
 - `POST /app/deployments/:address/execute`
@@ -85,13 +85,13 @@ Events use a mutex lock - an event cannot execute if another event is already ru
 {
   "name": "Season 1",
   "mode": "upgradable",
-  "targetChains": ["near-testnet"],
   "aiModelId": "openai/gpt-oss-120b",
   "isLLMPublic": false,
   "payToAddress": "6Q2...wallet",
   "bindings": [{
     "event": "race_result",
     "eventVersion": 1,
+    "targetChains": ["near-testnet"],
     "onchain": {
       "stateChanges": ["wins", "speed_rating"],
       "result": ["winner"]
@@ -103,8 +103,8 @@ Events use a mutex lock - an event cannot execute if another event is already ru
 
 ## Quick Flow
 1. Create world: `POST /api/worlds`
-2. Create entity schema: `POST /api/worlds/:worldId/entity-schemas`
-3. Create event: `POST /api/worlds/:worldId/events`
-4. Create deployment: `POST /api/worlds/:worldId/deployments`
-5. Create instance: `POST /api/worlds/:worldId/deployments/:deploymentId/entity-instances`
-6. Execute event: `POST /api/worlds/:worldId/deployments/:deploymentId/execute`
+2. Create entity schema: `POST /api/worlds/:worldAddress/entity-schemas`
+3. Create event: `POST /api/worlds/:worldAddress/events`
+4. Create deployment: `POST /api/worlds/:worldAddress/deployments`
+5. Create instance: `POST /api/worlds/:worldAddress/deployments/:deploymentAddress/entity-instances`
+6. Execute event: `POST /api/worlds/:worldAddress/deployments/:deploymentAddress/execute`

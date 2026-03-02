@@ -43,10 +43,12 @@ POST /api/worlds/:worldAddress/events
   "firstVersion": {
     "inputSchema": { "raceId": "string" },
     "readEntities": [{ "schema": "horse" }, { "schema": "jockey" }],
-    "stateChanges": { "horse": "partial" },
+    "stateChangeSchema": { "horse": "partial" },
     "outputSchema": { "winner": "string", "time": "string" },
-    "behaviorPrompt": "Determine the race winner based on horse stats.",
-    "mutationSettings": { "mode": "ai" },
+    "mutationSettings": {
+      "mode": "ai",
+      "behaviorPrompt": "Determine the race winner based on horse stats."
+    },
     "executionSettings": { "visibility": "admin" }
   }
 }
@@ -87,9 +89,9 @@ New versions start as drafts. You can modify:
 
 - `inputSchema` - What data the event accepts
 - `readEntities` - Which entity schemas to read
-- `stateChanges` - How state changes (partial/full/append)
+- `stateChangeSchema` - How state changes (partial/full/append)
 - `outputSchema` - What gets returned publicly
-- `behaviorPrompt` - AI resolution instructions
+- `mutationSettings` - Execution mode and settings (AI prompt or direct template)
 
 ### Published State
 
@@ -109,17 +111,134 @@ Once published via `POST /api/worlds/:worldAddress/events/:eventName/event-versi
 |-------|------|-------------|
 | `inputSchema` | object | Expected input fields and types |
 | `readEntities` | object[] | Entity schema read config (`schema`, optional `filter`) |
-| `stateChanges` | object | Per-schema change mode |
+| `stateChangeSchema` | object | Per-schema change mode (`partial`, `full`, `append`) |
 | `outputSchema` | object | Public output structure |
-| `behaviorPrompt` | string | Instructions for AI resolution |
-| `mutationSettings` | object | Execution mode: `ai` or `direct` (templated) |
+| `mutationSettings` | object | Execution mode settings: `ai` (with `behaviorPrompt`) or `direct` (with `template`) |
 | `executionSettings` | object | Visibility: `admin`, `public`, or `cron` (+ price/cron config) |
+
+## readEntities and Filter
+
+The `readEntities` field in event versions specifies which entity instances to load from the world state. The `filter` array tells the system which specific entity instance IDs to load from the event input.
+
+### Filter Syntax
+
+`filter` is an array of input paths that tells the system which specific entity instance IDs to load from the event input (e.g., `["raceId"]` looks up `eventInput.raceId` to find the target instance).
+
+### Examples
+
+#### 1. Simple input key
+
+Event input:
+```json
+{ "raceId": "RACE_001" }
+```
+
+readEntities config:
+```json
+[
+  { "schemaId": 1, "filter": ["raceId"] }
+]
+```
+
+Loads instances where `instanceId === "RACE_001"`
+
+---
+
+#### 2. Nested input key
+
+Event input:
+```json
+{ "data": { "raceId": "RACE_001" } }
+```
+
+readEntities config:
+```json
+[
+  { "schemaId": 1, "filter": ["data.raceId"] }
+]
+```
+
+Uses dot notation to access nested values
+
+---
+
+#### 3. Multiple filters (OR logic)
+
+Event input:
+```json
+{ "horse1": "HORSE_1", "horse2": "HORSE_2" }
+```
+
+readEntities config:
+```json
+[
+  { "schemaId": 1, "filter": ["horse1", "horse2"] }
+]
+```
+
+Loads both HORSE_1 and HORSE_2 instances
+
+---
+
+#### 4. Schema-prefixed instance IDs
+
+If your instance IDs are prefixed with schema name (e.g., "horse:HORSE_1"), use the schema name in the filter:
+
+Event input:
+```json
+{ "winnerId": "horse:HORSE_1" }
+```
+
+readEntities config:
+```json
+[
+  { "schemaId": 1, "filter": ["winnerId"] }
+]
+```
+
+Matches `instanceId === "horse:HORSE_1"` exactly
+
+---
+
+#### 5. Multiple schemas with different filters
+
+Event input:
+```json
+{ "raceId": "RACE_001", "betId": "BET_001" }
+```
+
+readEntities config:
+```json
+[
+  { "schemaId": 1, "filter": ["raceId"] },
+  { "schemaId": 2, "filter": ["betId"] }
+]
+```
+
+Schema 1 loads race instances, schema 2 loads bet instances
+
+---
+
+#### 6. No filter (load all instances of schema)
+
+```json
+[
+  { "schemaId": 1 }
+]
+```
+
+Loads all instances of schema 1 (useful for listing queries)
 
 ## Mutation Settings
 
 `mutationSettings` controls how entity states are mutated during execution.
 
-State mutation always ends as runtime `stateChanges`, and the version `stateChanges` map decides how those changes apply (`partial`, `full`, `append`).
+State mutation always ends as runtime `stateChanges`, and the version `stateChangeSchema` map decides how those changes apply (`partial`, `full`, `append`).
+
+<Callout type="info" title="Mode-Specific Requirements">
+  - When `mutationSettings.mode` is `"ai"`: `behaviorPrompt` is required, `template` must not be provided
+  - When `mutationSettings.mode` is `"direct"`: `template` is required, `behaviorPrompt` must not be provided
+</Callout>
 
 ### AI Mutation (`mode: "ai"`)
 
@@ -155,7 +274,7 @@ Example (`direct` mutation):
   "inputSchema": { "winner": "string" },
   "outputSchema": { "winner": "string" },
   "readEntities": [{ "schema": "horse" }],
-  "stateChanges": { "horse": "partial" },
+  "stateChangeSchema": { "horse": "partial" },
   "mutationSettings": {
     "mode": "direct",
     "template": {
@@ -308,7 +427,7 @@ Cron input template example:
 
 ### State Change Modes
 
-The `stateChanges` maps entity schema names to change modes:
+The `stateChangeSchema` maps entity schema names to change modes:
 
 ```json title="State Change Schema"
 {
@@ -344,8 +463,11 @@ POST /api/worlds/:worldAddress/events/:eventName/event-versions
 {
   "inputSchema": { "raceId": "string", "weather": "string" },
   "readEntities": [{ "schema": "horse" }, { "schema": "jockey" }],
-  "stateChanges": { "horse": "partial" },
-  "behaviorPrompt": "Consider weather conditions when determining the winner."
+  "stateChangeSchema": { "horse": "partial" },
+  "mutationSettings": {
+    "mode": "ai",
+    "behaviorPrompt": "Consider weather conditions when determining the winner."
+  }
 }
 ```
 

@@ -257,10 +257,9 @@ Events define what can happen in your world.
 
 - `inputSchema`: Defines the input payload expected at execution time.
 - `readEntities`: Lists entity schemas the event can read.
-- `stateChanges`: Per-schema mutation mode (`partial`, `full`, `append`). `partial` merges into existing state, `full` replaces state, and `append` appends to arrays.
+- `stateChangeSchema`: Per-schema mutation mode (`partial`, `full`, `append`). `partial` merges into existing state, `full` replaces state, and `append` appends to arrays.
 - `outputSchema`: Defines the expected public result fields.
-- `behaviorPrompt`: Prompt used by AI mode.
-- `mutationSettings`: Execution mode config (`ai` or `direct`; `direct` uses a template).
+- `mutationSettings`: Execution mode config (`ai` or `direct`; `direct` uses a template). When `mode` is `ai`, `behaviorPrompt` is required. When `mode` is `direct`, `template` is required.
 - `executionSettings`: Execution visibility and triggers (`admin`, `public`, `cron`) with optional `priceUsd` and `cron` config.
 
 For more details, see [Events](/docs/concepts/events).
@@ -282,9 +281,12 @@ For more details, see [Events](/docs/concepts/events).
         "firstVersion": {
           "inputSchema": { "raceId": "string" },
           "readEntities": [{ "schema": "horse" }],
-          "stateChanges": { "horse": "partial" },
+          "stateChangeSchema": { "horse": "partial" },
           "outputSchema": { "winner": "string", "time": "string" },
-          "behaviorPrompt": "Determine the race winner based on horse speed ratings. Update the winner's wins count."
+          "mutationSettings": {
+            "mode": "ai",
+            "behaviorPrompt": "Determine the race winner based on horse speed ratings. Update the winner's wins count."
+          }
         }
       }'
     ```
@@ -303,9 +305,12 @@ For more details, see [Events](/docs/concepts/events).
         firstVersion: {
           inputSchema: { raceId: "string" },
           readEntities: [{ schema: "horse" }],
-          stateChanges: { horse: "partial" },
+          stateChangeSchema: { horse: "partial" },
           outputSchema: { winner: "string", time: "string" },
-          behaviorPrompt: "Determine the race winner based on horse speed ratings. Update the winner's wins count."
+          mutationSettings: {
+            mode: "ai",
+            behaviorPrompt: "Determine the race winner based on horse speed ratings. Update the winner's wins count."
+          }
         }
       })
     });
@@ -328,9 +333,12 @@ For more details, see [Events](/docs/concepts/events).
             "firstVersion": {
                 "inputSchema": { "raceId": "string" },
                 "readEntities": [{ "schema": "horse" }],
-                "stateChanges": { "horse": "partial" },
+                "stateChangeSchema": { "horse": "partial" },
                 "outputSchema": { "winner": "string", "time": "string" },
-                "behaviorPrompt": "Determine the race winner based on horse speed ratings. Update the winner's wins count."
+                "mutationSettings": {
+                    "mode": "ai",
+                    "behaviorPrompt": "Determine the race winner based on horse speed ratings. Update the winner's wins count."
+                }
             }
         }
     )

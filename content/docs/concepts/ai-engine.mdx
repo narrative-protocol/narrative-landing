@@ -16,7 +16,7 @@ Events in Narrative Protocol are executed by an AI engine that computes state ch
 2. System gathers context
    ├── World definition (name, description, tags, promptSeed)
    ├── Current entity states
-   └── Event version config (behaviorPrompt, schemas)
+   └── Event version config (mutationSettings.behaviorPrompt, schemas)
    │
    ▼
 3. AI Engine processes (AI / configurable model)
@@ -162,11 +162,13 @@ The AI engine receives structured context:
 ```json
 {
   "name": "race_result",
-  "behaviorPrompt": "Determine the race winner based on horse stats and conditions.",
   "inputSchema": { "raceId": "string", "trackCondition": "string" },
-  "stateChanges": { "horse": "partial" },
+  "stateChangeSchema": { "horse": "partial" },
   "outputSchema": { "winner": "string", "time": "string" },
-  "mutationSettings": { "mode": "ai" },
+  "mutationSettings": {
+    "mode": "ai",
+    "behaviorPrompt": "Determine the race winner based on horse stats and conditions."
+  },
   "executionSettings": { "visibility": "admin" }
 }
 ```

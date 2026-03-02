@@ -66,8 +66,11 @@ Define what can happen in the world. Events have versioned behavior.
   "description": "Resolves a race",
   "firstVersion": {
     "inputSchema": { "raceId": "string" },
-    "stateChanges": { "horse": "partial" },
-    "behaviorPrompt": "Determine the winner based on horse stats"
+    "stateChangeSchema": { "horse": "partial" },
+    "mutationSettings": {
+      "mode": "ai",
+      "behaviorPrompt": "Determine the winner based on horse stats"
+    }
   }
 }
 ```

@@ -146,7 +146,7 @@ Create event version body:
 {
   "inputSchema": { "raceId": "string", "weather": "string" },
   "outputSchema": { "winner": "string", "time": "string", "weather": "string" },
-  "readEntities": [{ "schema": "horse", "filter": ["eq:instanceId:HORSE_1"] }],
+  "readEntities": [{ "schema": "horse", "filter": ["name"] }],
   "stateChanges": { "horse": "partial" },
   "behaviorPrompt": "Consider weather conditions.",
   "mutationSettings": {

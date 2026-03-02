@@ -37,24 +37,24 @@ POST /api/worlds/:worldAddress/events
 }
 ```
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `name` | `string` | Yes | Event name, unique within world. |
-| `description` | `string` | No | Event description. |
-| `firstVersion` | `object` | Yes | Initial event-version definition. |
-| `firstVersion.inputSchema` | `object` | No | Execution input contract. |
-| `firstVersion.outputSchema` | `object` | No | Public result contract. |
-| `firstVersion.readEntities` | `object[]` | No | Read access config. |
-| `firstVersion.readEntities[].schema` | `string` | Yes | Entity schema name to read. |
-| `firstVersion.readEntities[].filter` | `string[]` | No | Filter expressions. |
-| `firstVersion.stateChanges` | `object` | No | Per-schema mode map. |
-| `firstVersion.behaviorPrompt` | `string` | No | Prompt for AI mode. |
-| `firstVersion.mutationSettings.mode` | `enum` | No | `ai | direct`. |
-| `firstVersion.mutationSettings.template` | `object` | Conditionally | Required when mode is `direct`. |
-| `firstVersion.executionSettings.visibility` | `enum` | No | `admin | public | cron`. |
-| `firstVersion.executionSettings.priceUsd` | `number` | No | Price for public execution. |
-| `firstVersion.executionSettings.cron.schedule` | `string` | Conditionally | Required for cron visibility; must be valid cron. |
-| `firstVersion.executionSettings.cron.input` | `object` | No | Cron input template. |
+| Field                                          | Type       | Required      | Description                                       |
+| ---------------------------------------------- | ---------- | ------------- | ------------------------------------------------- |
+| `name`                                         | `string`   | Yes           | Event name, unique within world.                  |
+| `description`                                  | `string`   | No            | Event description.                                |
+| `firstVersion`                                 | `object`   | Yes           | Initial event-version definition.                 |
+| `firstVersion.inputSchema`                     | `object`   | No            | Execution input contract.                         |
+| `firstVersion.outputSchema`                    | `object`   | No            | Public result contract.                           |
+| `firstVersion.readEntities`                    | `object[]` | No            | Read access config.                               |
+| `firstVersion.readEntities[].schema`           | `string`   | Yes           | Entity schema name to read.                       |
+| `firstVersion.readEntities[].filter`           | `string[]` | No            | Filter expressions (see below).                   |
+| `firstVersion.stateChanges`                    | `object`   | No            | Per-schema mode map.                              |
+| `firstVersion.behaviorPrompt`                  | `string`   | No            | Prompt for AI mode.                               |
+| `firstVersion.mutationSettings.mode`           | `enum`     | No            | `ai` or `direct`.                                 |
+| `firstVersion.mutationSettings.template`       | `object`   | Conditionally | Required when mode is `direct`.                   |
+| `firstVersion.executionSettings.visibility`    | `enum`     | No            | `admin`, `public`, or `cron`.                     |
+| `firstVersion.executionSettings.priceUsd`      | `number`   | No            | Price for public execution.                       |
+| `firstVersion.executionSettings.cron.schedule` | `string`   | Conditionally | Required for cron visibility; must be valid cron. |
+| `firstVersion.executionSettings.cron.input`    | `object`   | No            | Cron input template.                              |
 
 ### List Event Versions
 
@@ -75,7 +75,10 @@ POST /api/worlds/:worldAddress/events/:eventName/event-versions
   "readEntities": [{ "schema": "horse", "filter": ["eq:instanceId:HORSE_1"] }],
   "stateChanges": { "horse": "partial" },
   "behaviorPrompt": "Consider weather conditions.",
-  "mutationSettings": { "mode": "direct", "template": { "result": { "winner": "{{input.winner}}" } } },
+  "mutationSettings": {
+    "mode": "direct",
+    "template": { "result": { "winner": "{{input.winner}}" } }
+  },
   "executionSettings": {
     "visibility": "cron",
     "cron": { "schedule": "*/5 * * * *", "input": { "tick": "{{counter}}" } }
@@ -83,21 +86,102 @@ POST /api/worlds/:worldAddress/events/:eventName/event-versions
 }
 ```
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `inputSchema` | `object` | No | Execution input contract. |
-| `outputSchema` | `object` | No | Public result contract. |
-| `readEntities` | `object[]` | No | Read access config. |
-| `readEntities[].schema` | `string` | Yes | Entity schema name to read. |
-| `readEntities[].filter` | `string[]` | No | Filter expressions. |
-| `stateChanges` | `object` | No | Per-schema mode map (`partial|full|append`). |
-| `behaviorPrompt` | `string` | No | Prompt for AI mode. |
-| `mutationSettings.mode` | `enum` | No | `ai | direct`. |
-| `mutationSettings.template` | `object` | Conditionally | Required when mode is `direct`. |
-| `executionSettings.visibility` | `enum` | No | `admin | public | cron`. |
-| `executionSettings.priceUsd` | `number` | No | Price for public execution. |
-| `executionSettings.cron.schedule` | `string` | Conditionally | Required for cron visibility; must be valid cron. |
-| `executionSettings.cron.input` | `object` | No | Cron input template. |
+| Field                             | Type       | Required      | Description                                        |
+| --------------------------------- | ---------- | ------------- | -------------------------------------------------- |
+| `inputSchema`                     | `object`   | No            | Execution input contract.                          |
+| `outputSchema`                    | `object`   | No            | Public result contract.                            |
+| `readEntities`                    | `object[]` | No            | Read access config.                                |
+| `readEntities[].schema`           | `string`   | Yes           | Entity schema name to read.                        |
+| `readEntities[].filter`           | `string[]` | No            | Filter expressions.                                |
+| `stateChanges`                    | `object`   | No            | Per-schema mode map (`partial`, `full`, `append`). |
+| `behaviorPrompt`                  | `string`   | No            | Prompt for AI mode.                                |
+| `mutationSettings.mode`           | `enum`     | No            | `ai` or `direct`.                                  |
+| `mutationSettings.template`       | `object`   | Conditionally | Required when mode is `direct`.                    |
+| `executionSettings.visibility`    | `enum`     | No            | `admin`, `public`, or `cron`.                      |
+| `executionSettings.priceUsd`      | `number`   | No            | Price for public execution.                        |
+| `executionSettings.cron.schedule` | `string`   | Conditionally | Required for cron visibility; must be valid cron.  |
+| `executionSettings.cron.input`    | `object`   | No            | Cron input template.                               |
+
+### readEntities Filter
+
+The `filter` field in `readEntities` specifies which entity instance IDs to load from the event input.
+
+#### Filter Syntax
+
+`filter` is an array of input paths that tells the system which specific entity instance IDs to load from the event input (e.g., `["raceId"]` looks up `eventInput.raceId` to find the target instance).
+
+#### Examples
+
+**1. Simple input key**
+
+Event input: `{ "raceId": "RACE_001" }`
+
+```json
+[{ "schema": "horse", "filter": ["raceId"] }]
+```
+
+Loads instances where `instanceId === "RACE_001"`
+
+---
+
+**2. Nested input key**
+
+Event input: `{ "data": { "raceId": "RACE_001" } }`
+
+```json
+[{ "schema": "horse", "filter": ["data.raceId"] }]
+```
+
+Uses dot notation to access nested values
+
+---
+
+**3. Multiple filters (OR logic)**
+
+Event input: `{ "horse1": "HORSE_1", "horse2": "HORSE_2" }`
+
+```json
+[{ "schema": "horse", "filter": ["horse1", "horse2"] }]
+```
+
+Loads both HORSE_1 and HORSE_2 instances
+
+---
+
+**4. Schema-prefixed instance IDs**
+
+If instance IDs are prefixed with schema name (e.g., "horse:HORSE_1"):
+
+Event input: `{ "winnerId": "horse:HORSE_1" }`
+
+```json
+[{ "schema": "horse", "filter": ["winnerId"] }]
+```
+
+Matches `instanceId === "horse:HORSE_1"` exactly
+
+---
+
+**5. Multiple schemas with different filters**
+
+Event input: `{ "raceId": "RACE_001", "betId": "BET_001" }`
+
+```json
+[
+  { "schema": "race", "filter": ["raceId"] },
+  { "schema": "bet", "filter": ["betId"] }
+]
+```
+
+---
+
+**6. No filter (load all instances)**
+
+```json
+[{ "schema": "horse" }]
+```
+
+Loads all instances of schema (useful for listing queries)
 
 ### Publish Event Version
 

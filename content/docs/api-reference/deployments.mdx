@@ -121,6 +121,34 @@ POST /api/worlds/:worldAddress/deployments/:address/execute
 POST /api/worlds/:worldAddress/deployments/:address/lock
 ```
 
+### Publish Deployment
+
+```http
+POST /api/worlds/:worldAddress/deployments/:address/publish
+```
+
+Makes the deployment public, enabling public execution. This endpoint is idempotent — calling it on an already public deployment returns success.
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": { "isPublic": true },
+  "message": "Deployment published successfully"
+}
+```
+
+Or if already public:
+
+```json
+{
+  "success": true,
+  "data": { "isPublic": true },
+  "message": "Deployment is already public"
+}
+```
+
 ### List Event History
 
 ```http

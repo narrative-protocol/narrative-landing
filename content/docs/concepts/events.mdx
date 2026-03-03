@@ -56,7 +56,7 @@ POST /api/worlds/:worldAddress/events
 
 ## Event Versioning
 
-Events have versions that become immutable once published. This ensures reproducibility and auditability of state changes over time.
+Events have versions that become immutable once locked. This ensures reproducibility and auditability of state changes over time.
 
 ### Why Versioning?
 
@@ -73,14 +73,14 @@ Without versioning, changing an event would make historical executions impossibl
 ```
 Version 1 (draft)
     │
-    ▼ [publish]
-Version 1 (published) ─── immutable, bound to deployments
+    ▼ [lock]
+Version 1 (locked) ─── immutable, bound to deployments
     │
     ▼ [create new version]
 Version 2 (draft)
     │
-    ▼ [publish]
-Version 2 (published) ─── immutable, can be bound
+    ▼ [lock]
+Version 2 (locked) ─── immutable, can be bound
 ```
 
 ### Draft State
@@ -93,16 +93,16 @@ New versions start as drafts. You can modify:
 - `outputSchema` - What gets returned publicly
 - `mutationSettings` - Execution mode and settings (AI prompt or direct template)
 
-### Published State
+### Locked State
 
-Once published via `POST /api/worlds/:worldAddress/events/:eventName/event-versions/:version/publish`:
+Once locked via `POST /api/worlds/:worldAddress/events/:eventName/event-versions/:version/lock`:
 
 - Version becomes **immutable**
 - Can be bound to deployments
 - Cannot be deleted
 
 <Callout type="warning" title="Irreversible Action">
-  Publishing a version is **permanent**. Once published, the version cannot be modified or deleted. Always test drafts thoroughly before publishing.
+  Locking a version is **permanent**. Once locked, the version cannot be modified or deleted. Always test drafts thoroughly before locking.
 </Callout>
 
 ## Version Fields
@@ -308,7 +308,8 @@ Type behavior:
 
 Operator support (applied against current instance state):
 
-- `$set`: set value directly
+- `$set`: set value directly (replaces entire field)
+- `$merge`: merge object into existing object field (preserves existing keys)
 - `$increment`: increment number (defaults to `+1` if value omitted/non-numeric)
 - `$append`: append item to array
 
@@ -448,9 +449,9 @@ Deployments bind to specific versions. Multiple deployments can use different ve
 
 ```
 Event: "race_result"
-├── Version 1 (published) ─── bound to "Production"
-├── Version 2 (published) ─── bound to "Staging"
-└── Version 3 (draft) ─── not yet published
+├── Version 1 (locked) ─── bound to "Production"
+├── Version 2 (locked) ─── bound to "Staging"
+└── Version 3 (draft) ─── not yet locked
 ```
 
 ## Creating a New Version
@@ -476,17 +477,17 @@ Version numbers auto-increment based on existing versions.
 ## Best Practices
 
 <Callout type="tip" title="Version Management Tips">
-1. **Test drafts thoroughly** before publishing
+1. **Test drafts thoroughly** before locking
 2. **Document changes** in version descriptions
 3. **Use staging deployments** to test new versions
-4. **Never rely on modifying published versions** - create new ones instead
+4. **Never rely on modifying locked versions** - create new ones instead
 </Callout>
 
 ## API Reference
 
 - `POST /api/worlds/:worldAddress/events` - Create event with first version
 - `POST /api/worlds/:worldAddress/events/:eventName/event-versions` - Create additional versions
-- `POST /api/worlds/:worldAddress/events/:eventName/event-versions/:version/publish` - Publish (make immutable)
+- `POST /api/worlds/:worldAddress/events/:eventName/event-versions/:version/lock` - Lock (make immutable)
 
 ## Related Concepts
 

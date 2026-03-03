@@ -143,50 +143,62 @@ Query parameters:
 
 - `event` - Event name (required)
 
-### Create Event Binding
+### Create Event Bindings
 
 ```http
 POST /api/worlds/:worldAddress/deployments/:address/event-bindings
 ```
 
 ```json title="Request Body"
-{
-  "event": "race_result",
-  "eventVersion": 2
-}
+[
+  {
+    "event": "race_result",
+    "eventVersion": 2
+  }
+]
 ```
 
-| Field          | Type     | Required | Description                      |
-| -------------- | -------- | -------- | -------------------------------- |
-| `event`        | `string` | Yes      | Event name to bind.              |
-| `eventVersion` | `number` | Yes      | Relative version number to bind. |
+| Field          | Type       | Required | Description                         |
+| -------------- | ---------- | -------- | ----------------------------------- |
+| `event`        | `string`   | Yes      | Event name to bind.                 |
+| `eventVersion` | `number`   | Yes      | Relative version number to bind.    |
 
-### Update Event Binding
+<Callout type="info">
+  Request body must be an array. Duplicate events are rejected.
+</Callout>
+
+### Update Event Bindings
 
 ```http
 PUT /api/worlds/:worldAddress/deployments/:address/event-bindings
 ```
 
 ```json title="Request Body"
-{
-  "event": "race_result",
-  "eventVersion": 3,
-  "targetChains": ["solana-devnet"],
-  "onchain": {
-    "stateChanges": ["wins"],
-    "result": ["winner"]
+[
+  {
+    "event": "race_result",
+    "eventVersion": 3,
+    "targetChains": ["solana-devnet"],
+    "onchain": {
+      "stateChanges": ["wins"],
+      "result": ["winner"]
+    }
   }
-}
+]
 ```
 
-| Field                  | Type       | Required | Description                       |
-| ---------------------- | ---------- | -------- | --------------------------------- |
-| `event`                | `string`   | Yes      | Event name to update.             |
-| `eventVersion`         | `number`   | No       | New version number to bind.       |
-| `targetChains`         | `enum[]`   | No       | Chain networks for on-chain push. |
-| `onchain`              | `object`   | No       | Field filter for on-chain push.   |
-| `onchain.stateChanges` | `string[]` | No       | Allowed state-change keys.        |
-| `onchain.result`       | `string[]` | No       | Allowed result keys.              |
+| Field                  | Type       | Required | Description                         |
+| ---------------------- | ---------- | -------- | ---------------------------------- |
+| `event`                | `string`   | Yes      | Event name to update.               |
+| `eventVersion`         | `number`   | No       | New version number to bind.         |
+| `targetChains`         | `enum[]`   | No       | Chain networks for on-chain push.   |
+| `onchain`              | `object`   | No       | Field filter for on-chain push.      |
+| `onchain.stateChanges` | `string[]` | No       | Allowed state-change keys.          |
+| `onchain.result`       | `string[]` | No       | Allowed result keys.                |
+
+<Callout type="info">
+  Request body must be an array. Duplicate events are rejected.
+</Callout>
 
 ### Delete Event Binding
 

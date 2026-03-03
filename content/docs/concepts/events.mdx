@@ -299,7 +299,11 @@ Template syntax:
 - `{{input.someKey}}` from execution input
 - `{{walletAddress}}` wallet executing public app route (if present)
 - `{{timestamp}}` execution timestamp (ISO string)
-- `{{date}}`, `{{unix}}`, `{{counter}}`, `{{cronState.someKey}}` (cron context)
+- Cron context variables (available in cron-triggered events):
+  - `{{date}}` — Current date in ISO format (e.g., "2024-01-15")
+  - `{{unix}}` — Current Unix timestamp in seconds
+  - `{{counter}}` — Auto-incrementing counter that persists between cron runs
+  - `{{cronState.key}}` — Access custom state stored from previous executions
 
 Type behavior:
 
@@ -324,6 +328,36 @@ Direct template shape:
   }
 }
 ```
+
+#### Cron Context Example
+
+When executing events via cron, you can use all the context variables to track state across scheduled executions:
+
+```json
+{
+  "executionSettings": {
+    "visibility": "cron",
+    "cron": {
+      "schedule": "0 * * * *",
+      "input": {
+        "currentTime": "{{unix}}",
+        "currentDate": "{{date}}",
+        "runNumber": "{{counter}}",
+        "previousRun": "{{cronState.counter}}"
+      }
+    },
+    "mutations": {
+      "cronTracker:DAILY": {
+        "totalRuns": { "$set": "{{counter}}" },
+        "lastRunTime": { "$set": "{{unix}}" },
+        "previousCounter": { "$set": "{{cronState.counter}}" }
+      }
+    }
+  }
+}
+```
+
+The `counter` increments automatically on each cron execution and persists across runs. Use `{{cronState.counter}}` to access the previous counter value, or store custom state using any key name that will be available in `cronState` for the next execution.
 
 Notes:
 
